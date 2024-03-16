@@ -118,7 +118,40 @@ input:checked + .slider:before
   visibility: visible;
 }
 
+button:disabled,
+    button[disabled] {
+        background-color: grey;
+        color: white;
+        padding: 6px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: not-allowed;
+        float: right;
+        width: 100%;
+        border: 1px solid #04AA6D;
+    }
+    
+button {
+  background-color: #04AA6D;
+  color: white;
+  padding: 6px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  float: right;
+  width: 100%;
+  border: 1px solid #04AA6D;
+} 
+
 input[type=text], select, textarea {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+input[type=password], select, textarea {
   width: 100%;
   padding: 6px;
   border: 1px solid #ccc;
@@ -149,6 +182,18 @@ input[type=radio], select, textarea {
   border-radius: 4px;
   resize: vertical;
 }
+
+input[type=button] {
+  background-color: #04AA6D;
+  color: white;
+  padding: 6px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  float: right;
+  width: 100%;
+  border: 1px solid #04AA6D;
+} 
 
 input[type=submit] {
   background-color: #04AA6D;
@@ -182,6 +227,12 @@ label {
     padding-left: 4px;
 }
 
+.pad-10-lr
+{
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
 /* Clear floats after the columns */
 .row:after {
   content: "";
@@ -213,9 +264,21 @@ label {
   margin-top: 6px;
 }
 
+.col-20 {
+  float: left;
+  width: 20%;
+  margin-top: 6px;
+}
+
 .col-25 {
   float: left;
   width: 25%;
+  margin-top: 6px;
+}
+
+.col-30 {
+  float: left;
+  width: 30%;
   margin-top: 6px;
 }
 
@@ -261,9 +324,15 @@ label {
   margin-top: 6px;
 }
 
+.hiddenitemdiv {
+  padding-left:8px;
+  padding-right:8px;  
+  display:none;
+}
+
 .container {
   background-color: #555;
-  padding: 5px 20px 15px 20px;
+  padding: 5px 10px 15px 10px;
   border: 1px solid lightgrey;
   border-radius: 3px;
 }

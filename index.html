@@ -20,12 +20,13 @@
   
   <div id="connectedLinks">
     <a href="javascript:disconnect()">Disconnect</a>
+    <a id="menuItemLogin" href="javascript:showDiv('loginDiv')">Login</a>
     <a href="javascript:showDiv('statusDiv')">Status</a>
     <a href="javascript:showDiv('commissionDiv')">Commission</a>
     <a href="javascript:showDiv('settingDiv')">Settings</a>
-    <!--a href="javascript:showAlarmLog()">Pressure Alarm</a -->
+    <a href="javascript:showDiv('alarmHistoryDiv')">Alarm History</a>
     <a href="javascript:showDiv('filterDetailsDiv')">Filter Details</a>
-    <!--a href="javascript:showDiv('filterHistory')">Filter History</a-->
+    <a href="javascript:showDiv('filterHistoryDiv')">Filter History</a>
     <a href="javascript:showDiv('contactDiv')">Contact</a>
   </div>
   <a href="javascript:void(0);" class="icon" onclick="toggleMenu()">
@@ -35,7 +36,7 @@
   </a>
 </div>
 
-<div id="connectingDiv" style="padding-left:16px; display:block;">
+<div id="connectingDiv" class="hiddenitemdiv">
   <h3>Connection</h3>
   <div class="container">
     <div class="row">
@@ -49,167 +50,8 @@
   </div>
 </div>
 
-<div id="filterHistory" style="padding-left:16px; display:none;">
-  <h3>Filter History</h3>
-  <div class="container">
-    <div class="row grid-border">
-      <div class="col-15">
-      <label>Date Installed</label>
-      </div>
-      <div class="col-15">
-      <label>Filter</label>
-      </div>
-      <div class="col-25">
-      <label>Part Number</label>
-      </div>      
-      <div class="col-45">
-      <label>Installed By</label>
-      </div>      
-    </div>
-    <div class="row grid-border">
-      <div class="col-15">
-      <label id="flr1c1">01/12/2024</label>
-      </div>
-      <div class="col-15">
-      <label id="flr1c2">HEPA</label>
-      </div>
-      <div class="col-25">
-      <label id="flr1c3">04623787112</label>
-      </div>      
-      <div class="col-45">
-      <label id="flr1c4">Peter Holmes, 01213</label>
-      </div> 
-    </div>
-    <div class="row grid-border">
-      <div class="col-15">
-      <label id="flr2c1"></label>
-      </div>
-      <div class="col-15">
-      <label id="flr2c2"></label>
-      </div>
-      <div class="col-25">
-      <label id="flr2c3"></label>
-      </div>      
-      <div class="col-45">
-      <label id="flr2c4"></label>
-      </div> 
-    </div>
-    <div class="row grid-border">
-      <div class="col-15">
-      <label id="flr3c1"></label>
-      </div>
-      <div class="col-15">
-      <label id="flr3c2"></label>
-      </div>
-      <div class="col-25">
-      <label id="flr3c3"></label>
-      </div>      
-      <div class="col-45">
-      <label id="flr3c4"></label>
-      </div> 
-    </div>
-    <div class="row grid-border">
-      <div class="col-15">
-      <label id="flr4c1"></label>
-      </div>
-      <div class="col-15">
-      <label id="flr4c2"></label>
-      </div>
-      <div class="col-25">
-      <label id="flr4c3"></label>
-      </div>      
-      <div class="col-45">
-      <label id="flr4c4"></label>
-      </div> 
-    </div>
-    <div class="row grid-border">
-      <div class="col-15">
-      <label id="flr5c1"></label>
-      </div>
-      <div class="col-15">
-      <label id="flr5c2"></label>
-      </div>
-      <div class="col-25">
-      <label id="flr5c3"></label>
-      </div>      
-      <div class="col-45">
-      <label id="flr5c4"></label>
-      </div> 
-    </div>
-    <div class="row grid-border">
-      <div class="col-15">
-      <label id="flr6c1"></label>
-      </div>
-      <div class="col-15">
-      <label id="flr6c2"></label>
-      </div>
-      <div class="col-25">
-      <label id="flr6c3"></label>
-      </div>      
-      <div class="col-45">
-      <label id="flr6c4"></label>
-      </div> 
-    </div>
-    <div class="row grid-border">
-      <div class="col-15">
-      <label id="flr7c1"></label>
-      </div>
-      <div class="col-15">
-      <label id="flr7c2"></label>
-      </div>
-      <div class="col-25">
-      <label id="flr7c3"></label>
-      </div>      
-      <div class="col-45">
-      <label id="flr7c4"></label>
-      </div> 
-    </div>
-    <div class="row grid-border">
-      <div class="col-15">
-      <label id="flr8c1"></label>
-      </div>
-      <div class="col-15">
-      <label id="flr8c2"></label>
-      </div>
-      <div class="col-25">
-      <label id="flr8c3"></label>
-      </div>      
-      <div class="col-45">
-      <label id="flr8c4"></label>
-      </div> 
-    </div>
-    <div class="row grid-border">
-      <div class="col-15">
-      <label id="flr9c1"></label>
-      </div>
-      <div class="col-15">
-      <label id="flr9c2"></label>
-      </div>
-      <div class="col-25">
-      <label id="flr9c3"></label>
-      </div>      
-      <div class="col-45">
-      <label id="flr9c4"></label>
-      </div> 
-    </div>
-    <div class="row grid-border">
-      <div class="col-15">
-      <label id="flr10c1"></label>
-      </div>
-      <div class="col-15">
-      <label id="flr10c2"></label>
-      </div>
-      <div class="col-25">
-      <label id="flr10c3"></label>
-      </div>      
-      <div class="col-45">
-      <label id="flr10c4"></label>
-      </div> 
-    </div>
-  </div>
-</div>
 
-<div id="statusDiv" style="padding-left:16px; display:none;">
+<div id="statusDiv" class="hiddenitemdiv">
   <h3>Status</h3>
   <div class="container">
     <form>
@@ -299,7 +141,7 @@
   </div>
 </div>
 
-<div id="filterDetailsDiv" style="padding-left:16px; display:none;">
+<div id="filterDetailsDiv" class="hiddenitemdiv">
   <h3>Replace Filters</h3>
   <div class="container">
     <form>
@@ -356,7 +198,6 @@
   </div>
   <h3>HEPA Filter Details</h3>
   <div class="container">
-    <form id="hepaFilterForm">
     <div class="row">
       <div class="col-35">
         <label>Installed Date</label>
@@ -389,11 +230,9 @@
         <input type="text" id="hepaInstallerId" readonly value="">
       </div>
     </div>
-    </form>
   </div>
   <h3>Main Filter Details</h3>
   <div class="container">
-    <form id="mainFilterForm">
       <div class="row">
         <div class="col-35">
           <label>Installed Date</label>
@@ -426,11 +265,64 @@
           <input type="text" id="mainInstallerId" readonly value="">
         </div>
       </div>
-    </form>
   </div>  
 </div>
 
-<div id="commissionDiv" style="padding-left:16px; display:none;">
+<div id="filterHistoryDiv" class="hiddenitemdiv">
+  <h3>Filter History</h3>
+  <div class="container">
+    <p id="filterHistorydbg"></p>
+    <div class="row">
+      <div class="col-30">
+        <button id="filterHistoryPrior" onclick="gotoFilterRec(-1)">Newer</button>
+      </div>
+      <div class="col-40 pad-10-lr">
+        <input type="text" id="filterHistoryPage" readonly value="1/100">
+      </div>
+      <div class="col-30 units">
+        <button id="filterHistoryNext" onclick="gotoFilterRec(1)">Older</button>
+      </div>
+    </div>
+    <div class="container"  id="filterHistoryDataDiv">
+    </div>
+    <div class="row">
+      <div class="col-70">
+      </div>
+      <div class="col-30 units">
+        <button id="filterHistorySave" onclick="saveFilterRecords()">Save to file</button>
+      </div>
+    </div>
+  </div> 
+</div>
+
+<div id="alarmHistoryDiv" class="hiddenitemdiv">
+  <h3>Alarm History</h3>
+  <div class="container">
+    <p id="alarmHistorydbg"></p>
+    <div class="row">
+      <div class="col-30">
+        <button id="alarmHistoryPrior" onclick="gotoAlarmRec(-1)">Newer</button>
+      </div>
+      <div class="col-40 pad-10-lr">
+        <input type="text" id="alarmHistoryPage" readonly value="1/100">
+      </div>
+      <div class="col-30 units">
+        <button id="alarmHistoryNext" onclick="gotoAlarmRec(1)">Older</button>
+      </div>
+    </div>
+    <div class="container"  id="alarmHistoryDataDiv">
+    </div>
+    <div class="row">
+      <div class="col-70">
+      </div>
+      <div class="col-30 units">
+        <button id="alarmHistorySave" onclick="saveAlarmRecords()">Save to file</button>
+      </div>
+    </div>
+  </div> 
+</div>
+
+<div id="commissionDiv" class="hiddenitemdiv">
   <h3>Commission</h3>
   <div class="container">
     <p id="phdbg1"></p>
@@ -493,7 +385,7 @@
       </div>
       <div class="col-75">
         <label class="switch">
-          <input type="checkbox">
+          <input id="testModeCheckbox" type="checkbox" onclick="testModeClicked()">
           <span class="slider round"></span>
         </label>
       </div>
@@ -501,7 +393,7 @@
   </div>
 </div>
 
-<div id="contactDiv" style="padding-left:16px; display:none;">   
+<div id="contactDiv" class="hiddenitemdiv">   
   <h3>Contact</h3>
   <div class="container">
     <div class="row">
@@ -523,7 +415,7 @@
   </div>
 </div>
 
-<div id="settingDiv" style="padding-left:16px; display:none;">             
+<div id="settingDiv" class="hiddenitemdiv">             
   <h3>Settings</h3>
   <div class="container">
     <form id="settingForm">
@@ -696,6 +588,31 @@
     </form> 
   </div>
 </div>
+
+<div id="loginDiv" class="hiddenitemdiv">             
+  <h3 id="loginDivHeader">Login</h3>
+  <div class="container">
+    <div class="row">
+        <p id="loginDbg"></p>
+    </div>
+    <div class="row" id="loginPasswordRow">
+      <div class="col-35">
+        <label>Password</label>
+      </div>
+      <div class="col-65">
+        <input id="loginPassword" type="password" value=""> 
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-35">
+      </div>
+      <div class="col-65">
+        <input id="loginBtn" type="button" value="Login" onclick="loginClicked()">
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- End smartphone / tablet look -->
 </div>
 
@@ -708,8 +625,6 @@ var phdbgc = 0;
 
 const settingForm = document.querySelector("#settingForm");
 const commissionForm = document.querySelector("#commissionForm");
-const hepaFilterForm = document.querySelector("#hepaFilterForm");
-const mainFilterForm = document.querySelector("#mainFilterForm");
 //const settingSaveBtn = document.querySelector("#settingSaveBtn");
 
 // Settings fields
@@ -731,11 +646,18 @@ const connectingState = document.querySelector("#connectingState");
 
 var selectDisplay;
 var activeLinks;
+var filterHistory;
+var alarmHistory;
+var authorizeControl;
 
 function init()
 {
     selectDisplay = "";
     activeLinks = "idleLinks";
+
+    filterHistory = new filterHistoryClass("filter", 5);
+    alarmHistory = new alarmHistoryClass("alarm", 6);
+    authorizeControl = new authorizeClass();    
 }
 
 settingForm.addEventListener("submit", (event) => 
@@ -743,16 +665,6 @@ settingForm.addEventListener("submit", (event) =>
   event.preventDefault();
   
   sendSettingData();
-});
-
-hepaFilterForm.addEventListener("submit", (event) =>
-{
-  event.preventDefault();
-});
-
-mainFilterForm.addEventListener("submit", (event) =>
-{
-  event.preventDefault();
 });
 
 commissionForm.addEventListener("submit", (event) => 
@@ -807,6 +719,21 @@ function showSelected()
         {
             x.style.display = "block";
         }
+        
+        if (selectDisplay === "filterHistoryDiv")
+        {
+            if (filterHistory)
+            {
+                filterHistory.loadHistoryDiv(0);
+            }
+        }
+        else if (selectDisplay === "alarmHistoryDiv")
+        {
+            if (alarmHistory)
+            {
+                alarmHistory.loadHistoryDiv(0);
+            }
+        }
     }
 }
 
@@ -845,6 +772,8 @@ var BluetoothDevices = [];
 var BluetoothCharacteristics = [];
 var BluetoothConnected = false;
 var TimeHasBeenSet = false;
+var testHasBeenSet = false;
+var testState = false;
 var BluetoothSettingsRead = false;
 var BluetoothCommissionRead = false;
 var BluetoothStatusRead = 0;
@@ -860,6 +789,10 @@ registerBluetoothDataSource(BluetoothDataSources, 2, "0666a01a-035e-4a01-9bd8-77
 registerBluetoothDataSource(BluetoothDataSources, 3, "0666a01a-035e-4a01-9bd8-77b2b56a6bd1", "469cbb22-dc08-4f1a-9e52-2626391ae161", blehandle_rtc);
 registerBluetoothDataSource(BluetoothDataSources, 4, "0666a01b-035e-4a01-9bd8-77b2b56a6bd1", "59bb5014-1e25-4cdb-aab9-c675d7d5b608", blehandle_general);
 registerBluetoothDataSource(BluetoothDataSources, 5, "0666a01b-035e-4a01-9bd8-77b2b56a6bd1", "f8885b19-317b-451c-bb17-ad16498fa694", blehandle_filter);
+registerBluetoothDataSource(BluetoothDataSources, 6, "0666a01b-035e-4a01-9bd8-77b2b56a6bd1", "3df84905-2b48-4223-8588-7f52f8cbb71d", blehandle_alarm);
+registerBluetoothDataSource(BluetoothDataSources, 7, "0666a01a-035e-4a01-9bd8-77b2b56a6bd1", "546a24ea-ec5b-461b-9cce-b9bce932a72c", blehandle_test);
+registerBluetoothDataSource(BluetoothDataSources, 8, "0666a01b-035e-4a01-9bd8-77b2b56a6bd1", "af297289-ad63-457c-bc81-de7db0450df7", blehandle_authorize);
+
 
 
 //Dont forget the RTC
@@ -901,8 +834,14 @@ function connect()
 {
   if (isWebBluetoothEnabled())
   {
+    authorizeControl.restart();
+    
+    testSwitch.checked = false;
+    
     BluetoothConnected = false;
     TimeHasBeenSet = false;
+    testHasBeenSet = false;
+    testState = false;
     BluetoothSettingsRead = false;
     BluetoothCommissionRead = false;
     BluetoothStatusRead = 0;
@@ -987,6 +926,10 @@ var BluetoothReadWait = 0;
 
 function BluetoothPoll()
 {
+  if (authorizeControl)
+  {
+    authorizeControl.tick();
+  }
   if (BluetoothConnected)
   {
     phdbgc++;
@@ -1025,6 +968,27 @@ function BluetoothPoll()
           }
           BluetoothReadWait = 4;
         }
+        else if (!testHasBeenSet)
+        {
+            if (BluetoothCharacteristics[7])
+            {
+                testHasBeenSet = true;
+                BluetoothReadWait = 2;
+                
+                let data = new Uint8Array(1);
+                data[0] = testState ? 1 : 0;
+                
+                BluetoothCharacteristics[7].writeValue(data); 
+                connectingState.innerHTML += "<br>Turning Test Mode off"; 
+            }
+            BluetoothReadWait = 4;
+        }
+        else if (BluetoothCharacteristics[8] &&
+                 authorizeControl &&
+                 authorizeControl.handleActions())
+        {
+            // busy. Wait
+        }
         else
         {
           if (!BluetoothCommissionRead &&                                           //commission
@@ -1035,21 +999,21 @@ function BluetoothPoll()
             BluetoothCharacteristics[0].readValue(); 
           }
           else if (!BluetoothSettingsRead &&                                        //settings
-              BluetoothCharacteristics[1])
+                   BluetoothCharacteristics[1])
           {
             connectingState.innerHTML += "<br>Fetching Setting Data";   
             BluetoothReadWait = 4;
             BluetoothCharacteristics[1].readValue();         
           }
           else if (!BluetoothGeneralRead &&                                         //general
-            BluetoothCharacteristics[4])    
+                   BluetoothCharacteristics[4])    
           {
             connectingState.innerHTML += "<br>Fetching Device Details";   
             BluetoothReadWait = 4;
             BluetoothCharacteristics[4].readValue();         
           }
           else if (BluetoothFilterRead == 0 &&
-            BluetoothCharacteristics[5])
+                   BluetoothCharacteristics[5])
           {
             BluetoothReadWait = 2;
             let data = new Uint8Array(2);
@@ -1059,14 +1023,14 @@ function BluetoothPoll()
             BluetoothCharacteristics[5].writeValue(data); 
           }
           else if (BluetoothFilterRead == 1 &&
-            BluetoothCharacteristics[5])
+                   BluetoothCharacteristics[5])
           {
             connectingState.innerHTML += "<br>Fetching Hepa Filter Details";   
             BluetoothReadWait = 4;
             BluetoothCharacteristics[5].readValue(); 
           }
           else if (BluetoothFilterRead == 2 &&
-            BluetoothCharacteristics[5])
+                   BluetoothCharacteristics[5])
           {
             BluetoothReadWait = 2;
             let data = new Uint8Array(2);
@@ -1076,14 +1040,26 @@ function BluetoothPoll()
             BluetoothCharacteristics[5].writeValue(data); 
           }
           else if (BluetoothFilterRead == 3 &&
-            BluetoothCharacteristics[5])
+                   BluetoothCharacteristics[5])
           {
             connectingState.innerHTML += "<br>Fetching Main Filter Details";   
             BluetoothReadWait = 4;
             BluetoothCharacteristics[5].readValue(); 
           }
+          else if (filterHistory &&
+                   BluetoothCharacteristics[5] && 
+                   filterHistory.handleHistoryLoading())
+          {
+              //busy loading filter history
+          }
+          else if (alarmHistory &&
+                   BluetoothCharacteristics[6] &&
+                   alarmHistory.handleHistoryLoading())
+          {
+                //busy reading alarms
+          }
           else if (BluetoothStatusRead != 1 &&                                          //status
-              BluetoothCharacteristics[2])
+                   BluetoothCharacteristics[2])
           {
             if (BluetoothStatusRead == 0)
             {
@@ -1096,6 +1072,7 @@ function BluetoothPoll()
         if (selectDisplay === "connectingDiv")
         {
           if (TimeHasBeenSet &&
+              testHasBeenSet &&
               BluetoothCommissionRead &&
               BluetoothSettingsRead &&
               BluetoothStatusRead == 1 &&
@@ -1144,8 +1121,6 @@ function getRadioInput(fieldName)
   return 0;
 }
 
-var homeCounter = 0;
-
 function getNowDateForInput()
 {        
   const date = new Date();
@@ -1175,6 +1150,7 @@ const cMachineName = document.querySelector("#cMachineName");
 const cPlantNumber = document.querySelector("#cPlantNumber");
 const cSaveRow = document.querySelector("#cSaveRow");
 const phdbg1 = document.querySelector("#phdbg1");
+var   commissionDataValid = false;
 
 function blehandle_commission(event, bluetoothId)
 {
@@ -1182,12 +1158,11 @@ function blehandle_commission(event, bluetoothId)
   {
     BluetoothCommissionRead = true;
     BluetoothReadWait = 0;
-
+    commissionDataValid = false;
+    
     const decodedValue = new TextDecoder().decode(event.target.value);
 
     const myArray = decodedValue.split("|");
-    
-    let entryDisabled = false;
     
     cSaveRow.style.display = "none";
     if (myArray.length >= 7)
@@ -1199,24 +1174,36 @@ function blehandle_commission(event, bluetoothId)
       cMachineName.value = myArray[5];
       cPlantNumber.value = myArray[6];
 
-      entryDisabled = (myArray[0] === "V");    
+      commissionDataValid = (myArray[0] === "V");    
     }
-    if (!entryDisabled)
+    if (!commissionDataValid)
     {
         cInstalledDate.value = getNowDateForInput();
     }
-    if (homeCounter > 3)
-    {
-      entryDisabled = false;
-    }
-    cSaveRow.style.display = (entryDisabled) ? "none" : "block";
-    //cInstalledDate.readOnly = entryDisabled;
-    cInstallerName.readOnly = entryDisabled;
-    cInstallerPhone.readOnly = entryDisabled;
-    cInstallerCompany.readOnly = entryDisabled;
-    cMachineName.readOnly = entryDisabled;
-    cPlantNumber.readOnly = entryDisabled;
+    authorizeCommission();
   }
+}
+
+function authorizeCommission()
+{
+    let allowed = true;
+    
+    if (commissionDataValid)
+    {
+        allowed = false;
+        if (authorizeControl &&
+            authorizeControl.getAuthorized())
+        {
+            allowed = true;
+        }
+    }
+    cSaveRow.style.display = (!allowed) ? "none" : "block";
+    //cInstalledDate.readOnly = !allowed;
+    cInstallerName.readOnly = !allowed;
+    cInstallerPhone.readOnly = !allowed;
+    cInstallerCompany.readOnly = !allowed;
+    cMachineName.readOnly = !allowed;
+    cPlantNumber.readOnly = !allowed;
 }
 
 function sendCommissionData()
@@ -1300,16 +1287,22 @@ const sMotorTime = document.querySelector("#sMotorTime");
 const sHepaFilterTime = document.querySelector("#sHepaFilterTime");
 const sMainFilterTime = document.querySelector("#sMainFilterTime");
 
+function decodeFanSpeed(fan)
+{
+  let tempFan = (((fan * 100) + 0.5) / 255 >> 0);
+  if (tempFan > 100)
+  {
+    tempFan = 100;
+  }
+  return tempFan;
+}
+
 function blehandle_status(event, bluetoothId)
 {
   BluetoothStatusRead = 1;
   //BluetoothReadWait = 0; always let the timeout expire
   
-  fan = (((event.target.value.getUint8(0) * 100) + 0.5) / 255 >> 0);
-  if (fan > 100)
-  {
-    fan = 100;
-  }
+  fan = decodeFanSpeed(event.target.value.getUint8(0));
   sFanSpeedBar.style.width = fan + '%';
   sFanSpeedBar.innerHTML = fan + '%';
 
@@ -1371,15 +1364,18 @@ function blehandle_rtc(event, bluetoothId)
 {
 }
 
-function home()
+function blehandle_test(event, bluetoothId)
 {
-  homeCounter++;
-  
-  phdbg1.innerHTML = homeCounter;
-  if (homeCounter > 3)
-  {
-    BluetoothCommissionRead = true;
-  }
+}
+
+function blehandle_authorize(event, bluetoothId)
+{
+    BluetoothReadWait = 0;
+    
+    if (authorizeControl)
+    {
+        authorizeControl.processData(event.target.value);
+    }
 }
 
 function blehandle_general(event, bluetoothId)
@@ -1404,38 +1400,70 @@ const mainPartNumber = document.querySelector("#mainPartNumber");
 const mainInstallerName = document.querySelector("#mainInstallerName");
 const mainInstallerId = document.querySelector("#mainInstallerId");
 
-function filterDataValid(data)
+function logDataValid(data)
 {
     return data.getUint8(1) > 0;
 }   
 
-function filterDataDate(data)
+function logDataRecordNum(data)
 {
-    thedate = "20";
-    if (data.getUint8(4) < 10)
-    {
-      thedate += "0";
-    }
-    thedate += data.getUint8(4) + "-";
-    if (data.getUint8(3) < 10)
-    {
-      thedate += "0";
-    }
-    thedate += data.getUint8(3) + "-";
-    if (data.getUint8(2) < 10)
-    {
-      thedate += "0";
-    }
-    thedate += data.getUint8(2);
+    return data.getUint16(2, true);
+}   
+
+function logDataNumOfRecords(data)
+{
+    return data.getUint16(4, true);
+}   
+
+function pad2(num) 
+{
+    var s = "0" + num;
+    return s.substr(s.length - 2);
+}
+
+function logDataDate(data)
+{
+    let theYear = "20" + pad2(data.getUint8(8));   
+    let theMonth = pad2(data.getUint8(7));
+    let theDay = pad2(data.getUint8(6));
     
-    return thedate;
+    let theDate = theYear + "-" + theMonth + "-" + theDay;
+    
+    return theDate;
+}
+
+function logDataTime(data)
+{
+    let theHour = pad2(data.getUint8(9));   
+    let theMinute = pad2(data.getUint8(10));
+    let theSecond = pad2(data.getUint8(11));
+    
+    let theTime = theHour + ":" + theMinute + ":" + theSecond;
+    
+    return theTime;
+}
+
+function filterDataFilterType(data)
+{
+  if (data.getUint8(9) == 0)
+  {
+    return "Hepa Filter";
+  }
+  return "Main Filter";
+}
+
+function filterDataHoursRun(data)
+{
+    mins = data.getUint16(10, true) / 60;
+    
+    return mins.toFixed(1);
 }
 
 function filterDataStrings(data)
 {        
-  thelen = data.getUint8(11);
+  thelen = data.getUint8(12);
         
-  const view2 = new DataView(data.buffer, 12, thelen);
+  const view2 = new DataView(data.buffer, 13, thelen);
   const decodedValue = new TextDecoder().decode(view2);
   return decodedValue.split("|");
 }    
@@ -1443,16 +1471,16 @@ function filterDataStrings(data)
 
 function blehandle_filter(event, bluetoothId)
 {
-    var eventId = event.target.value.getUint8(0);
+    var eventId = event.target.value.getUint8(0);       // this is the message identifier
     
     if (eventId == 1 && BluetoothFilterRead == 1)
     {
       BluetoothFilterRead = 2;
       BluetoothReadWait = 0
 
-      if (filterDataValid(event.target.value))
+      if (logDataValid(event.target.value))
       {
-        hepaInstalledDate.value = filterDataDate(event.target.value);
+        hepaInstalledDate.value = logDataDate(event.target.value);
         const filterStrings = filterDataStrings(event.target.value);
         if (filterStrings.length >= 3)
         {
@@ -1467,9 +1495,9 @@ function blehandle_filter(event, bluetoothId)
       BluetoothFilterRead = 4;
       BluetoothReadWait = 0;
 
-      if (filterDataValid(event.target.value))
+      if (logDataValid(event.target.value))
       {
-        mainInstalledDate.value = filterDataDate(event.target.value);
+        mainInstalledDate.value = logDataDate(event.target.value);
         const filterStrings = filterDataStrings(event.target.value);
         if (filterStrings.length >= 3)
         {
@@ -1478,6 +1506,42 @@ function blehandle_filter(event, bluetoothId)
             mainInstallerId.value = filterStrings[2];
         }
       }
+    }
+    else if (filterHistory &&
+             filterHistory.id == eventId)
+    {
+        // reading the filter history data
+
+        if (filterHistory.readId == 88 ||                // goto first record
+            filterHistory.readId == 99 ||                // goto a specified record
+            filterHistory.readId == 101 ||               // read for history display
+            filterHistory.readId == 102)                 // read for export to file
+        {
+           // Filter record has been received so we can proceed
+           
+           filterHistory.handleRecordRead(event.target.value);
+        }
+    }
+}
+
+function blehandle_alarm(event, bluetoothId)
+{
+    var eventId = event.target.value.getUint8(0);       // this is the message identifier
+
+    if (alarmHistory &&
+        alarmHistory.id == eventId)
+    {
+        // reading the alarm history data
+
+        if (alarmHistory.readId == 88 ||                // goto first record
+            alarmHistory.readId == 99 ||                // goto a specified record
+            alarmHistory.readId == 101 ||               // read for history display
+            alarmHistory.readId == 102)                 // read for export to file
+        {
+           // Alarm record has been received so we can proceed
+           
+           alarmHistory.handleRecordRead(event.target.value);
+        }
     }
 }
 
@@ -1555,6 +1619,717 @@ function filterSave()
         filterInstallerName.value = "";
         filterInstallerId.value = "";                
     }
+}
+
+function showDetailsDiv(frecId)
+{
+    element = document.getElementById(frecId);
+    if (element)
+    {
+        if (element.style.display === "none")
+        {
+            element.style.display = "block";
+        }
+        else
+        {
+            element.style.display = "none";
+        }
+    }
+}
+
+
+class historyClass
+{
+    constructor(historyName, bleIdx)
+    {
+        this.elementDbg = document.getElementById(historyName + "Historydbg");
+        this.elementDataDiv = document.getElementById(historyName + "HistoryDataDiv");
+        this.elementPrior = document.getElementById(historyName + "HistoryPrior");
+        this.elementNext = document.getElementById(historyName + "HistoryNext");
+        this.elementPage = document.getElementById(historyName + "HistoryPage");
+        this.elementSave = document.getElementById(historyName + "HistorySave");
+        this.fileData = "";
+        this.top = 0;
+        this.count = 0;
+        this.id = 10;
+        this.numRecords = 0;
+        this.readId = 0;
+        this.bleIdx = bleIdx;
+        this.fileName = historyName + "-history.txt";
+        this.name = historyName;
+    }
+    
+    setExportFileHeader()
+    {
+        this.fileData = "";
+    }
+    
+    exportRecords()
+    {
+        this.elementDbg.innerHTML = "Exporting data...";
+
+        this.elementNext.disabled = true;    
+        this.elementPrior.disabled = true;
+        this.elementSave.disabled = true;
+
+        this.readId = 88;
+        this.setExportFileHeader();
+    
+        this.id++;
+        if (this.id >= 99)
+        {
+            this.id = 10;
+        }
+        this.count = 2;     // actually a retry count
+    }
+
+    loadHistoryDiv(thePage)
+    {
+        this.elementDbg.innerHTML = "Loading data...";
+
+        this.elementNext.disabled = true;    
+        this.elementPrior.disabled = true;
+        this.elementSave.disabled = true;
+    
+        while (this.elementDataDiv.firstChild) 
+        {
+            this.elementDataDiv.removeChild(this.elementDataDiv.firstChild);
+        }  
+        this.id++;
+        if (this.id >= 99)
+        {
+            this.id = 10;
+        }
+        this.readId = 99;                   // 99 is the goto request
+        this.top = thePage;
+        this.count = 10;
+        this.numRecords = 0;
+    }
+
+    handleHistoryLoading()
+    {
+        let result = false;
+connectingState.innerHTML += "<br>In handleHistoryLoading " + this.readId;    
+        if (this.readId == 88)
+        {
+            // perform a Start command
+        
+            result = true;
+            BluetoothReadWait = 2;
+            let data = new Uint8Array(2);
+    
+            data[0] = this.id;
+            data[1] = 3;
+        
+            this.readId = 89;
+            BluetoothCharacteristics[this.bleIdx].writeValue(data);         
+        }
+        else if (this.readId == 99)
+        {
+            // performing a GOTO record.
+        
+            result = true;
+            BluetoothReadWait = 2;
+            let data = new Uint8Array(4);
+            let tempRec = this.top + 9;
+    
+            data[0] = this.id;
+            data[1] = 0;
+            data[2] = tempRec & 0x00ff;
+            data[3] = (tempRec >> 8) & 0x00ff;
+        
+            this.readId = 100;
+            BluetoothCharacteristics[this.bleIdx].writeValue(data); 
+        }
+        else if (this.readId == 100)
+        {
+            // performing the first read after a GOTO record request
+        
+            result = true;
+            this.readId = 99;                   // if we fail then go back to sending the GOTO request
+            BluetoothReadWait = 4;
+            BluetoothCharacteristics[this.bleIdx].readValue();
+        }
+        else if (this.readId == 89)
+        {
+            // performing the first read after a get First record request
+        
+            result = true;
+            this.readId = 88;                   // if we fail then go back to sending the First request
+            BluetoothReadWait = 4;
+            BluetoothCharacteristics[this.bleIdx].readValue();
+        }
+        else if (this.readId == 101 ||
+                 this.readId == 102)
+        {
+            // the first record after the GOTO had been read, so keep reading until the end
+        
+            if (this.count > 0)
+            {
+                this.count--;
+                result = true;
+                BluetoothReadWait = 4;
+                BluetoothCharacteristics[this.bleIdx].readValue();
+            }
+            else
+            {
+                // 4 is the default finished reading hepa/main filters
+            
+                this.ReadDone();
+            }
+        }
+connectingState.innerHTML += "<br>Leaving " + result;        
+        return result;
+    }
+
+    readDone()
+    {
+        if (this.readId == 102)
+        {
+            var tempLink = document.createElement("a");
+            var taBlob = new Blob([this.fileData], {type: 'text/plain'});
+            tempLink.setAttribute('href', URL.createObjectURL(taBlob));
+            tempLink.setAttribute('download', this.fileName);
+            tempLink.click();
+  
+            URL.revokeObjectURL(tempLink.href);
+            this.fileData = "";
+        }
+    
+        this.readId = 4;
+        if (this.numRecords == 0)
+        {
+            this.elementDbg.innerHTML = "No records found";
+        }
+        else
+        {
+            this.elementDbg.innerHTML = "";
+        }
+
+        this.elementNext.disabled = (this.top + 10) >= this.numRecords;;    
+        this.elementPrior.disabled = this.top == 0;
+        this.elementPage.value = this.top + "/" + this.numRecords;
+        this.elementSave.disabled = false;
+    }    
+    
+    addRowElement(element, theLabel, theValue)
+    {
+        var rowDiv = document.createElement("div");
+        var labelDiv = document.createElement("div");
+        var valueDiv = document.createElement("div");
+    
+        rowDiv.setAttribute("class", "row");
+        labelDiv.setAttribute("class", "col-35");
+        valueDiv.setAttribute("class", "col-65");
+        labelDiv.innerHTML = "<label>" + theLabel + "</label>";
+        valueDiv.innerHTML = "<input type='text' readonly value='" + theValue + "'>";
+    
+        rowDiv.appendChild(labelDiv);
+        rowDiv.appendChild(valueDiv);
+    
+        element.appendChild(rowDiv);
+    }            
+
+    dataValid(data)
+    {
+        return false;
+    }
+    
+    dataRecordNumber(data)
+    {
+        return 0;
+    }
+    
+    dataNumOfRecords(data)
+    {
+        return 0;
+    }
+    
+    dataAddToFileData(data)
+    {
+    }
+    
+    dataAddDetailElements(detailsDiv, data)
+    {
+    }
+    
+    dataDate(data)
+    {
+        return "";
+    }
+    
+    dataRecordType(data)
+    {
+        return "";
+    }
+    
+    handleRecordRead(data)
+    {   
+        if (this.readId == 99)
+        {
+            // we have the first record, and the id was good
+        
+            this.readId = 101;
+        }
+        else if (this.readId == 88)
+        {
+            this.readId = 102;
+        }
+        if (this.readId == 102)
+        {
+            // export to file
+        
+            BluetoothReadWait = 0;
+            this.count = 2;
+            if (this.dataValid(data))
+            {
+                this.elementDbg.innerHTML = "Exporting data ... Record " + this.dataRecordNumber(data);
+           
+                this.dataAddToFileData(data);                                           
+            }
+            else
+            {
+                this.readDone();
+            }
+        }
+        else if (this.readId == 101)
+        {
+            // need to add the record
+
+            BluetoothReadWait = 0;
+        
+            if (this.dataValid(data))
+            {
+                this.elementDbg.innerHTML = "Loading data ... Record " + this.dataRecordNumber(data);
+            
+                this.numRecords = this.dataNumOfRecords(data);
+            
+                // here. Add a new element.
+            
+                var rowDiv = document.createElement("div");
+                var dateDiv = document.createElement("div");
+                var typeDiv = document.createElement("div");
+                var btnDiv = document.createElement("div");
+            
+                var frecId = "frec" + this.name + "Id" + this.dataRecordNumber(data);
+            
+                rowDiv.setAttribute("class", "row");
+                dateDiv.setAttribute("class", "col-30");
+                typeDiv.setAttribute("class", "col-40 units");
+                btnDiv.setAttribute("class", "col-30 units");
+                dateDiv.innerHTML = "<input type='text' readonly value='" + this.dataDate(data) + "'>";
+                typeDiv.innerHTML = "<input type='text' readonly value='" + this.dataRecordType(data) + "'>";
+                btnDiv.innerHTML = "<input type='button' value='Details...' onclick=" + '"' + "showDetailsDiv('" + frecId + "')" + '"' + ">";
+            
+                rowDiv.appendChild(dateDiv);
+                rowDiv.appendChild(typeDiv);
+                rowDiv.appendChild(btnDiv);
+
+                if (this.elementDataDiv.firstChild)
+                {
+                    this.elementDataDiv.insertBefore(rowDiv, this.elementDataDiv.firstChild);
+                }
+                else
+                {
+                    this.elementDataDiv.appendChild(rowDiv);
+                }
+
+                var detailsDiv = document.createElement("div");
+            
+                detailsDiv.setAttribute("class", "container hiddenitemdiv");
+                detailsDiv.setAttribute("id", frecId);
+                
+                this.dataAddDetailElements(detailsDiv, data);
+            
+                rowDiv.appendChild(detailsDiv);
+            
+                detailsDiv.style.display = "none";
+            
+                if (this.dataRecordNumber(data) == this.top)
+                {
+                    this.readDone();
+                }
+            }
+            else
+            {
+                // not valid so finished reading
+           
+                this.readDone();           
+            }
+        }
+    }  
+
+    gotoRecord(rec)
+    {
+        if (rec < 0)
+        {
+            if (this.top > 10)
+            {
+                this.top -= 10;
+            }
+            else
+            {
+                this.top = 0;
+            }
+        }
+        else
+        {
+            this.top += 10;
+            if (this.top >= this.numRecords)
+            {
+                this.top -= 10;
+                if (this.top < 0)
+                {
+                    this.top = 0;
+                }
+            }
+        }
+        this.loadHistoryDiv(this.top)
+    }
+}
+
+class filterHistoryClass extends historyClass
+{
+    setExportFileHeader()
+    {
+        this.fileData = "Date,Filter Type,Hours run,Part Number,Installer Name,Installer Id\r\n";
+    }
+
+    dataValid(data)
+    {
+        return logDataValid(data);
+    }
+    
+    dataRecordNumber(data)
+    {
+        return logDataRecordNum(data);
+    }
+    
+    dataNumOfRecords(data)
+    {
+        return logDataNumOfRecords(data);
+    }
+    
+    dataAddToFileData(data)
+    {
+        this.fileData  += this.dataDate(data) + "," +
+                          this.dataRecordType(data) + "," +
+                          filterDataHoursRun(data) + ",";
+
+        const filterStrings = filterDataStrings(data);
+        if (filterStrings.length >= 3)
+        {
+            this.fileData  += filterStrings[0] + "," +
+                              filterStrings[1] + "," +
+                              filterStrings[2] + "\r\n";
+        }
+        else
+        {
+            this.fileData  += ",,\r\n";
+        }                                           
+    }
+    
+    dataAddDetailElements(detailsDiv, data)
+    {               
+        this.addRowElement(detailsDiv, "Hours Run", filterDataHoursRun(data));
+
+        const filterStrings = filterDataStrings(data);
+        if (filterStrings.length >= 3)
+        {
+            this.addRowElement(detailsDiv, "Part Number", filterStrings[0]);
+            this.addRowElement(detailsDiv, "Installer Name", filterStrings[1]);
+            this.addRowElement(detailsDiv, "Installer Id", filterStrings[2]);
+        }
+    }
+    
+    dataDate(data)
+    {
+        return logDataDate(data);
+    }
+    
+    dataRecordType(data)
+    {
+        return filterDataFilterType(data);
+    }
+}
+
+class alarmHistoryClass extends historyClass
+{
+    setExportFileHeader()
+    {
+        this.fileData = "Date,Pressure Alarm,CO2 Alarm,Door,Fan Speed,Pressure\r\n";
+    }
+        
+    dataValid(data)
+    {
+        return logDataValid(data);
+    }
+    
+    dataRecordNumber(data)
+    {
+        return logDataRecordNum(data);
+    }
+    
+    dataNumOfRecords(data)
+    {
+        return logDataNumOfRecords(data);
+    }
+    
+    dataAddToFileData(data)
+    {
+        this.fileData  += this.dataDate(data) + "," +
+                          this.dataRecordType(data) + "," +
+                          this.dataDoorState(data) + "," +
+                          this.dataFanSpeed(data) + "," +
+                          this.dataPressure(data) + "\r\n";
+    }
+    
+    dataAddDetailElements(detailsDiv, data)
+    {               
+        this.addRowElement(detailsDiv, "Door State", this.dataDoorState(data));
+        this.addRowElement(detailsDiv, "Fan Speed", this.dataFanSpeed(data));
+        this.addRowElement(detailsDiv, "Pressure", this.dataPressure(data));
+    }
+    
+    dataDate(data)
+    {
+        return logDataDate(data) + " " + logDataTime(data);
+    }
+    
+    dataRecordType(data)
+    {
+        if ((data.getUint8(13) & 0x80) == 0x80)
+        {
+            if ((data.getUint8(13) & 0x01) == 0x01)
+            {
+                return "CO2 Active";
+            }
+            return "CO2 Idle";
+        }
+        if ((data.getUint8(12) & 0x01) == 0x01)
+        {
+            return "Alarm Active";
+        }
+        return "Alarm Idle";
+    }
+    
+    dataDoorState(data)
+    {
+        if (data.getUint8(14) == 0)
+        {
+            return "Door Closed";
+        }
+        return "Door Opened";
+    }
+    
+    dataFanSpeed(data)
+    {
+        return decodeFanSpeed(data.getUint8(15));    
+    }
+    
+    dataPressure(data)
+    {
+        return data.getUint16(16, true);
+    }
+}
+
+function gotoFilterRec(recDir)
+{
+    if (filterHistory)
+    {
+        filterHistory.gotoRecord(recDir);
+    }
+}
+
+function gotoAlarmRec(recDir)
+{
+    if (alarmHistory)
+    {
+        alarmHistory.gotoRecord(recDir);
+    }
+}
+
+function saveFilterRecords()
+{
+    if (filterHistory)
+    {
+        filterHistory.exportRecords();
+    }
+}
+
+function saveAlarmRecords()
+{
+    if (alarmHistory)
+    {
+        alarmHistory.exportRecords();
+    }
+}
+
+testSwitch = document.querySelector("#testModeCheckbox");
+
+function testModeClicked()
+{
+    testState = testSwitch.checked;
+    testHasBeenSet = false;    
+}
+
+class authorizeClass
+{
+    constructor()
+    {
+        this.authorized = false;
+        this.sendLogin = false;
+        this.sendPassword = "";
+        this.queryLogin = false;
+        this.count = 0;
+        this.timer = 0;
+        this.elementBtn = document.getElementById("loginBtn");
+        this.elementPassword = document.getElementById("loginPassword");
+        this.elementDbg = document.getElementById("loginDbg");
+        this.elementMenuItem = document.getElementById("menuItemLogin");
+        this.elementHeader = document.getElementById("loginDivHeader");
+        this.elementPasswordDiv = document.getElementById("loginPasswordRow");
+    }
+    
+    handleClicked()
+    {
+        if (!this.authorized)
+        {
+            this.sendPassword = this.elementPassword.value;
+            this.sendLogin = true;
+        }
+        else
+        {
+            this.sendPassword = "";
+            this.sendLogin = true;
+        }
+    }
+    
+    tick()
+    {
+        if (this.timer > 0)
+        {
+            this.timer--;
+            
+            if (this.timer == 0)
+            {
+                this.elementDbg.innerHTML = "";
+            }
+        }
+    }
+    
+    restart()
+    {
+        this.setAuthorized(false);
+        this.sendLogin = true;
+        this.sendPassword = "";
+        this.queryLogin = false;
+        this.elementPassword.value = "";
+    }
+    
+    getAuthorized()
+    {
+        return this.authorized;
+    }
+    
+    setAuthorized(authorized)
+    {
+        if (authorized != this.authorized)
+        {
+            this.authorized = authorized;
+            if (authorized)
+            {
+                this.elementBtn.value = "Logout";  
+                this.elementMenuItem.innerHTML = "Logout";
+                this.elementHeader.innerHTML = "Logout";
+                this.elementPasswordDiv.style.display = "none";
+            }
+            else
+            {
+                this.elementBtn.value = "Login";
+                this.elementMenuItem.innerHTML = "Login";
+                this.elementHeader.innerHTML = "Login";
+                this.elementPasswordDiv.style.display = "block";
+            }
+            this.elementPassword.readOnly = authorized;
+        }
+        authorizeCommission();
+    }
+
+    processData(data)
+    {
+        const decodedValue = new TextDecoder().decode(data);
+        
+        this.queryLogin = false;
+        this.setAuthorized(decodedValue == "Y");    
+        
+        if (this.sendPassword == "")
+        {
+            if (!this.authorized)
+            {
+                this.timer = 5;
+                this.elementDbg.innerHTML = "Successful Logout";                
+            }
+        }
+        else
+        {
+            if (!this.authorized)
+            {
+                this.timer = 5;
+                this.elementDbg.innerHTML = "Login failed";                
+            }
+            else
+            {
+                this.timer = 5;
+                this.elementDbg.innerHTML = "Successful Login"; 
+                this.elementPassword.value = "";
+            }
+        }
+    }    
+    
+    handleActions()
+    {
+        if (this.sendLogin)
+        {
+            this.timer = 5;
+            this.elementDbg.innerHTML = "Trying to Login/Logout";
+            
+            this.sendLogin = false;
+            this.queryLogin = true;
+            this.count = 2;
+            BluetoothReadWait = 2;
+
+            const encodedValue = new TextEncoder().encode(this.sendPassword);
+            BluetoothCharacteristics[8].writeValue(encodedValue); 
+            
+            return true;
+        }
+        
+        if (this.queryLogin)
+        {
+            if (this.count == 0)
+            {
+                this.timer = 5;
+                this.elementDbg.innerHTML = "Login/Logout failed. No response";
+                this.queryLogin = false;
+                this.setAuthorized(false);
+            }
+            else
+            {
+                this.count--;
+                BluetoothReadWait = 4;
+                
+                BluetoothCharacteristics[8].readValue(); 
+            }
+            return true;
+        }
+        return false;
+    }    
+}
+
+function loginClicked()
+{
+    authorizeControl.handleClicked();
 }
 
 </script>
