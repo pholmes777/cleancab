@@ -109,10 +109,10 @@
         <label>Motor</label>
       </div>
       <div class="col-65">
-        <input type="text" id="sMotorTime" name="sMotorTime" readonly value="123">
+        <input type="text" id="sMotorTime" readonly value="123">
       </div>
       <div class="col-5">
-        <label class="units">mins</label>
+        <label class="units">hrs</label>
       </div>
     </div>
     <div class="row">
@@ -120,10 +120,10 @@
         <label>HEPA</label>
       </div>
       <div class="col-65">
-        <input type="text" id="sHepaFilterTime" name="sHepaFilterTime" readonly value="123">
+        <input type="text" id="sHepaFilterTime" readonly value="123">
       </div>
       <div class="col-5">
-        <label class="units">mins</label>
+        <label class="units">hrs</label>
       </div>
     </div>
     <div class="row">
@@ -131,10 +131,10 @@
         <label>Main Filter</label>
       </div>
       <div class="col-65">
-        <input type="text" id="sMainFilterTime" name="sMainFilterTime" readonly value="123">
+        <input type="text" id="sMainFilterTime" readonly value="123">
       </div>
       <div class="col-5">
-        <label class="units">mins</label>
+        <label class="units">hrs</label>
       </div>
     </div>    
     </form>
@@ -332,7 +332,7 @@
           <label>Installed Date</label>
         </div>
         <div class="col-75">
-          <input type="date" id="cInstalledDate" name="cInstalledDate" readonly value="2024-02-18">
+          <input type="date" id="cInstalledDate" readonly value="2024-02-18">
         </div>
       </div>
       <div class="row">
@@ -340,7 +340,7 @@
           <label>Company</label>
         </div>
         <div class="col-75">
-          <input type="text" id="cInstallerCompany" name="cInstallerCompany" readonly value="">
+          <input type="text" id="cInstallerCompany" maxlength="99" readonly value="">
         </div>
       </div>
       <div class="row">
@@ -348,7 +348,7 @@
           <label>Installed By</label>
         </div>
         <div class="col-75">
-          <input type="text" id="cInstallerName" name="cInstallerName" readonly value="">
+          <input type="text" id="cInstallerName" maxlength="99" readonly value="">
         </div>
       </div>
       <div class="row">
@@ -356,7 +356,7 @@
           <label>Contact</label>  
         </div>
         <div class="col-75">
-          <input type="text" id="cInstallerPhone" name="cInstallerPhone" readonly value="">
+          <input type="text" id="cInstallerPhone" maxlength="19" readonly value="">
         </div>
       </div>
       <div class="row">
@@ -364,7 +364,7 @@
           <label>Machine Name</label>
         </div>
         <div class="col-75">
-          <input type="text" id="cMachineName" name="cMachineName" readonly value="">
+          <input type="text" id="cMachineName" maxlength="99" readonly value="">
         </div>
       </div>
       <div class="row">
@@ -372,7 +372,15 @@
           <label>Plant Number</label>
         </div>
         <div class="col-75">
-          <input type="text" id="cPlantNumber" name="cPlantNumber" readonly value="">
+          <input type="text" id="cPlantNumber" maxlength="29" readonly value="">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-25">
+          <label>Plant Hours</label>
+        </div>
+        <div class="col-75">
+          <input type="text" id="cPlantHours" maxlength="9" readonly value="">
         </div>
       </div>
       <div class="row" id="cSaveRow" style="display:none;">
@@ -388,6 +396,90 @@
           <input id="testModeCheckbox" type="checkbox" onclick="testModeClicked()">
           <span class="slider round"></span>
         </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="calibrateDiv" class="hiddenitemdiv">
+  <h3>Calibration</h3>
+  <div class="container">
+    <div class="row">
+        <p id="calDbg"></p>
+    </div>
+    <div class="row">
+      <div class="col-25">
+        <label>ADC Reading</label>
+      </div>
+      <div class="col-65">
+        <div class="row-progress">
+          <div id="calAdcBar" class="container-progress" style="width:10%">10%</div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+        <label>Pressure</label>
+      </div>
+      <div class="col-65">
+        <div class="row-progress">
+          <div id="calPressureBar" class="container-progress" style="width:10%">10%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-25">
+        <label>Real Pressure</label>
+      </div>
+      <div class="col-65">
+        <input type="number" id="calRealPressure" min="0" max="300" value="0">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+      </div>
+      <div class="col-65">
+        <input type="button" value="Set Zero Point" onclick="calibratePoint(1)">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+      </div>
+      <div class="col-65">
+        <input type="button" value="Set Point 2" onclick="calibratePoint(2)">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+      </div>
+      <div class="col-65">
+        <input type="button" value="Clear Data Points" onclick="calibratePoint(0)">
+      </div>
+    </div>
+  </div>
+  <h3>Log Management</h3>
+  <div class="container">
+    <div class="row">
+      <div class="col-25">
+      </div>
+      <div class="col-65">
+        <input type="button" value="Erase Filter Log" onclick="eraseLog(0)">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+      </div>
+      <div class="col-65">
+        <input type="button" value="Erase Alarm Log" onclick="eraseLog(1)">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+      </div>
+      <div class="col-65">
+        <input type="button" value="Erase Running Counts" onclick="eraseLog(2)">
       </div>
     </div>
   </div>
@@ -649,6 +741,7 @@ var activeLinks;
 var filterHistory;
 var alarmHistory;
 var authorizeControl;
+var calibrateControl;
 
 function init()
 {
@@ -658,6 +751,7 @@ function init()
     filterHistory = new filterHistoryClass("filter", 5);
     alarmHistory = new alarmHistoryClass("alarm", 6);
     authorizeControl = new authorizeClass();    
+    calibrateControl = new calibrateClass();
 }
 
 settingForm.addEventListener("submit", (event) => 
@@ -792,6 +886,7 @@ registerBluetoothDataSource(BluetoothDataSources, 5, "0666a01b-035e-4a01-9bd8-77
 registerBluetoothDataSource(BluetoothDataSources, 6, "0666a01b-035e-4a01-9bd8-77b2b56a6bd1", "3df84905-2b48-4223-8588-7f52f8cbb71d", blehandle_alarm);
 registerBluetoothDataSource(BluetoothDataSources, 7, "0666a01a-035e-4a01-9bd8-77b2b56a6bd1", "546a24ea-ec5b-461b-9cce-b9bce932a72c", blehandle_test);
 registerBluetoothDataSource(BluetoothDataSources, 8, "0666a01b-035e-4a01-9bd8-77b2b56a6bd1", "af297289-ad63-457c-bc81-de7db0450df7", blehandle_authorize);
+registerBluetoothDataSource(BluetoothDataSources, 9, "0666a01b-035e-4a01-9bd8-77b2b56a6bd1", "aba886d1-094b-4808-87a8-6d1d73afd8fe", blehandle_calibrate);
 
 
 
@@ -835,6 +930,7 @@ function connect()
   if (isWebBluetoothEnabled())
   {
     authorizeControl.restart();
+    calibrateControl.restart();
     
     testSwitch.checked = false;
     
@@ -930,6 +1026,10 @@ function BluetoothPoll()
   {
     authorizeControl.tick();
   }
+  if (calibrateControl)
+  {
+    calibrateControl.tick();
+  }
   if (BluetoothConnected)
   {
     phdbgc++;
@@ -989,10 +1089,23 @@ function BluetoothPoll()
         {
             // busy. Wait
         }
+        else if (BluetoothCharacteristics[9] &&
+                 calibrateControl &&
+                 calibrateControl.handleActions())
+        {
+            // busy. Wait
+        }                 
         else
         {
-          if (!BluetoothCommissionRead &&                                           //commission
-              BluetoothCharacteristics[0])
+          if (!BluetoothGeneralRead &&                                         //general
+              BluetoothCharacteristics[4])    
+          {
+            connectingState.innerHTML += "<br>Fetching Device Details";   
+            BluetoothReadWait = 4;
+            BluetoothCharacteristics[4].readValue();         
+          }
+          else if (!BluetoothCommissionRead &&                                           //commission
+                   BluetoothCharacteristics[0])
           {
             connectingState.innerHTML += "<br>Fetching Commission Data";   
             BluetoothReadWait = 4;
@@ -1004,13 +1117,6 @@ function BluetoothPoll()
             connectingState.innerHTML += "<br>Fetching Setting Data";   
             BluetoothReadWait = 4;
             BluetoothCharacteristics[1].readValue();         
-          }
-          else if (!BluetoothGeneralRead &&                                         //general
-                   BluetoothCharacteristics[4])    
-          {
-            connectingState.innerHTML += "<br>Fetching Device Details";   
-            BluetoothReadWait = 4;
-            BluetoothCharacteristics[4].readValue();         
           }
           else if (BluetoothFilterRead == 0 &&
                    BluetoothCharacteristics[5])
@@ -1148,6 +1254,7 @@ const cInstallerName = document.querySelector("#cInstallerName");
 const cInstallerPhone = document.querySelector("#cInstallerPhone");
 const cMachineName = document.querySelector("#cMachineName");
 const cPlantNumber = document.querySelector("#cPlantNumber");
+const cPlantHours = document.querySelector("#cPlantHours");
 const cSaveRow = document.querySelector("#cSaveRow");
 const phdbg1 = document.querySelector("#phdbg1");
 var   commissionDataValid = false;
@@ -1173,6 +1280,14 @@ function blehandle_commission(event, bluetoothId)
       cInstallerCompany.value = myArray[4];
       cMachineName.value = myArray[5];
       cPlantNumber.value = myArray[6];
+      if (myArray.length >= 8)
+      {
+        cPlantHours.value = myArray[7];
+      }
+      else
+      {
+        cPlantHours.value = "";
+      }
 
       commissionDataValid = (myArray[0] === "V");    
     }
@@ -1204,6 +1319,7 @@ function authorizeCommission()
     cInstallerCompany.readOnly = !allowed;
     cMachineName.readOnly = !allowed;
     cPlantNumber.readOnly = !allowed;
+    cPlantHours.readOnly = !allowed;
 }
 
 function sendCommissionData()
@@ -1213,7 +1329,8 @@ function sendCommissionData()
           cInstallerPhone.value + "|" +
           cInstallerCompany.value + "|" +
           cMachineName.value + "|" +
-          cPlantNumber.value;
+          cPlantNumber.value + '|' +
+          cPlantHours.value;
 
   BluetoothReadWait = 4;
   
@@ -1297,6 +1414,13 @@ function decodeFanSpeed(fan)
   return tempFan;
 }
 
+function toHours(mins)
+{
+    var hours = mins / 60;
+    
+    return hours.toFixed(1);
+}
+
 function blehandle_status(event, bluetoothId)
 {
   BluetoothStatusRead = 1;
@@ -1355,9 +1479,10 @@ function blehandle_status(event, bluetoothId)
   
   sPressureBar.style.width = pressure + '%';
   sPressureBar.innerHTML = event.target.value.getUint16(4, true) + 'pa';
-  sHepaFilterTime.value = event.target.value.getUint32(6, true)
-  sMainFilterTime.value = event.target.value.getUint32(10, true)
-  sMotorTime.value = event.target.value.getUint32(14, true)
+  
+  sHepaFilterTime.value = toHours(event.target.value.getUint32(6, true));
+  sMainFilterTime.value = toHours(event.target.value.getUint32(10, true));
+  sMotorTime.value = toHours(event.target.value.getUint32(14, true));
 }
 
 function blehandle_rtc(event, bluetoothId)
@@ -1378,15 +1503,39 @@ function blehandle_authorize(event, bluetoothId)
     }
 }
 
+function blehandle_calibrate(event, bluetoothId)
+{
+    BluetoothReadWait = 0;
+    
+    if (calibrateControl)
+    {
+        calibrateControl.processData(event.target.value);
+    }
+}
+
+var protocolVersion = 0;
+
 function blehandle_general(event, bluetoothId)
 {
   if (!BluetoothGeneralRead)
   {
     BluetoothGeneralRead = true;
     BluetoothReadWait = 0;
-    const decodedValue = new TextDecoder().decode(event.target.value);
     
-    connectingState.innerHTML += "<br>Version: " + decodedValue;  
+    if (event.target.value.getUint8(0) == 0)
+    {
+        // this is the new general message
+        
+        protocolVersion = event.target.value.getUint8(1);
+        connectingState.innerHTML += "<br>Version: " + event.target.value.getUint8(6) + "." + pad2(event.target.value.getUint8(7));  
+    }
+    else
+    {
+        protocolVersion = 0;
+        const decodedValue = new TextDecoder().decode(event.target.value);
+    
+        connectingState.innerHTML += "<br>Version: " + decodedValue;  
+    }
   }    
 }
 
@@ -1407,11 +1556,19 @@ function logDataValid(data)
 
 function logDataRecordNum(data)
 {
+    if (protocolVersion == 0)
+    {
+        return 0;
+    }
     return data.getUint16(2, true);
 }   
 
 function logDataNumOfRecords(data)
 {
+    if (protocolVersion == 0)
+    {
+        return 0;
+    }
     return data.getUint16(4, true);
 }   
 
@@ -1421,11 +1578,17 @@ function pad2(num)
     return s.substr(s.length - 2);
 }
 
+// Log data:
+//  Version 0:  id,valid,day,       month,     year,       hour,       min,sec,...
+//  Version 1:  id,valid,rec num lo,rec num hi,num recs lo,num recs hi,day,month,year
+
 function logDataDate(data)
 {
-    let theYear = "20" + pad2(data.getUint8(8));   
-    let theMonth = pad2(data.getUint8(7));
-    let theDay = pad2(data.getUint8(6));
+    let offset = (protocolVersion == 0) ? 2 : 6;            
+    
+    let theDay = pad2(data.getUint8(offset + 0));
+    let theMonth = pad2(data.getUint8(offset + 1));
+    let theYear = "20" + pad2(data.getUint8(offset + 2));   
     
     let theDate = theYear + "-" + theMonth + "-" + theDay;
     
@@ -1434,9 +1597,11 @@ function logDataDate(data)
 
 function logDataTime(data)
 {
-    let theHour = pad2(data.getUint8(9));   
-    let theMinute = pad2(data.getUint8(10));
-    let theSecond = pad2(data.getUint8(11));
+    let offset = (protocolVersion == 0) ? 5 : 9;
+
+    let theHour = pad2(data.getUint8(offset + 0));   
+    let theMinute = pad2(data.getUint8(offset + 1));
+    let theSecond = pad2(data.getUint8(offset + 2));
     
     let theTime = theHour + ":" + theMinute + ":" + theSecond;
     
@@ -1445,34 +1610,39 @@ function logDataTime(data)
 
 function filterDataFilterType(data)
 {
-  if (data.getUint8(9) == 0)
-  {
-    return "Hepa Filter";
-  }
-  return "Main Filter";
+    let offset = (protocolVersion == 0) ? 8 : 9;
+  
+    if (data.getUint8(offset) == 0)
+    {
+        return "Hepa Filter";
+    }
+    return "Main Filter";
 }
 
 function filterDataHoursRun(data)
 {
-    mins = data.getUint16(10, true) / 60;
+    let offset = (protocolVersion == 0) ? 9 : 10;
+
+    mins = data.getUint16(offset, true) / 60;
     
     return mins.toFixed(1);
 }
 
 function filterDataStrings(data)
 {        
-  thelen = data.getUint8(12);
+    let offset = (protocolVersion == 0) ? 11 : 12;
+    thelen = data.getUint8(offset);
         
-  const view2 = new DataView(data.buffer, 13, thelen);
-  const decodedValue = new TextDecoder().decode(view2);
-  return decodedValue.split("|");
+    const view2 = new DataView(data.buffer, offset + 1, thelen);
+    const decodedValue = new TextDecoder().decode(view2);
+    return decodedValue.split("|");
 }    
    
 
 function blehandle_filter(event, bluetoothId)
 {
     var eventId = event.target.value.getUint8(0);       // this is the message identifier
-    
+
     if (eventId == 1 && BluetoothFilterRead == 1)
     {
       BluetoothFilterRead = 2;
@@ -1545,16 +1715,16 @@ function blehandle_alarm(event, bluetoothId)
     }
 }
 
-addingFilter = 0;
-addHepaBtn = document.querySelector("#addHepaBtn");
-addMainBtn = document.querySelector("#addMainBtn");
-filterForm = document.querySelector("#filterForm");
-addHepaDiv = document.querySelector("#addHepaDiv");
-addMainDiv = document.querySelector("#addMainDiv");
+var addingFilter = 0;
+var addHepaBtn = document.querySelector("#addHepaBtn");
+var addMainBtn = document.querySelector("#addMainBtn");
+var filterForm = document.querySelector("#filterForm");
+var addHepaDiv = document.querySelector("#addHepaDiv");
+var addMainDiv = document.querySelector("#addMainDiv");
 
-filterPartNumber = document.querySelector("#filterPartNumber");
-filterInstallerName = document.querySelector("#filterInstallerName");
-filterInstallerId = document.querySelector("#filterInstallerId");
+var filterPartNumber = document.querySelector("#filterPartNumber");
+var filterInstallerName = document.querySelector("#filterInstallerName");
+var filterInstallerId = document.querySelector("#filterInstallerId");
 
 function replaceFilter(filterType)
 {
@@ -1709,7 +1879,7 @@ class historyClass
     handleHistoryLoading()
     {
         let result = false;
-connectingState.innerHTML += "<br>In handleHistoryLoading " + this.readId;    
+
         if (this.readId == 88)
         {
             // perform a Start command
@@ -1778,7 +1948,7 @@ connectingState.innerHTML += "<br>In handleHistoryLoading " + this.readId;
                 this.ReadDone();
             }
         }
-connectingState.innerHTML += "<br>Leaving " + result;        
+
         return result;
     }
 
@@ -2165,7 +2335,7 @@ function saveAlarmRecords()
     }
 }
 
-testSwitch = document.querySelector("#testModeCheckbox");
+var testSwitch = document.querySelector("#testModeCheckbox");
 
 function testModeClicked()
 {
@@ -2189,6 +2359,7 @@ class authorizeClass
         this.elementMenuItem = document.getElementById("menuItemLogin");
         this.elementHeader = document.getElementById("loginDivHeader");
         this.elementPasswordDiv = document.getElementById("loginPasswordRow");
+        this.calibrateMenuItem = 0;
     }
     
     handleClicked()
@@ -2243,6 +2414,15 @@ class authorizeClass
                 this.elementMenuItem.innerHTML = "Logout";
                 this.elementHeader.innerHTML = "Logout";
                 this.elementPasswordDiv.style.display = "none";
+                
+                if (!this.calibrateMenuItem)
+                {
+                    this.calibrateMenuItem = document.createElement("a");
+                    this.calibrateMenuItem.setAttribute("href", "javascript:showDiv('calibrateDiv')");
+                    this.calibrateMenuItem.innerHTML = "Calibrate";
+                
+                    this.elementMenuItem.parentNode.insertBefore(this.calibrateMenuItem, this.elementMenuItem.nextSibling); 
+                }
             }
             else
             {
@@ -2250,6 +2430,12 @@ class authorizeClass
                 this.elementMenuItem.innerHTML = "Login";
                 this.elementHeader.innerHTML = "Login";
                 this.elementPasswordDiv.style.display = "block";
+                
+                if (this.calibrateMenuItem)
+                {
+                    this.calibrateMenuItem.remove();
+                    this.calibrateMenuItem = 0;
+                }
             }
             this.elementPassword.readOnly = authorized;
         }
@@ -2330,6 +2516,195 @@ class authorizeClass
 function loginClicked()
 {
     authorizeControl.handleClicked();
+}
+
+class calibrateClass
+{
+    constructor()
+    {
+        this.elementPressureBar = document.getElementById("calPressureBar");
+        this.elementAdcBar = document.getElementById("calAdcBar");
+        this.elementRealPressure = document.getElementById("calRealPressure");
+        this.elementDbg = document.getElementById("calDbg");
+        
+        this.pressure = 0;
+        this.adc = 0;
+        this.one_pa = 0;
+        this.two_pa = 0;
+        
+        this.send_req = false;
+        this.send_cmd = 0;
+        this.send_idx = 0;
+        this.send_value = 0;
+        this.timer = 0;
+        
+        this.deleteAlarm = false;
+        this.deleteFilter = false;
+    }
+
+    tick()
+    {
+        if (this.timer > 0)
+        {
+            this.timer--;
+            if (this.timer == 0)
+            {
+                this.elementDbg.innerHTML = "";
+            }
+        }
+    }
+    
+    restart()
+    {
+        this.pressure = 0;
+        this.adc = 0;
+        this.one_pa = 0;
+        this.two_pa = 0;
+        
+        this.elementRealPressure.value = "0";
+        this.elementPressureBar.style.width = '0%';
+        this.elementPressureBar.innerHTML = "Not Calibrated";
+        
+        this.elementAdcBar.style.width = '0%';
+        this.elementAdcBar.innerHTML = '0';   
+
+        this.send_req = false;        
+
+        this.deleteAlarm = false;
+        this.deleteFilter = false;
+    }
+
+    processData(data)
+    {
+        if (data.getUint8(0) == 0)
+        {
+            this.one_pa = data.getUint16(1, true);
+            this.two_pa = data.getUint16(3, true);
+            this.adc = data.getUint16(5, true);
+            this.pressure = data.getUint16(7, true);
+
+            let temp = (((this.adc * 100) + 0.5) / 4096 >> 0);
+            if (temp > 100)
+            {
+                temp = 100;
+            }
+            this.elementAdcBar.style.width = temp + '%';
+            this.elementAdcBar.innerHTML = this.adc;
+
+            if (this.pressure == 0xffff)
+            {
+                this.elementPressureBar.style.width = '0%';
+                this.elementPressureBar.innerHTML = "Not Calibrated";
+            }
+            else
+            {
+                let temp = (((this.pressure * 100) + 0.5) / 250 >> 0);
+                if (temp > 100)
+                {
+                    temp = 100;
+                }
+                this.elementPressureBar.style.width = temp + '%';
+                this.elementPressureBar.innerHTML = this.pressure;
+            }
+            
+            if (this.deleteAlarm && (data.getUint8(9) == 0))
+            {
+                this.deleteAlarm = false;
+                this.elementDbg.innerHTML = "Alarm Log Deleted";    
+                this.timer = 5;
+            }
+            if (this.deleteFilter && (data.getUint8(10) == 0))
+            {
+                this.deleteFilter = false;
+                this.elementDbg.innerHTML = "Filter Log Deleted";    
+                this.timer = 5;
+            }
+        }
+    }   
+
+    executeSetCalibrate(thePoint)
+    {  
+        this.send_req = false;
+        this.send_idx = 0;
+        
+        if (thePoint == 0)
+        {    
+            this.send_cmd = 1;          // delete
+        }
+        else
+        {       
+            this.send_cmd = 0;          // set
+            this.send_value = 0;
+            this.send_idx = thePoint - 1;      
+        }
+        
+        this.send_value = this.elementRealPressure.value;      
+        this.send_req = true;
+    }
+    
+    executeEraseLog(theLog)
+    {
+        this.send_req = false;
+        this.send_cmd = theLog + 2;
+        this.send_idx = 0;
+        this.send_value = 0;
+        this.send_req = true;
+    }
+
+    handleActions()
+    {
+        if (this.send_req)
+        {
+            this.send_req = false;
+            BluetoothReadWait = 2;
+
+            const buffer = new ArrayBuffer(24);
+            const view = new DataView(buffer);
+            
+            view.setUint8(0, this.send_cmd);
+            view.setUint8(1, this.send_idx);
+            view.setUint16(2, this.send_value, true);
+            
+            BluetoothCharacteristics[9].writeValue(buffer); 
+            
+            if (this.send_cmd == 2)
+            {
+                this.deleteFilter = true;
+                this.elementDbg.innerHTML = "Deleting Filter Log...";
+            }
+            if (this.send_cmd == 3)
+            {
+                this.deleteAlarm = true;
+                this.elementDbg.innerHTML = "Deleting Alarm Log...";
+            }
+            return true;
+        }
+        
+        if (selectDisplay === "calibrateDiv")
+        {
+            BluetoothReadWait = 4;
+                
+            BluetoothCharacteristics[9].readValue(); 
+            return true;
+        }
+        return false;
+    }    
+}
+
+function calibratePoint(thePoint)
+{
+    if (calibrateControl)
+    {
+        calibrateControl.executeSetCalibrate(thePoint);
+    }                    
+}
+
+function eraseLog(theLog)
+{
+    if (calibrateControl)
+    {
+        calibrateControl.executeEraseLog(theLog);
+    }
 }
 
 </script>
