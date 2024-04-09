@@ -23,7 +23,6 @@
     <a id="menuItemLogin" href="javascript:showDiv('loginDiv')">Login</a>
     <a href="javascript:showDiv('statusDiv')">Status</a>
     <a href="javascript:showDiv('commissionDiv')">Commission</a>
-    <a href="javascript:showDiv('settingDiv')">Settings</a>
     <a href="javascript:showDiv('alarmHistoryDiv')">Alarm History</a>
     <a href="javascript:showDiv('filterDetailsDiv')">Filter Details</a>
     <a href="javascript:showDiv('filterHistoryDiv')">Filter History</a>
@@ -2294,7 +2293,7 @@ class alarmHistoryClass extends historyClass
     
     dataFanSpeed(data)
     {
-        return decodeFanSpeed(data.getUint8(15));    
+        return data.getUint8(15);    
     }
     
     dataPressure(data)
@@ -2360,6 +2359,7 @@ class authorizeClass
         this.elementHeader = document.getElementById("loginDivHeader");
         this.elementPasswordDiv = document.getElementById("loginPasswordRow");
         this.calibrateMenuItem = 0;
+        this.settingMenuItem = 0;
     }
     
     handleClicked()
@@ -2423,6 +2423,14 @@ class authorizeClass
                 
                     this.elementMenuItem.parentNode.insertBefore(this.calibrateMenuItem, this.elementMenuItem.nextSibling); 
                 }
+                if (!this.settingMenuItem)
+                {
+                    this.settingMenuItem = document.createElement("a");
+                    this.settingMenuItem.setAttribute("href", "javascript:showDiv('settingDiv')");
+                    this.settingMenuItem.innerHTML = "Settings";
+                
+                    this.elementMenuItem.parentNode.insertBefore(this.settingMenuItem, this.elementMenuItem.nextSibling); 
+                }
             }
             else
             {
@@ -2435,6 +2443,11 @@ class authorizeClass
                 {
                     this.calibrateMenuItem.remove();
                     this.calibrateMenuItem = 0;
+                }
+                if (this.settingMenuItem)
+                {
+                    this.settingMenuItem.remove();
+                    this.settingMenuItem = 0;
                 }
             }
             this.elementPassword.readOnly = authorized;
