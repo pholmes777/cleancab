@@ -12,7 +12,7 @@
 
 <!-- Top Navigation Menu -->
 <div class="topnav">
-  <a href="#home" class="active">CleanCab</a>
+  <a href="javascript:showDiv('connectingDiv')" class="active">CleanCab</a>
   <div id="idleLinks">
     <a href="javascript:connect()">Connect</a>
     <a href="javascript:showDiv('contactDiv')">Contact</a>
@@ -35,6 +35,17 @@
   </a>
 </div>
 
+<!--div id="debugDiv">
+  <div class="container">
+    <div class="row">
+      <p id="phdbg"></p>
+    </div>
+    <div class="row">
+        <input id="phdbgBtn" type="button" value="Clear" onclick="phdbgClear()" class="btn">
+    </div>
+  </div>
+</div-->
+
 <div id="connectingDiv" class="hiddenitemdiv">
   <h3>Connection</h3>
   <div class="container">
@@ -43,8 +54,8 @@
       </div>
     </div>
     <div class="row">
+      <p id="connectingTicks"></p>
       <p id="connectingState"></p>  
-      <p id="phdbg"></p>
     </div>
   </div>
 </div>
@@ -324,7 +335,6 @@
 <div id="commissionDiv" class="hiddenitemdiv">
   <h3>Commission</h3>
   <div class="container">
-    <p id="phdbg1"></p>
     <form id="commissionForm">
       <div class="row">
         <div class="col-25">
@@ -684,7 +694,11 @@
   <h3 id="loginDivHeader">Login</h3>
   <div class="container">
     <div class="row">
-        <p id="loginDbg"></p>
+      <div class="col-35">
+      </div>
+      <div class="col-65">
+        <label id="loginDbg">Enter login password</label>
+      </div>
     </div>
     <div class="row" id="loginPasswordRow">
       <div class="col-35">
@@ -709,31 +723,27 @@
 
 <script>
 
+//=====================================================
+//
+//      Initialization
+//
+//=====================================================
+
 //const phdbg = document.querySelector("#phdbg");
+//var phdbgc = 0;
+//
+//function phdbgClear()
+//{
+//    phdbg.innerHTML = "";
+//}
 
-const phdbg = document.querySelector("#phdbg");
-var phdbgc = 0;
+const DBG_INFO = 0;
+const DBG_CONNECT = 1;
+const DBG_DEBUG = 2;
 
-const settingForm = document.querySelector("#settingForm");
-const commissionForm = document.querySelector("#commissionForm");
-//const settingSaveBtn = document.querySelector("#settingSaveBtn");
-
-// Settings fields
-const fieldRampRate = document.querySelector("#frampRate");
-const fieldStartPause = document.querySelector("#fstartPause");
-const fieldDoorSpeed = document.querySelector("#fdoorSpeed");
-const fieldFixedSpeed = document.querySelector("#ffixedSpeed");
-const fieldTargetPressure = document.querySelector("#ftargetPressure");
-const fieldMinSpeed = document.querySelector("#fminSpeed");
-const fieldStepSize = document.querySelector("#fstepSize");
-const fieldHoldTime = document.querySelector("#fholdTime");
-// Setting fields radio buttons
-//const fieldModes = document.querySelector("#fmode");
-//const fieldDoorMode = document.querySelector("#fdoorMode");
-//const fieldAlarmMode = document.querySelector("#falarmMode");
-//const fieldCo2Mode = document.querySelector("#fco2Mode");
 
 const connectingState = document.querySelector("#connectingState");
+const connectingTicks = document.querySelector("#connectingTicks");
 
 var selectDisplay;
 var activeLinks;
@@ -746,26 +756,22 @@ function init()
 {
     selectDisplay = "";
     activeLinks = "idleLinks";
-
-    filterHistory = new filterHistoryClass("filter", 5);
-    alarmHistory = new alarmHistoryClass("alarm", 6);
-    authorizeControl = new authorizeClass();    
+    
+    filterHistory = new filterHistoryClass("filter", "Filter");
+    alarmHistory = new alarmHistoryClass("alarm", "Alarm");
+    authorizeControl = new authorizeClass();
     calibrateControl = new calibrateClass();
+    
+    onDisconnected();
+    
+    setTimeout(secondTimer, 500);
 }
 
-settingForm.addEventListener("submit", (event) => 
-{
-  event.preventDefault();
-  
-  sendSettingData();
-});
-
-commissionForm.addEventListener("submit", (event) => 
-{
-  event.preventDefault();
-  
-  sendCommissionData();
-});
+//=====================================================
+//
+//      Menu helper
+//
+//=====================================================
 
 function menuHide()
 {
@@ -840,377 +846,45 @@ function showDiv(divName)
     menuHide();
 }
 
-function handleModeClick(myRadio)
+//===================================================
+//
+//      Helper functions
+//
+//===================================================
+
+function showDetailsDiv(frecId)
 {
-  if (myRadio.value == 0)
-  {
-    fieldFixedSpeed.disabled = false;
-    fieldTargetPressure.disabled = true;
-    fieldMinSpeed.disabled = true;
-    fieldStepSize.disabled = true;
-    fieldHoldTime.disabled = true;
-  }
-  else
-  {
-    fieldFixedSpeed.disabled = true;
-    fieldTargetPressure.disabled = false;
-    fieldMinSpeed.disabled = false;
-    fieldStepSize.disabled = false;
-    fieldHoldTime.disabled = false;  
-  }
-}
-
-var BluetoothDataSources = [];
-var BluetoothDevices = [];
-var BluetoothCharacteristics = [];
-var BluetoothConnected = false;
-var TimeHasBeenSet = false;
-var testHasBeenSet = false;
-var testState = false;
-var BluetoothSettingsRead = false;
-var BluetoothCommissionRead = false;
-var BluetoothStatusRead = 0;
-var BluetoothFilterRead = 0;
-var BluetoothGeneralRead = false;
-var BluetoothDevice;
-
-
-
-registerBluetoothDataSource(BluetoothDataSources, 0, "0666a01a-035e-4a01-9bd8-77b2b56a6bd1", "f31e779c-7729-4073-8319-a0a2f33524ed", blehandle_commission);
-registerBluetoothDataSource(BluetoothDataSources, 1, "0666a01a-035e-4a01-9bd8-77b2b56a6bd1", "3bfa30cb-f9f9-4122-9367-979de74970b6", blehandle_settings);
-registerBluetoothDataSource(BluetoothDataSources, 2, "0666a01a-035e-4a01-9bd8-77b2b56a6bd1", "d65a4ca2-5c9a-43ff-aac3-3091ba7e165b", blehandle_status);
-registerBluetoothDataSource(BluetoothDataSources, 3, "0666a01a-035e-4a01-9bd8-77b2b56a6bd1", "469cbb22-dc08-4f1a-9e52-2626391ae161", blehandle_rtc);
-registerBluetoothDataSource(BluetoothDataSources, 4, "0666a01b-035e-4a01-9bd8-77b2b56a6bd1", "59bb5014-1e25-4cdb-aab9-c675d7d5b608", blehandle_general);
-registerBluetoothDataSource(BluetoothDataSources, 5, "0666a01b-035e-4a01-9bd8-77b2b56a6bd1", "f8885b19-317b-451c-bb17-ad16498fa694", blehandle_filter);
-registerBluetoothDataSource(BluetoothDataSources, 6, "0666a01b-035e-4a01-9bd8-77b2b56a6bd1", "3df84905-2b48-4223-8588-7f52f8cbb71d", blehandle_alarm);
-registerBluetoothDataSource(BluetoothDataSources, 7, "0666a01a-035e-4a01-9bd8-77b2b56a6bd1", "546a24ea-ec5b-461b-9cce-b9bce932a72c", blehandle_test);
-registerBluetoothDataSource(BluetoothDataSources, 8, "0666a01b-035e-4a01-9bd8-77b2b56a6bd1", "af297289-ad63-457c-bc81-de7db0450df7", blehandle_authorize);
-registerBluetoothDataSource(BluetoothDataSources, 9, "0666a01b-035e-4a01-9bd8-77b2b56a6bd1", "aba886d1-094b-4808-87a8-6d1d73afd8fe", blehandle_calibrate);
-
-
-
-//Dont forget the RTC
-
-function registerBluetoothDataSource(BluetoothDataSourcesArray, BluetoothIdx, BluetoothServiceUUID, BluetoothCharacteristicUUID, ValueHandler) 
-{
-  // Appends a data source, parser and target to the data sources list
-  BluetoothDataSourcesArray.push({
-    BluetoothIdx: BluetoothIdx,
-    BluetoothServiceUUID: BluetoothServiceUUID,
-    BluetoothCharacteristicUUID : BluetoothCharacteristicUUID,
-    ValueHandler: ValueHandler});
-};
-
-function isWebBluetoothEnabled() 
-{
-    if (!navigator.bluetooth) 
+    element = document.getElementById(frecId);
+    if (element)
     {
-        menuHide();
-        showDiv("connectingDiv");
-        connectingState.innerHTML = "Web Bluetooth API is not available in this browser/device!";
-        return false
-    }
-    return true
-}
-
-function onDisconnected(event)
-{
-  BluetoothConnected = false;
-  menuHide();
-  activeLinks = "idleLinks";
-  showDiv("connectingDiv");
-  connectingState.innerHTML = "Device disconnected";
-  phdbgc = 0;
-  phdbg.innerHTML = "";
-}
-
-function connect()
-{
-  if (isWebBluetoothEnabled())
-  {
-    authorizeControl.restart();
-    calibrateControl.restart();
-    
-    testSwitch.checked = false;
-    
-    BluetoothConnected = false;
-    TimeHasBeenSet = false;
-    testHasBeenSet = false;
-    testState = false;
-    BluetoothSettingsRead = false;
-    BluetoothCommissionRead = false;
-    BluetoothStatusRead = 0;
-    BluetoothFilterRead = 0;
-    BluetoothGeneralRead = false;
-    
-    menuHide();
-    showDiv("connectingDiv");
-    connectingState.innerHTML = "Connecting...";
-
-    navigator.bluetooth.requestDevice({
-       filters: [{name: 'CLEANCAB'}],
-       optionalServices: ['0666a01a-035e-4a01-9bd8-77b2b56a6bd1', '0666a01b-035e-4a01-9bd8-77b2b56a6bd1']
-     })
-    .then(device => 
-    {
-      
-      device.addEventListener('gattserverdisconnected', onDisconnected); 
-      BluetoothDevice = device;
-      
-      BluetoothDataSources.forEach(source => 
-      {
-        connectBlueToothCharacteristic(device, 
-          source.BluetoothIdx, 
-          source.BluetoothServiceUUID.toLowerCase(), 
-          source.BluetoothCharacteristicUUID.toLowerCase(), 
-          source.ValueHandler); 
-      });
-      setTimeout(BluetoothPoll, 1000);
-      activeLinks = "connectedLinks";
-      connectingState.innerHTML = "Connected";
-      BluetoothConnected = true;
-    })
-    .catch(error => 
-    {
-      connectingState.innerHTML = "Connection Failed: " + error;
-    });
-  }
-}
-
-function disconnect()
-{
-    menuHide();
-    activeLinks = "idleLinks";
-    showDiv("connectingDiv");
-    connectingState.innerHTML = "Disconnected";
-    if (BluetoothConnected)
-    {
-        BluetoothDevice.gatt.disconnect();
-    }
-    phdbgc = 0;
-    phdbg.innerHTML = "";
-    BluetoothConnected = false;    
-}
-
-function connectBlueToothCharacteristic(BluetoothDevice, BluetoothIdx, BluetoothServiceUUID, BluetoothCharacteristicUUID, ValueHandler)
-{
-  BluetoothDevice.gatt.connect()
-      .then(server => 
+        if (element.style.display === "none")
         {
-            return server.getPrimaryService(BluetoothServiceUUID);
-        })
-      .then(service => 
-        {
-            return service.getCharacteristic(BluetoothCharacteristicUUID);
-        })
-      .then(characteristic => 
-        {
-            BluetoothCharacteristics[BluetoothIdx] = characteristic;
-            
-            characteristic.startNotifications();
-            characteristic.addEventListener('characteristicvaluechanged', function(event){ ValueHandler(event, BluetoothIdx) });
-            //return characteristic.readValue();
-        })
-      .catch(error => 
-      {
-         connectingState.innerHTML = error;
-      });
-};
-
-var BluetoothReadWait = 0;
-
-function BluetoothPoll()
-{
-  if (authorizeControl)
-  {
-    authorizeControl.tick();
-  }
-  if (calibrateControl)
-  {
-    calibrateControl.tick();
-  }
-  if (BluetoothConnected)
-  {
-    phdbgc++;
-    phdbg.innerHTML = phdbgc;
-    
-    if (connectingState.innerHTML === "Connecting...")
-    {
-        connectingState.innerHTML="Connected";
-    }
-    if (BluetoothReadWait > 0)
-    {
-      BluetoothReadWait--;
-    }
-    if (BluetoothReadWait <= 0)
-    {
-        if (!TimeHasBeenSet)
-        {
-          if (BluetoothCharacteristics[3])
-          {
-            TimeHasBeenSet = true;
-            BluetoothReadWait = 2;
-          
-            const date = new Date();
-        
-            let data = new Uint8Array(7);
-            data[0] = date.getDate();
-            data[1] = date.getMonth() + 1;
-            data[2] = date.getFullYear() & 0x00ff;
-            data[3] = (date.getFullYear() >> 8) & 0x00ff;
-            data[4] = date.getHours();
-            data[5] = date.getMinutes();
-            data[6] = date.getSeconds();
-            BluetoothCharacteristics[3].writeValue(data); 
-
-            connectingState.innerHTML += "<br>Setting RTC";          
-          }
-          BluetoothReadWait = 4;
+            element.style.display = "block";
         }
-        else if (!testHasBeenSet)
-        {
-            if (BluetoothCharacteristics[7])
-            {
-                testHasBeenSet = true;
-                BluetoothReadWait = 2;
-                
-                let data = new Uint8Array(1);
-                data[0] = testState ? 1 : 0;
-                
-                BluetoothCharacteristics[7].writeValue(data); 
-                connectingState.innerHTML += "<br>Turning Test Mode off"; 
-            }
-            BluetoothReadWait = 4;
-        }
-        else if (BluetoothCharacteristics[8] &&
-                 authorizeControl &&
-                 authorizeControl.handleActions())
-        {
-            // busy. Wait
-        }
-        else if (BluetoothCharacteristics[9] &&
-                 calibrateControl &&
-                 calibrateControl.handleActions())
-        {
-            // busy. Wait
-        }                 
         else
         {
-          if (!BluetoothGeneralRead &&                                         //general
-              BluetoothCharacteristics[4])    
-          {
-            connectingState.innerHTML += "<br>Fetching Device Details";   
-            BluetoothReadWait = 4;
-            BluetoothCharacteristics[4].readValue();         
-          }
-          else if (!BluetoothCommissionRead &&                                           //commission
-                   BluetoothCharacteristics[0])
-          {
-            connectingState.innerHTML += "<br>Fetching Commission Data";   
-            BluetoothReadWait = 4;
-            BluetoothCharacteristics[0].readValue(); 
-          }
-          else if (!BluetoothSettingsRead &&                                        //settings
-                   BluetoothCharacteristics[1])
-          {
-            connectingState.innerHTML += "<br>Fetching Setting Data";   
-            BluetoothReadWait = 4;
-            BluetoothCharacteristics[1].readValue();         
-          }
-          else if (BluetoothFilterRead == 0 &&
-                   BluetoothCharacteristics[5])
-          {
-            BluetoothReadWait = 2;
-            let data = new Uint8Array(2);
-            data[0] = 1;
-            data[1] = 1;
-            BluetoothFilterRead = 1;
-            BluetoothCharacteristics[5].writeValue(data); 
-          }
-          else if (BluetoothFilterRead == 1 &&
-                   BluetoothCharacteristics[5])
-          {
-            connectingState.innerHTML += "<br>Fetching Hepa Filter Details";   
-            BluetoothReadWait = 4;
-            BluetoothCharacteristics[5].readValue(); 
-          }
-          else if (BluetoothFilterRead == 2 &&
-                   BluetoothCharacteristics[5])
-          {
-            BluetoothReadWait = 2;
-            let data = new Uint8Array(2);
-            data[0] = 2;
-            data[1] = 2;
-            BluetoothFilterRead = 3;
-            BluetoothCharacteristics[5].writeValue(data); 
-          }
-          else if (BluetoothFilterRead == 3 &&
-                   BluetoothCharacteristics[5])
-          {
-            connectingState.innerHTML += "<br>Fetching Main Filter Details";   
-            BluetoothReadWait = 4;
-            BluetoothCharacteristics[5].readValue(); 
-          }
-          else if (filterHistory &&
-                   BluetoothCharacteristics[5] && 
-                   filterHistory.handleHistoryLoading())
-          {
-              //busy loading filter history
-          }
-          else if (alarmHistory &&
-                   BluetoothCharacteristics[6] &&
-                   alarmHistory.handleHistoryLoading())
-          {
-                //busy reading alarms
-          }
-          else if (BluetoothStatusRead != 1 &&                                          //status
-                   BluetoothCharacteristics[2])
-          {
-            if (BluetoothStatusRead == 0)
-            {
-              connectingState.innerHTML += "<br>Fetching Status Data";   
-            }
-            BluetoothReadWait = 5;
-            BluetoothCharacteristics[2].readValue();         
-          }        
-        }
-        if (selectDisplay === "connectingDiv")
-        {
-          if (TimeHasBeenSet &&
-              testHasBeenSet &&
-              BluetoothCommissionRead &&
-              BluetoothSettingsRead &&
-              BluetoothStatusRead == 1 &&
-              BluetoothFilterRead == 4 &&
-              BluetoothGeneralRead)      
-          {
-            showDiv("statusDiv");
-          }
+            element.style.display = "none";
         }
     }
- 
-    if (BluetoothReadWait <= 0)
-    {
-      if (selectDisplay === "statusDiv")
-      {
-        BluetoothStatusRead = 2; 
-      }
-    }
-    setTimeout(BluetoothPoll, 200);
-  }
+}
+
+function pad2(num) 
+{
+    var s = "0" + num;
+    return s.substr(s.length - 2);
 }
 
 function setRadioInput(fieldName, selectValue)
 {
-  var radios = document.getElementsByName(fieldName);
-  for (var j = 0; j < radios.length; j++) 
-  {
-    if (radios[j].value == selectValue) 
+    var radios = document.getElementsByName(fieldName);
+    for (var j = 0; j < radios.length; j++) 
     {
-      radios[j].checked = true;
-      break;
+        if (radios[j].value == selectValue) 
+        {
+            radios[j].checked = true;
+            break;
+        }
     }
-  }
 }
 
 function getRadioInput(fieldName)
@@ -1228,190 +902,24 @@ function getRadioInput(fieldName)
 
 function getNowDateForInput()
 {        
-  const date = new Date();
+    const date = new Date();
         
-  thedate = date.getFullYear() + "-";
+    thedate = date.getFullYear() + "-";
         
-  let realMonth = date.getMonth() + 1;
-  if (realMonth < 10)
-  {
-    thedate += '0';
-  }
-  thedate += realMonth + '-';
-  if (date.getDate() < 10)
-  {
-    thedate += '0';
-  }
-  thedate += date.getDate();
-  
-  return thedate;
-}
-     
-const cInstalledDate = document.querySelector("#cInstalledDate");
-const cInstallerCompany = document.querySelector("#cInstallerCompany");
-const cInstallerName = document.querySelector("#cInstallerName");
-const cInstallerPhone = document.querySelector("#cInstallerPhone");
-const cMachineName = document.querySelector("#cMachineName");
-const cPlantNumber = document.querySelector("#cPlantNumber");
-const cPlantHours = document.querySelector("#cPlantHours");
-const cSaveRow = document.querySelector("#cSaveRow");
-const phdbg1 = document.querySelector("#phdbg1");
-var   commissionDataValid = false;
-
-function blehandle_commission(event, bluetoothId)
-{
-  if (!BluetoothCommissionRead)
-  {
-    BluetoothCommissionRead = true;
-    BluetoothReadWait = 0;
-    commissionDataValid = false;
-    
-    const decodedValue = new TextDecoder().decode(event.target.value);
-
-    const myArray = decodedValue.split("|");
-    
-    cSaveRow.style.display = "none";
-    if (myArray.length >= 7)
+    let realMonth = date.getMonth() + 1;
+    if (realMonth < 10)
     {
-      cInstalledDate.value = myArray[1];
-      cInstallerName.value = myArray[2];
-      cInstallerPhone.value = myArray[3];
-      cInstallerCompany.value = myArray[4];
-      cMachineName.value = myArray[5];
-      cPlantNumber.value = myArray[6];
-      if (myArray.length >= 8)
-      {
-        cPlantHours.value = myArray[7];
-      }
-      else
-      {
-        cPlantHours.value = "";
-      }
-
-      commissionDataValid = (myArray[0] === "V");    
+        thedate += '0';
     }
-    if (!commissionDataValid)
+    thedate += realMonth + '-';
+    if (date.getDate() < 10)
     {
-        cInstalledDate.value = getNowDateForInput();
+        thedate += '0';
     }
-    authorizeCommission();
-  }
-}
-
-function authorizeCommission()
-{
-    let allowed = true;
-    
-    if (commissionDataValid)
-    {
-        allowed = false;
-        if (authorizeControl &&
-            authorizeControl.getAuthorized())
-        {
-            allowed = true;
-        }
-    }
-    cSaveRow.style.display = (!allowed) ? "none" : "block";
-    //cInstalledDate.readOnly = !allowed;
-    cInstallerName.readOnly = !allowed;
-    cInstallerPhone.readOnly = !allowed;
-    cInstallerCompany.readOnly = !allowed;
-    cMachineName.readOnly = !allowed;
-    cPlantNumber.readOnly = !allowed;
-    cPlantHours.readOnly = !allowed;
-}
-
-function sendCommissionData()
-{
-  cdata = cInstalledDate.value + "|" +
-          cInstallerName.value + "|" +
-          cInstallerPhone.value + "|" +
-          cInstallerCompany.value + "|" +
-          cMachineName.value + "|" +
-          cPlantNumber.value + '|' +
-          cPlantHours.value;
-
-  BluetoothReadWait = 4;
+    thedate += date.getDate();
   
-  const encodedValue = new TextEncoder().encode(cdata);
-
-  BluetoothCharacteristics[0].writeValue(encodedValue); 
-  
-  BluetoothCommissionRead = false;
-}
-
-
-function blehandle_settings(event, bluetoothId)
-{
-  if (!BluetoothSettingsRead)
-  {
-    BluetoothSettingsRead = true;
-    BluetoothReadWait = 0;
-    
-    var mode = event.target.value.getUint16(0, true);
-    setRadioInput("fmode", event.target.value.getUint16(0, true));
-    fieldRampRate.value = event.target.value.getUint16(2, true);
-    fieldFixedSpeed.value = event.target.value.getUint16(4, true);
-    fieldDoorSpeed.value = event.target.value.getUint16(6, true);
-    fieldMinSpeed.value = event.target.value.getUint16(8, true);
-    fieldTargetPressure.value = event.target.value.getUint16(10, true);
-    fieldStepSize.value = event.target.value.getUint16(12, true);
-    fieldHoldTime.value = event.target.value.getUint16(14, true);
-    fieldStartPause.value = event.target.value.getUint16(16, true);
-    setRadioInput("fdoorMode", event.target.value.getUint16(18, true));
-    setRadioInput("falarmMode", event.target.value.getUint16(20, true));
-    setRadioInput("fco2Mode", event.target.value.getUint16(22, true));
-    
-    fieldFixedSpeed.disabled = mode == 1;
-    fieldTargetPressure.disabled = mode == 0;
-    fieldMinSpeed.disabled = mode == 0;
-    fieldStepSize.disabled = mode == 0;
-    fieldHoldTime.disabled = mode == 0;
-  }  
-}
-
-function sendSettingData()
-{
-  const buffer = new ArrayBuffer(24);
-  const view = new DataView(buffer);
-
-  BluetoothReadWait = 4;
-  view.setUint16( 0, getRadioInput("fmode"), true);
-  view.setUint16( 2, fieldRampRate.value, true);
-  view.setUint16( 4, fieldFixedSpeed.value, true);
-  view.setUint16( 6, fieldDoorSpeed.value, true);
-  view.setUint16( 8, fieldMinSpeed.value, true);
-  view.setUint16(10, fieldTargetPressure.value, true);
-  view.setUint16(12, fieldStepSize.value, true);
-  view.setUint16(14, fieldHoldTime.value, true);
-  view.setUint16(16, fieldStartPause.value, true);
-  view.setUint16(18, getRadioInput("fdoorMode"), true);
-  view.setUint16(20, getRadioInput("falarmMode"), true);
-  view.setUint16(22, getRadioInput("fco2Mode"), true);
-  
-  BluetoothCharacteristics[1].writeValue(buffer); 
-  
-  BluetoothSettingsRead = false;
-}
-
-const sFanSpeedBar = document.querySelector("#sFanSpeedBar");
-const sPressureBar = document.querySelector("#sPressureBar");
-const sDoorState = document.querySelector("#sDoorState");
-const sAlarmState = document.querySelector("#sAlarmState");
-const sCO2State = document.querySelector("#sCO2State");
-const sMotorTime = document.querySelector("#sMotorTime");
-const sHepaFilterTime = document.querySelector("#sHepaFilterTime");
-const sMainFilterTime = document.querySelector("#sMainFilterTime");
-
-function decodeFanSpeed(fan)
-{
-  let tempFan = (((fan * 100) + 0.5) / 255 >> 0);
-  if (tempFan > 100)
-  {
-    tempFan = 100;
-  }
-  return tempFan;
-}
+    return thedate;
+}    
 
 function toHours(mins)
 {
@@ -1420,133 +928,13 @@ function toHours(mins)
     return hours.toFixed(1);
 }
 
-function blehandle_status(event, bluetoothId)
-{
-  BluetoothStatusRead = 1;
-  //BluetoothReadWait = 0; always let the timeout expire
-  
-  fan = decodeFanSpeed(event.target.value.getUint8(0));
-  sFanSpeedBar.style.width = fan + '%';
-  sFanSpeedBar.innerHTML = fan + '%';
+//==========================================================
+//
+//          Log reader base class (aka History)
+//
+//==========================================================
 
-  if (event.target.value.getUint8(1) == 3)
-  {
-    sDoorState.value = "Disabled";
-  } 
-  else if (event.target.value.getUint8(1) == 0)  
-  {
-    sDoorState.value = "Closed";
-  }
-  else
-  {
-    sDoorState.value = "Opened";
-  }
-
-  if (event.target.value.getUint8(2) == 3)
-  {
-    sAlarmState.value = "Disabled";
-  } 
-  else if (event.target.value.getUint8(2) == 0)  
-  {
-    sAlarmState.value = "Inactive";
-  }
-  else
-  {
-    sAlarmState.value = "Alarmed";
-  }
-
-  if (event.target.value.getUint8(3) == 3)
-  {
-    sCO2State.value = "Disabled";
-  } 
-  else if (event.target.value.getUint8(3) == 0)  
-  {
-    sCO2State.value = "Inactive";
-  }
-  else
-  {
-    sCO2State.value = "Alarmed";
-  }
-  
-  //NOTE: With the pressure. need to scale to 100% (ie choose a range and if greater the set to 100)
-
-  pressure = (event.target.value.getUint16(4, true) / 2 >> 0);
-  if (pressure > 100)
-  {
-    pressure = 100;
-  }
-  
-  sPressureBar.style.width = pressure + '%';
-  sPressureBar.innerHTML = event.target.value.getUint16(4, true) + 'pa';
-  
-  sHepaFilterTime.value = toHours(event.target.value.getUint32(6, true));
-  sMainFilterTime.value = toHours(event.target.value.getUint32(10, true));
-  sMotorTime.value = toHours(event.target.value.getUint32(14, true));
-}
-
-function blehandle_rtc(event, bluetoothId)
-{
-}
-
-function blehandle_test(event, bluetoothId)
-{
-}
-
-function blehandle_authorize(event, bluetoothId)
-{
-    BluetoothReadWait = 0;
-    
-    if (authorizeControl)
-    {
-        authorizeControl.processData(event.target.value);
-    }
-}
-
-function blehandle_calibrate(event, bluetoothId)
-{
-    BluetoothReadWait = 0;
-    
-    if (calibrateControl)
-    {
-        calibrateControl.processData(event.target.value);
-    }
-}
-
-var protocolVersion = 0;
-
-function blehandle_general(event, bluetoothId)
-{
-  if (!BluetoothGeneralRead)
-  {
-    BluetoothGeneralRead = true;
-    BluetoothReadWait = 0;
-    
-    if (event.target.value.getUint8(0) == 0)
-    {
-        // this is the new general message
-        
-        protocolVersion = event.target.value.getUint8(1);
-        connectingState.innerHTML += "<br>Version: " + event.target.value.getUint8(6) + "." + pad2(event.target.value.getUint8(7));  
-    }
-    else
-    {
-        protocolVersion = 0;
-        const decodedValue = new TextDecoder().decode(event.target.value);
-    
-        connectingState.innerHTML += "<br>Version: " + decodedValue;  
-    }
-  }    
-}
-
-const hepaInstalledDate = document.querySelector("#hepaInstalledDate");
-const hepaPartNumber = document.querySelector("#hepaPartNumber");
-const hepaInstallerName = document.querySelector("#hepaInstallerName");
-const hepaInstallerId = document.querySelector("#hepaInstallerId");
-
-const mainInstalledDate = document.querySelector("#mainInstalledDate");
-const mainPartNumber = document.querySelector("#mainPartNumber");
-const mainInstallerName = document.querySelector("#mainInstallerName");
-const mainInstallerId = document.querySelector("#mainInstallerId");
+// Log helper functions
 
 function logDataValid(data)
 {
@@ -1571,11 +959,6 @@ function logDataNumOfRecords(data)
     return data.getUint16(4, true);
 }   
 
-function pad2(num) 
-{
-    var s = "0" + num;
-    return s.substr(s.length - 2);
-}
 
 // Log data:
 //  Version 0:  id,valid,day,       month,     year,       hour,       min,sec,...
@@ -1607,209 +990,11 @@ function logDataTime(data)
     return theTime;
 }
 
-function filterDataFilterType(data)
-{
-    let offset = (protocolVersion == 0) ? 8 : 9;
-  
-    if (data.getUint8(offset) == 0)
-    {
-        return "Hepa Filter";
-    }
-    return "Main Filter";
-}
-
-function filterDataHoursRun(data)
-{
-    let offset = (protocolVersion == 0) ? 9 : 10;
-
-    mins = data.getUint16(offset, true) / 60;
-    
-    return mins.toFixed(1);
-}
-
-function filterDataStrings(data)
-{        
-    let offset = (protocolVersion == 0) ? 11 : 12;
-    thelen = data.getUint8(offset);
-        
-    const view2 = new DataView(data.buffer, offset + 1, thelen);
-    const decodedValue = new TextDecoder().decode(view2);
-    return decodedValue.split("|");
-}    
-   
-
-function blehandle_filter(event, bluetoothId)
-{
-    var eventId = event.target.value.getUint8(0);       // this is the message identifier
-
-    if (eventId == 1 && BluetoothFilterRead == 1)
-    {
-      BluetoothFilterRead = 2;
-      BluetoothReadWait = 0
-
-      if (logDataValid(event.target.value))
-      {
-        hepaInstalledDate.value = logDataDate(event.target.value);
-        const filterStrings = filterDataStrings(event.target.value);
-        if (filterStrings.length >= 3)
-        {
-            hepaPartNumber.value = filterStrings[0];
-            hepaInstallerName.value = filterStrings[1];
-            hepaInstallerId.value = filterStrings[2];
-        }
-      }
-    }
-    else if (eventId == 2 && BluetoothFilterRead == 3)
-    {
-      BluetoothFilterRead = 4;
-      BluetoothReadWait = 0;
-
-      if (logDataValid(event.target.value))
-      {
-        mainInstalledDate.value = logDataDate(event.target.value);
-        const filterStrings = filterDataStrings(event.target.value);
-        if (filterStrings.length >= 3)
-        {
-            mainPartNumber.value = filterStrings[0];
-            mainInstallerName.value = filterStrings[1];
-            mainInstallerId.value = filterStrings[2];
-        }
-      }
-    }
-    else if (filterHistory &&
-             filterHistory.id == eventId)
-    {
-        // reading the filter history data
-
-        if (filterHistory.readId == 88 ||                // goto first record
-            filterHistory.readId == 99 ||                // goto a specified record
-            filterHistory.readId == 101 ||               // read for history display
-            filterHistory.readId == 102)                 // read for export to file
-        {
-           // Filter record has been received so we can proceed
-           
-           filterHistory.handleRecordRead(event.target.value);
-        }
-    }
-}
-
-function blehandle_alarm(event, bluetoothId)
-{
-    var eventId = event.target.value.getUint8(0);       // this is the message identifier
-
-    if (alarmHistory &&
-        alarmHistory.id == eventId)
-    {
-        // reading the alarm history data
-
-        if (alarmHistory.readId == 88 ||                // goto first record
-            alarmHistory.readId == 99 ||                // goto a specified record
-            alarmHistory.readId == 101 ||               // read for history display
-            alarmHistory.readId == 102)                 // read for export to file
-        {
-           // Alarm record has been received so we can proceed
-           
-           alarmHistory.handleRecordRead(event.target.value);
-        }
-    }
-}
-
-var addingFilter = 0;
-var addHepaBtn = document.querySelector("#addHepaBtn");
-var addMainBtn = document.querySelector("#addMainBtn");
-var filterForm = document.querySelector("#filterForm");
-var addHepaDiv = document.querySelector("#addHepaDiv");
-var addMainDiv = document.querySelector("#addMainDiv");
-
-var filterPartNumber = document.querySelector("#filterPartNumber");
-var filterInstallerName = document.querySelector("#filterInstallerName");
-var filterInstallerId = document.querySelector("#filterInstallerId");
-
-function replaceFilter(filterType)
-{
-  if (addingFilter == filterType)
-  {
-    // hide the form
-    
-    addHepaBtn.value = "Replace";
-    addMainBtn.value = "Replace";
-    addingFilter = 0;
-    filterForm.style.display="none";
-  }
-  else if (addingFilter == 0)
-  {
-    addingFilter = filterType;
-    if (filterType == 1)
-        addHepaBtn.value = "Cancel Replace";
-    if (filterType == 2)
-        addMainBtn.value = "Cancel Replace";
-    filterForm.style.display="block";
-  }
-  addMainBtn.disabled = addingFilter == 1;
-  addHepaBtn.disabled = addingFilter == 2;
-  addHepaDiv.style.display = (addingFilter != 2) ? "block" : "none"
-  addMainDiv.style.display = (addingFilter != 1) ? "block" : "none"
-}
-
-function filterSave()
-{
-    if (addingFilter != 0)
-    {
-        cdata = filterPartNumber.value + "|" + filterInstallerName.value + "|" + filterInstallerId.value;
-
-        BluetoothReadWait = 4;
-  
-        const encodedValue = new TextEncoder().encode(cdata);
-
-        const sdata = new Uint8Array(3 + encodedValue.length);
-        
-        sdata[0] = 3;
-        sdata[1] = 5;
-        sdata[2] = addingFilter - 1;
-        sdata.set(encodedValue, 3);
-        BluetoothCharacteristics[5].writeValue(sdata); 
-  
-        if (addingFilter == 1)
-        {
-            hepaInstalledDate.value = getNowDateForInput();
-            hepaPartNumber.value = filterPartNumber.value;
-            hepaInstallerName.value = filterInstallerName.value;
-            hepaInstallerId.value = filterInstallerId.value;
-        }
-        else
-        {
-            mainInstalledDate.value = getNowDateForInput();
-            mainPartNumber.value = filterPartNumber.value;
-            mainInstallerName.value = filterInstallerName.value;
-            mainInstallerId.value = filterInstallerId.value;
-        }
-        replaceFilter(addingFilter);    
-        filterPartNumber.value = "";  
-        filterInstallerName.value = "";
-        filterInstallerId.value = "";                
-    }
-}
-
-function showDetailsDiv(frecId)
-{
-    element = document.getElementById(frecId);
-    if (element)
-    {
-        if (element.style.display === "none")
-        {
-            element.style.display = "block";
-        }
-        else
-        {
-            element.style.display = "none";
-        }
-    }
-}
-
+// Log base class
 
 class historyClass
 {
-    constructor(historyName, bleIdx)
+    constructor(historyName, blename)
     {
         this.elementDbg = document.getElementById(historyName + "Historydbg");
         this.elementDataDiv = document.getElementById(historyName + "HistoryDataDiv");
@@ -1820,12 +1005,13 @@ class historyClass
         this.fileData = "";
         this.top = 0;
         this.count = 0;
-        this.id = 10;
         this.numRecords = 0;
-        this.readId = 0;
-        this.bleIdx = bleIdx;
+        this.blename = blename;
         this.fileName = historyName + "-history.txt";
         this.name = historyName;
+        this.id = 0;
+        this.exporting = false;
+        this.readState = 0;
     }
     
     setExportFileHeader()
@@ -1835,25 +1021,24 @@ class historyClass
     
     exportRecords()
     {
+        bleiface.setMessage(DBG_INFO, "History " + this.name + ": Start Export");
         this.elementDbg.innerHTML = "Exporting data...";
 
         this.elementNext.disabled = true;    
         this.elementPrior.disabled = true;
         this.elementSave.disabled = true;
 
-        this.readId = 88;
+        this.exporting = true;
+        this.readState = 1;
+
         this.setExportFileHeader();
     
-        this.id++;
-        if (this.id >= 99)
-        {
-            this.id = 10;
-        }
         this.count = 2;     // actually a retry count
     }
 
     loadHistoryDiv(thePage)
     {
+        bleiface.setMessage(DBG_INFO, "History " + this.name + ": Start Loading Page");
         this.elementDbg.innerHTML = "Loading data...";
 
         this.elementNext.disabled = true;    
@@ -1864,12 +1049,10 @@ class historyClass
         {
             this.elementDataDiv.removeChild(this.elementDataDiv.firstChild);
         }  
-        this.id++;
-        if (this.id >= 99)
-        {
-            this.id = 10;
-        }
-        this.readId = 99;                   // 99 is the goto request
+
+        this.exporting = false;
+        this.readState = 1;
+
         this.top = thePage;
         this.count = 10;
         this.numRecords = 0;
@@ -1879,81 +1062,72 @@ class historyClass
     {
         let result = false;
 
-        if (this.readId == 88)
+        if (this.readState > 0)
         {
-            // perform a Start command
-        
-            result = true;
-            BluetoothReadWait = 2;
-            let data = new Uint8Array(2);
-    
-            data[0] = this.id;
-            data[1] = 3;
-        
-            this.readId = 89;
-            BluetoothCharacteristics[this.bleIdx].writeValue(data);         
-        }
-        else if (this.readId == 99)
-        {
-            // performing a GOTO record.
-        
-            result = true;
-            BluetoothReadWait = 2;
-            let data = new Uint8Array(4);
-            let tempRec = this.top + 9;
-    
-            data[0] = this.id;
-            data[1] = 0;
-            data[2] = tempRec & 0x00ff;
-            data[3] = (tempRec >> 8) & 0x00ff;
-        
-            this.readId = 100;
-            BluetoothCharacteristics[this.bleIdx].writeValue(data); 
-        }
-        else if (this.readId == 100)
-        {
-            // performing the first read after a GOTO record request
-        
-            result = true;
-            this.readId = 99;                   // if we fail then go back to sending the GOTO request
-            BluetoothReadWait = 4;
-            BluetoothCharacteristics[this.bleIdx].readValue();
-        }
-        else if (this.readId == 89)
-        {
-            // performing the first read after a get First record request
-        
-            result = true;
-            this.readId = 88;                   // if we fail then go back to sending the First request
-            BluetoothReadWait = 4;
-            BluetoothCharacteristics[this.bleIdx].readValue();
-        }
-        else if (this.readId == 101 ||
-                 this.readId == 102)
-        {
-            // the first record after the GOTO had been read, so keep reading until the end
-        
-            if (this.count > 0)
+            let item = bleiface.getItem(this.blename);
+            if (item)
             {
-                this.count--;
-                result = true;
-                BluetoothReadWait = 4;
-                BluetoothCharacteristics[this.bleIdx].readValue();
+                bleiface.setMessage(DBG_INFO, "History " + this.name + ": State: " + this.readState);
+                
+                switch (this.readState)
+                {
+                    case 1:
+                        // perform a Start command
+
+                        if (this.exporting)
+                        {
+                            item.setReadRecord(3);
+                        }
+                        else
+                        {
+                            item.setGotoRecord(0, this.top + 9);    
+                        }
+                        this.id = item.getId();
+                
+                        result = true;
+        
+                        this.readState = 2;
+                    break;
+                    
+                    case 2:
+                        // performing the first read after a GOTO record request or a get First record request
+        
+                        result = true;
+                        this.readState = 1;                   // if we fail then go back to sending the GOTO request
+            
+                        bleiface.itemReadWithBusy(item);
+                    break;
+            
+                    case 3:
+                        // the first record after the GOTO had been read, so keep reading until the end
+        
+                        if (this.count > 0)
+                        {
+                            this.count--;
+                            result = true;
+                    
+                            bleiface.itemReadWithBusy(item);
+                        }
+                        else
+                        {
+                            this.ReadDone();
+                        }
+                    break;
+                }
             }
             else
             {
-                // 4 is the default finished reading hepa/main filters
-            
-                this.ReadDone();
+                this.readState = 0;
             }
         }
-
         return result;
     }
 
     readDone()
     {
-        if (this.readId == 102)
+        bleiface.setMessage(DBG_INFO, "History " + this.name + ": Finished");
+    
+        if (this.exporting)
         {
             var tempLink = document.createElement("a");
             var taBlob = new Blob([this.fileData], {type: 'text/plain'});
@@ -1964,8 +1138,7 @@ class historyClass
             URL.revokeObjectURL(tempLink.href);
             this.fileData = "";
         }
-    
-        this.readId = 4;
+   
         if (this.numRecords == 0)
         {
             this.elementDbg.innerHTML = "No records found";
@@ -1979,6 +1152,9 @@ class historyClass
         this.elementPrior.disabled = this.top == 0;
         this.elementPage.value = this.top + "/" + this.numRecords;
         this.elementSave.disabled = false;
+    
+        this.exporting = false;
+        this.readState = 0;
     }    
     
     addRowElement(element, theLabel, theValue)
@@ -2032,104 +1208,105 @@ class historyClass
         return "";
     }
     
-    handleRecordRead(data)
+    handleRecordRead(id, data)
     {   
-        if (this.readId == 99)
+        if (this.id == id &&
+            this.readState > 0)
         {
-            // we have the first record, and the id was good
-        
-            this.readId = 101;
-        }
-        else if (this.readId == 88)
-        {
-            this.readId = 102;
-        }
-        if (this.readId == 102)
-        {
-            // export to file
-        
-            BluetoothReadWait = 0;
-            this.count = 2;
-            if (this.dataValid(data))
-            {
-                this.elementDbg.innerHTML = "Exporting data ... Record " + this.dataRecordNumber(data);
-           
-                this.dataAddToFileData(data);                                           
-            }
-            else
-            {
-                this.readDone();
-            }
-        }
-        else if (this.readId == 101)
-        {
-            // need to add the record
+            bleiface.setMessage(DBG_INFO, "History " + this.name + ": Received. Len=" + data.length);
 
-            BluetoothReadWait = 0;
-        
-            if (this.dataValid(data))
+            if (this.readState == 1)
             {
-                this.elementDbg.innerHTML = "Loading data ... Record " + this.dataRecordNumber(data);
-            
-                this.numRecords = this.dataNumOfRecords(data);
-            
-                // here. Add a new element.
-            
-                var rowDiv = document.createElement("div");
-                var dateDiv = document.createElement("div");
-                var typeDiv = document.createElement("div");
-                var btnDiv = document.createElement("div");
-            
-                var frecId = "frec" + this.name + "Id" + this.dataRecordNumber(data);
-            
-                rowDiv.setAttribute("class", "row");
-                dateDiv.setAttribute("class", "col-30");
-                typeDiv.setAttribute("class", "col-40 units");
-                btnDiv.setAttribute("class", "col-30 units");
-                dateDiv.innerHTML = "<input type='text' readonly value='" + this.dataDate(data) + "'>";
-                typeDiv.innerHTML = "<input type='text' readonly value='" + this.dataRecordType(data) + "'>";
-                btnDiv.innerHTML = "<input type='button' value='Details...' onclick=" + '"' + "showDetailsDiv('" + frecId + "')" + '"' + ">";
-            
-                rowDiv.appendChild(dateDiv);
-                rowDiv.appendChild(typeDiv);
-                rowDiv.appendChild(btnDiv);
-
-                if (this.elementDataDiv.firstChild)
+                this.readState = 3;
+            }
+        
+            if (this.readState == 3)
+            {
+                if (this.exporting)
                 {
-                    this.elementDataDiv.insertBefore(rowDiv, this.elementDataDiv.firstChild);
+                    this.count = 2;
+                    if (this.dataValid(data))
+                    {
+                        this.elementDbg.innerHTML = "Exporting data ... Record " + this.dataRecordNumber(data);
+           
+                        this.dataAddToFileData(data);                                           
+                    }
+                    else
+                    {
+                        this.readDone();
+                    }
                 }
                 else
                 {
-                    this.elementDataDiv.appendChild(rowDiv);
-                }
+                    // need to add the record
 
-                var detailsDiv = document.createElement("div");
+                    if (this.dataValid(data))
+                    {
+                        this.elementDbg.innerHTML = "Loading data ... Record " + this.dataRecordNumber(data);
             
-                detailsDiv.setAttribute("class", "container hiddenitemdiv");
-                detailsDiv.setAttribute("id", frecId);
+                        this.numRecords = this.dataNumOfRecords(data);
+            
+                        // Add a new element.
+            
+                        var rowDiv = document.createElement("div");
+                        var dateDiv = document.createElement("div");
+                        var typeDiv = document.createElement("div");
+                        var btnDiv = document.createElement("div");
+            
+                        var frecId = "frec" + this.name + "Id" + this.dataRecordNumber(data);
+            
+                        rowDiv.setAttribute("class", "row");
+                        dateDiv.setAttribute("class", "col-30");
+                        typeDiv.setAttribute("class", "col-40 units");
+                        btnDiv.setAttribute("class", "col-30 units");
+                        dateDiv.innerHTML = "<input type='text' readonly value='" + this.dataDate(data) + "' title='" + this.dataDate(data) + "'>";
+                        typeDiv.innerHTML = "<input type='text' readonly value='" + this.dataRecordType(data) + "'>";
+                        btnDiv.innerHTML = "<input type='button' value='Details...' onclick=" + '"' + "showDetailsDiv('" + frecId + "')" + '"' + ">";
+            
+                        rowDiv.appendChild(dateDiv);
+                        rowDiv.appendChild(typeDiv);
+                        rowDiv.appendChild(btnDiv);
+
+                        if (this.elementDataDiv.firstChild)
+                        {
+                            this.elementDataDiv.insertBefore(rowDiv, this.elementDataDiv.firstChild);
+                        }
+                        else
+                        {
+                            this.elementDataDiv.appendChild(rowDiv);
+                        }
+
+                        var detailsDiv = document.createElement("div");
+            
+                        detailsDiv.setAttribute("class", "container hiddenitemdiv");
+                        detailsDiv.setAttribute("id", frecId);
                 
-                this.dataAddDetailElements(detailsDiv, data);
+                        this.dataAddDetailElements(detailsDiv, data);
             
-                rowDiv.appendChild(detailsDiv);
+                        rowDiv.appendChild(detailsDiv);
             
-                detailsDiv.style.display = "none";
+                        detailsDiv.style.display = "none";
             
-                if (this.dataRecordNumber(data) == this.top)
-                {
-                    this.readDone();
-                }
-            }
-            else
-            {
-                // not valid so finished reading
+                        if (this.dataRecordNumber(data) == this.top)
+                        {
+                            this.readDone();
+                        }
+                    }
+                    else
+                    {
+                        // not valid so finished reading
            
-                this.readDone();           
+                        this.readDone();           
+                    }
+                }
             }
         }
     }  
 
     gotoRecord(rec)
     {
+        bleiface.setMessage(DBG_INFO, "History " + this.name + ": Goto " + rec);    
+        
         if (rec < 0)
         {
             if (this.top > 10)
@@ -2156,6 +1333,359 @@ class historyClass
         this.loadHistoryDiv(this.top)
     }
 }
+
+//===================================================
+//
+//      Bluetooth Characteristic base class
+//
+//===================================================
+
+class blueToothIf
+{
+    constructor(itemName, serviceIdx, characteristicUUID)
+    {
+        this.name = itemName;
+        this.serviceIdx = serviceIdx;
+        this.characteristicUUID = characteristicUUID.toLowerCase();
+        this.characteristic = null;
+        this.validIsValid = false;
+        this.connectState = 0;          // 0 = idle, 1 = connecting, 2 = connected, 3 = failed
+        this.readValue = null;
+        this.initState = 0;
+        this.runState = 0;
+    }
+    
+    getName()
+    {
+        return this.name;
+    }
+    
+    disconnected()
+    {
+        this.characteristic = null;
+        this.readValue = null;
+        this.validIsValid = false;
+        this.connectState = 0;
+        this.initState = 0;
+    }
+    
+    start()
+    {
+        this.connectState = 1;
+    }
+
+    done()
+    {
+        this.connectState = 2;
+    }
+
+    failed()
+    {
+        this.connectState = 3;
+    }
+    
+    setCharactistic(characteristic)
+    {
+        this.characteristic = characteristic;
+        this.done();
+    }
+    
+    connect(service)
+    {
+        this.characteristic = null;
+        this.readValue = null;
+        this.validIsValid = false;
+        this.connectState = 1;
+        
+        return service[this.serviceIdx].getCharacteristic(this.characteristicUUID);
+    }
+    
+    isConnected()
+    {
+        return this.connectState == 2;
+    }
+
+    isConnecting()
+    {
+        return this.connectState == 1;
+    }
+
+    isConnectFailed()
+    {
+        return this.connectState == 3;
+    }
+
+    isNotConnect()
+    {
+        return this.connectState == 0 || this.connectState == 3;
+    }
+    
+    isValueValid()
+    {
+        return this.isConnected() && this.validIsValid;
+    }
+    
+    getValue()
+    {
+        return this.readValue;
+    }
+    
+    setRead(readValue)
+    {
+        this.validIsValid = true;
+        this.readValue = readValue;
+    }
+    
+    read()
+    {
+        this.validIsValid = false;
+        this.readValue = null;
+        
+        return this.characteristic.readValue();
+    }
+    
+    write(data)
+    {
+        bleiface.setBusy(this.getName);
+        this.characteristic.writeValueWithResponse(data)
+            .then (cdata =>
+            {
+                bleiface.clearBusy();
+                return true;
+            })
+            .catch (error =>
+            {
+                bleiface.setError("Error:Write: " + error);
+            });
+    }
+
+    init()
+    {
+        this.initState = 9999;
+    }
+    
+    isInit()
+    {
+        return this.initState == 9999;
+    }
+    
+    run()
+    {
+    }
+};
+
+//==========================================================
+//
+//          Test Switch
+//
+//==========================================================
+
+// Variables
+
+var testSwitch = document.querySelector("#testModeCheckbox");
+
+// Callback events
+
+function testModeClicked()
+{
+    let item = bleiface.getItem("Test");
+
+    if (item)
+    {
+        item.setTestState(testSwitch.checked);
+    }
+}
+
+// Bluetooth interface
+
+class blueToothTest extends blueToothIf
+{
+    constructor ()
+    {
+        super ("Test", 0, "546a24ea-ec5b-461b-9cce-b9bce932a72c");
+        this.send = false;
+        this.testState = false;
+    }
+
+    disconnected()
+    {
+        super.disconnected();
+        this.send = false;
+        this.testState = false;
+    }
+    
+    writeTestState(on)
+    {
+        let data = new Uint8Array(1);
+        data[0] = on ? 1 : 0;
+        this.write(data);
+    }
+    
+    setTestState(on)
+    {
+        this.send = true;   
+        this.testState = on;        
+    }
+    
+    init()
+    {
+        if (this.initState == 0)
+        {
+            super.init();
+            
+            bleiface.setMessage(DBG_CONNECT, "Turning off Test Mode");
+            this.writeTestState(false);
+        }
+    }
+    
+    run()
+    {
+        if (this.send)
+        {
+            this.send = false;
+            this.writeTestState(this.testState);
+        }
+    }
+}
+
+//==========================================================
+//
+//          Filter setting/change
+//
+//==========================================================
+
+// Variables
+
+var addingFilter = 0;
+var addHepaBtn = document.querySelector("#addHepaBtn");
+var addMainBtn = document.querySelector("#addMainBtn");
+var filterForm = document.querySelector("#filterForm");
+var addHepaDiv = document.querySelector("#addHepaDiv");
+var addMainDiv = document.querySelector("#addMainDiv");
+
+var filterPartNumber = document.querySelector("#filterPartNumber");
+var filterInstallerName = document.querySelector("#filterInstallerName");
+var filterInstallerId = document.querySelector("#filterInstallerId");
+
+const hepaInstalledDate = document.querySelector("#hepaInstalledDate");
+const hepaPartNumber = document.querySelector("#hepaPartNumber");
+const hepaInstallerName = document.querySelector("#hepaInstallerName");
+const hepaInstallerId = document.querySelector("#hepaInstallerId");
+
+const mainInstalledDate = document.querySelector("#mainInstalledDate");
+const mainPartNumber = document.querySelector("#mainPartNumber");
+const mainInstallerName = document.querySelector("#mainInstallerName");
+const mainInstallerId = document.querySelector("#mainInstallerId");
+
+//Filter event handlers
+
+function gotoFilterRec(recDir)
+{
+    if (filterHistory)
+    {
+        filterHistory.gotoRecord(recDir);
+    }
+}
+
+function saveFilterRecords()
+{
+    if (filterHistory)
+    {
+        filterHistory.exportRecords();
+    }
+}
+
+function replaceFilter(filterType)
+{
+    if (addingFilter == filterType)
+    {
+        // hide the form
+    
+        addHepaBtn.value = "Replace";
+        addMainBtn.value = "Replace";
+        addingFilter = 0;
+        filterForm.style.display="none";
+    }
+    else if (addingFilter == 0)
+    {
+        addingFilter = filterType;
+        if (filterType == 1)
+            addHepaBtn.value = "Cancel Replace";
+        if (filterType == 2)
+            addMainBtn.value = "Cancel Replace";
+        filterForm.style.display="block";
+    }
+    addMainBtn.disabled = addingFilter == 1;
+    addHepaBtn.disabled = addingFilter == 2;
+    addHepaDiv.style.display = (addingFilter != 2) ? "block" : "none"
+    addMainDiv.style.display = (addingFilter != 1) ? "block" : "none"
+}
+
+function filterSave()
+{
+    if (addingFilter != 0)
+    {
+        item = bleiface.getItem("Filter");
+        if (item)
+        {
+            item.addFilter(addingFilter - 1,
+                           filterPartNumber.value + "|" + filterInstallerName.value + "|" + filterInstallerId.value);
+        }
+        
+        if (addingFilter == 1)
+        {
+            hepaInstalledDate.value = getNowDateForInput();
+            hepaPartNumber.value = filterPartNumber.value;
+            hepaInstallerName.value = filterInstallerName.value;
+            hepaInstallerId.value = filterInstallerId.value;
+        }
+        else
+        {
+            mainInstalledDate.value = getNowDateForInput();
+            mainPartNumber.value = filterPartNumber.value;
+            mainInstallerName.value = filterInstallerName.value;
+            mainInstallerId.value = filterInstallerId.value;
+        }
+        replaceFilter(addingFilter);    
+        filterPartNumber.value = "";  
+        filterInstallerName.value = "";
+        filterInstallerId.value = "";                
+    }
+}
+
+// filter helper functions
+
+function filterDataFilterType(data)
+{
+    let offset = (protocolVersion == 0) ? 8 : 9;
+  
+    if (data.getUint8(offset) == 0)
+    {
+        return "Hepa Filter";
+    }
+    return "Main Filter";
+}
+
+function filterDataHoursRun(data)
+{
+    let offset = (protocolVersion == 0) ? 9 : 10;
+
+    mins = data.getUint16(offset, true) / 60;
+    
+    return mins.toFixed(1);
+}
+
+function filterDataStrings(data)
+{        
+    let offset = (protocolVersion == 0) ? 11 : 12;
+    thelen = data.getUint8(offset);
+        
+    const view2 = new DataView(data.buffer, offset + 1, thelen);
+    const decodedValue = new TextDecoder().decode(view2);
+    return decodedValue.split("|");
+}    
+
+// Filter history class
 
 class filterHistoryClass extends historyClass
 {
@@ -2222,314 +1752,667 @@ class filterHistoryClass extends historyClass
     }
 }
 
-class alarmHistoryClass extends historyClass
+// filter ble class 
+
+class blueToothFilter extends blueToothIf
 {
-    setExportFileHeader()
+    constructor ()
     {
-        this.fileData = "Date,Pressure Alarm,CO2 Alarm,Door,Fan Speed,Pressure\r\n";
+        super ("Filter", 1, "f8885b19-317b-451c-bb17-ad16498fa694");
+        this.id = 0;
+        this.retries = 0;
+        this.send = false;
+        this.filterId = 0;
+        this.filterData = null;
     }
+
+    disconnected()
+    {
+        super.disconnected();
         
-    dataValid(data)
-    {
-        return logDataValid(data);
+        this.send = false;
     }
     
-    dataRecordNumber(data)
+    addFilter(filterId, filterData)
     {
-        return logDataRecordNum(data);
+        this.send = true;
+        this.filterId = filterId;
+        this.filterData = filterData;
     }
-    
-    dataNumOfRecords(data)
+
+    advanceId()
     {
-        return logDataNumOfRecords(data);
-    }
-    
-    dataAddToFileData(data)
-    {
-        this.fileData  += this.dataDate(data) + "," +
-                          this.dataRecordType(data) + "," +
-                          this.dataDoorState(data) + "," +
-                          this.dataFanSpeed(data) + "," +
-                          this.dataPressure(data) + "\r\n";
-    }
-    
-    dataAddDetailElements(detailsDiv, data)
-    {               
-        this.addRowElement(detailsDiv, "Door State", this.dataDoorState(data));
-        this.addRowElement(detailsDiv, "Fan Speed", this.dataFanSpeed(data));
-        this.addRowElement(detailsDiv, "Pressure", this.dataPressure(data));
-    }
-    
-    dataDate(data)
-    {
-        return logDataDate(data) + " " + logDataTime(data);
-    }
-    
-    dataRecordType(data)
-    {
-        if ((data.getUint8(13) & 0x80) == 0x80)
+        this.id++;
+        if (this.id > 200)
         {
-            if ((data.getUint8(13) & 0x01) == 0x01)
-            {
-                return "CO2 Active";
-            }
-            return "CO2 Idle";
-        }
-        if ((data.getUint8(12) & 0x01) == 0x01)
+            this.id = 0;
+        }    
+    }
+    
+    getId()
+    {
+        return this.id;
+    }
+    
+    setReadRecord(rec)
+    {
+        bleiface.setMessage(DBG_INFO, this.getName() + " set record to read " + rec);
+        this.advanceId();
+        this.retries = 0;
+        
+        let data = new Uint8Array(2);
+        data[0] = this.id;
+        data[1] = rec;
+        
+        this.write(data);
+    }
+
+    setGotoRecord(cmd, rec)
+    {
+        bleiface.setMessage(DBG_INFO, this.getName() + " set record to goto " + rec);
+        
+        this.advanceId();
+        this.retries = 0;
+        
+        let data = new Uint8Array(4);
+        data[0] = this.id;
+        data[1] = cmd;
+        data[2] = rec & 0x00ff;
+        data[3] = (rec >> 8) & 0x00ff;
+        
+        this.write(data);
+    }
+    
+    writeFilter(filterId, filterData)
+    {
+        const encodedValue = new TextEncoder().encode(filterData);
+
+        const sdata = new Uint8Array(3 + encodedValue.length);
+        
+        bleiface.setMessage(DBG_INFO, this.getName() + " write filter data " + filterId);
+        
+        sdata[0] = 3;
+        sdata[1] = 5;
+        sdata[2] = filterId;
+        sdata.set(encodedValue, 3);
+        this.write(sdata); 
+    }
+    
+    run()
+    {
+        if (this.send)
         {
-            return "Alarm Active";
-        }
-        return "Alarm Idle";
-    }
-    
-    dataDoorState(data)
-    {
-        if (data.getUint8(14) == 0)
-        {
-            return "Door Closed";
-        }
-        return "Door Opened";
-    }
-    
-    dataFanSpeed(data)
-    {
-        return data.getUint8(15);    
-    }
-    
-    dataPressure(data)
-    {
-        return data.getUint16(16, true);
-    }
-}
-
-function gotoFilterRec(recDir)
-{
-    if (filterHistory)
-    {
-        filterHistory.gotoRecord(recDir);
-    }
-}
-
-function gotoAlarmRec(recDir)
-{
-    if (alarmHistory)
-    {
-        alarmHistory.gotoRecord(recDir);
-    }
-}
-
-function saveFilterRecords()
-{
-    if (filterHistory)
-    {
-        filterHistory.exportRecords();
-    }
-}
-
-function saveAlarmRecords()
-{
-    if (alarmHistory)
-    {
-        alarmHistory.exportRecords();
-    }
-}
-
-var testSwitch = document.querySelector("#testModeCheckbox");
-
-function testModeClicked()
-{
-    testState = testSwitch.checked;
-    testHasBeenSet = false;    
-}
-
-class authorizeClass
-{
-    constructor()
-    {
-        this.authorized = false;
-        this.sendLogin = false;
-        this.sendPassword = "";
-        this.queryLogin = false;
-        this.count = 0;
-        this.timer = 0;
-        this.elementBtn = document.getElementById("loginBtn");
-        this.elementPassword = document.getElementById("loginPassword");
-        this.elementDbg = document.getElementById("loginDbg");
-        this.elementMenuItem = document.getElementById("menuItemLogin");
-        this.elementHeader = document.getElementById("loginDivHeader");
-        this.elementPasswordDiv = document.getElementById("loginPasswordRow");
-        this.calibrateMenuItem = 0;
-        this.settingMenuItem = 0;
-    }
-    
-    handleClicked()
-    {
-        if (!this.authorized)
-        {
-            this.sendPassword = this.elementPassword.value;
-            this.sendLogin = true;
+            this.send = false;
+            this.writeFilter(this.filterId, this.filterData);
         }
         else
         {
-            this.sendPassword = "";
-            this.sendLogin = true;
+            filterHistory.handleHistoryLoading();
         }
     }
     
-    tick()
+    init()
     {
-        if (this.timer > 0)
+        switch (this.initState)
         {
-            this.timer--;
+            case 0:
+                bleiface.setMessage(DBG_CONNECT, "Reading current Hepa Filter");
+                this.initState++;
+                this.setReadRecord(1);               // read the current Hepa Filter
+            break;
             
-            if (this.timer == 0)
-            {
-                this.elementDbg.innerHTML = "";
-            }
+            case 1:
+                this.initState++;
+                bleiface.itemReadWithBusy(this);
+            break;
+
+            case 2:
+                if (!this.isValueValid() ||
+                    this.getValue().getUint8(0) != this.id)
+                {
+                    if (this.isValueValid())
+                    {
+                        bleiface.setError("Value is valid");
+                        bleiface.setError("Data = " + this.getValue() + "  id=" + this.id);
+                    }
+                    else
+                    {
+                        bleiface.setError("Value is invalid");
+                    }
+                    
+                    this.retries++;
+                    if (this.retries > 3)
+                    {
+                        bleiface.setError("Failed to read current HEPA Filter");
+                        break;
+                    }
+                    bleiface.itemReadWithBusy(this);
+                    break;
+                }
+                else
+                {
+                    this.initState++;
+                    if (logDataValid(this.getValue()))
+                    {
+                        hepaInstalledDate.value = logDataDate(this.getValue());
+                        const filterStrings = filterDataStrings(this.getValue());
+                        if (filterStrings.length >= 3)
+                        {
+                            hepaPartNumber.value = filterStrings[0];
+                            hepaInstallerName.value = filterStrings[1];
+                            hepaInstallerId.value = filterStrings[2];
+                        }
+                    }
+                }
+                
+                bleiface.setMessage(DBG_CONNECT, "Reading current Main Filter");
+                
+                this.setReadRecord(2);               // read the current Main Filter
+            break;
+            
+            case 3:
+                this.initState++;
+                bleiface.itemReadWithBusy(this);
+            break;
+
+            case 4:
+                if (!this.isValueValid() ||
+                    this.getValue().getUint8(0) != this.id)
+                {
+                    this.retries++;
+                    if (this.retries > 3)
+                    {
+                        bleiface.setError("Failed to read current Main Filter");
+                        break;
+                    }
+                    bleiface.itemReadWithBusy(this);
+                    break;
+                }
+                else
+                {
+                    super.init()
+                    if (logDataValid(this.getValue()))
+                    {
+                        mainInstalledDate.value = logDataDate(this.getValue());
+                        const filterStrings = filterDataStrings(this.getValue());
+                        if (filterStrings.length >= 3)
+                        {
+                            mainPartNumber.value = filterStrings[0];
+                            mainInstallerName.value = filterStrings[1];
+                            mainInstallerId.value = filterStrings[2];
+                        }
+                    }
+                }
+            break;
+        }    
+    }
+    
+    setRead(readValue)
+    {
+        super.setRead(readValue);
+
+        if (this.isInit())
+        {
+            var id = readValue.getUint8(0);         
+            filterHistory.handleRecordRead(id, readValue);        
         }
     }
-    
-    restart()
+}
+
+//==========================================================
+//
+//          Real Time Clock
+//
+//==========================================================
+
+// Bluetooh interface
+
+class blueToothRtc extends blueToothIf
+{
+    constructor ()
     {
-        this.setAuthorized(false);
-        this.sendLogin = true;
-        this.sendPassword = "";
-        this.queryLogin = false;
-        this.elementPassword.value = "";
+        super ("RTC", 0, "469cbb22-dc08-4f1a-9e52-2626391ae161");
     }
     
-    getAuthorized()
+    init()
     {
-        return this.authorized;
-    }
-    
-    setAuthorized(authorized)
-    {
-        if (authorized != this.authorized)
+        if (this.initState == 0)
         {
-            this.authorized = authorized;
-            if (authorized)
+            super.init();
+
+            const date = new Date();
+
+            bleiface.setMessage(DBG_CONNECT, "Setting RTC");        
+            
+            let data = new Uint8Array(7);
+            data[0] = date.getDate();
+            data[1] = date.getMonth() + 1;
+            data[2] = date.getFullYear() & 0x00ff;
+            data[3] = (date.getFullYear() >> 8) & 0x00ff;
+            data[4] = date.getHours();
+            data[5] = date.getMinutes();
+            data[6] = date.getSeconds();
+            this.write(data);
+        }
+    }
+}
+
+//==========================================================
+//
+//          Commission
+//
+//==========================================================
+
+// variables
+
+var   commissionDataValid = false;
+const commissionForm = document.querySelector("#commissionForm");
+const cInstalledDate = document.querySelector("#cInstalledDate");
+const cInstallerCompany = document.querySelector("#cInstallerCompany");
+const cInstallerName = document.querySelector("#cInstallerName");
+const cInstallerPhone = document.querySelector("#cInstallerPhone");
+const cMachineName = document.querySelector("#cMachineName");
+const cPlantNumber = document.querySelector("#cPlantNumber");
+const cPlantHours = document.querySelector("#cPlantHours");
+const cSaveRow = document.querySelector("#cSaveRow");
+
+// Callback events
+
+commissionForm.addEventListener("submit", (event) => 
+{
+    event.preventDefault();
+  
+    var cdata = cInstalledDate.value + "|" +
+                cInstallerName.value + "|" +
+                cInstallerPhone.value + "|" +
+                cInstallerCompany.value + "|" +
+                cMachineName.value + "|" +
+                cPlantNumber.value + '|' +
+                cPlantHours.value;
+
+    var item = bleiface.getItem("Commission");
+    if (item)
+    {
+        item.setCommission(cdata);
+    }
+});
+
+// helper functions
+
+function authorizeCommission()
+{
+    let allowed = true;
+    
+    if (commissionDataValid)
+    {
+        allowed = false;
+        if (authorizeControl &&
+            authorizeControl.getAuthorized())
+        {
+            allowed = true;
+        }
+    }
+    cSaveRow.style.display = (!allowed) ? "none" : "block";
+    cInstallerName.readOnly = !allowed;
+    cInstallerPhone.readOnly = !allowed;
+    cInstallerCompany.readOnly = !allowed;
+    cMachineName.readOnly = !allowed;
+    cPlantNumber.readOnly = !allowed;
+    cPlantHours.readOnly = !allowed;
+}
+
+// bluetooth interface class
+
+class blueToothCommission extends blueToothIf
+{
+    constructor ()
+    {
+        super ("Commission", 0, "f31e779c-7729-4073-8319-a0a2f33524ed");
+        
+        this.send = false;
+        this.sendValue = "";
+    }
+
+    disconnected()
+    {
+        this.send = false;
+    }
+    
+    setCommission(commissionData)
+    {
+        this.sendValue = commissionData;
+        this.send = true;
+    }
+    
+    setRead(readValue)
+    {
+        super.setRead(readValue);
+        
+        commissionDataValid = false;
+    
+        const decodedValue = new TextDecoder().decode(readValue);
+
+        const myArray = decodedValue.split("|");
+    
+        cSaveRow.style.display = "none";
+        if (myArray.length >= 7)
+        {
+            cInstalledDate.value = myArray[1];
+            cInstallerName.value = myArray[2];
+            cInstallerPhone.value = myArray[3];
+            cInstallerCompany.value = myArray[4];
+            cMachineName.value = myArray[5];
+            cPlantNumber.value = myArray[6];
+            if (myArray.length >= 8)
             {
-                this.elementBtn.value = "Logout";  
-                this.elementMenuItem.innerHTML = "Logout";
-                this.elementHeader.innerHTML = "Logout";
-                this.elementPasswordDiv.style.display = "none";
-                
-                if (!this.calibrateMenuItem)
-                {
-                    this.calibrateMenuItem = document.createElement("a");
-                    this.calibrateMenuItem.setAttribute("href", "javascript:showDiv('calibrateDiv')");
-                    this.calibrateMenuItem.innerHTML = "Calibrate";
-                
-                    this.elementMenuItem.parentNode.insertBefore(this.calibrateMenuItem, this.elementMenuItem.nextSibling); 
-                }
-                if (!this.settingMenuItem)
-                {
-                    this.settingMenuItem = document.createElement("a");
-                    this.settingMenuItem.setAttribute("href", "javascript:showDiv('settingDiv')");
-                    this.settingMenuItem.innerHTML = "Settings";
-                
-                    this.elementMenuItem.parentNode.insertBefore(this.settingMenuItem, this.elementMenuItem.nextSibling); 
-                }
+                cPlantHours.value = myArray[7];
             }
             else
             {
-                this.elementBtn.value = "Login";
-                this.elementMenuItem.innerHTML = "Login";
-                this.elementHeader.innerHTML = "Login";
-                this.elementPasswordDiv.style.display = "block";
-                
-                if (this.calibrateMenuItem)
-                {
-                    this.calibrateMenuItem.remove();
-                    this.calibrateMenuItem = 0;
-                }
-                if (this.settingMenuItem)
-                {
-                    this.settingMenuItem.remove();
-                    this.settingMenuItem = 0;
-                }
+                cPlantHours.value = "";
             }
-            this.elementPassword.readOnly = authorized;
+
+            commissionDataValid = (myArray[0] === "V");    
+        }
+        if (!commissionDataValid)
+        {
+            cInstalledDate.value = getNowDateForInput();
         }
         authorizeCommission();
     }
-
-    processData(data)
+    
+    run()
     {
-        const decodedValue = new TextDecoder().decode(data);
-        
-        this.queryLogin = false;
-        this.setAuthorized(decodedValue == "Y");    
-        
-        if (this.sendPassword == "")
+        if (this.send)
         {
-            if (!this.authorized)
-            {
-                this.timer = 5;
-                this.elementDbg.innerHTML = "Successful Logout";                
-            }
+            this.send = false;
+
+            const encodedValue = new TextEncoder().encode(this.sendValue);
+            
+            this.write(encodedValue);
         }
+    }
+}
+
+//==========================================================
+//
+//          Settings
+//
+//==========================================================
+
+// variables
+
+const settingForm = document.querySelector("#settingForm");
+
+// Settings fields
+const fieldRampRate = document.querySelector("#frampRate");
+const fieldStartPause = document.querySelector("#fstartPause");
+const fieldDoorSpeed = document.querySelector("#fdoorSpeed");
+const fieldFixedSpeed = document.querySelector("#ffixedSpeed");
+const fieldTargetPressure = document.querySelector("#ftargetPressure");
+const fieldMinSpeed = document.querySelector("#fminSpeed");
+const fieldStepSize = document.querySelector("#fstepSize");
+const fieldHoldTime = document.querySelector("#fholdTime");
+
+// event callbacks
+
+settingForm.addEventListener("submit", (event) => 
+{
+    event.preventDefault();
+  
+    const buffer = new ArrayBuffer(24);
+    const view = new DataView(buffer);
+
+    view.setUint16( 0, getRadioInput("fmode"), true);
+    view.setUint16( 2, fieldRampRate.value, true);
+    view.setUint16( 4, fieldFixedSpeed.value, true);
+    view.setUint16( 6, fieldDoorSpeed.value, true);
+    view.setUint16( 8, fieldMinSpeed.value, true);
+    view.setUint16(10, fieldTargetPressure.value, true);
+    view.setUint16(12, fieldStepSize.value, true);
+    view.setUint16(14, fieldHoldTime.value, true);
+    view.setUint16(16, fieldStartPause.value, true);
+    view.setUint16(18, getRadioInput("fdoorMode"), true);
+    view.setUint16(20, getRadioInput("falarmMode"), true);
+    view.setUint16(22, getRadioInput("fco2Mode"), true);
+
+    var item = bleiface.getItem("Settings");
+    if (item)
+    {
+        item.sendSettings(buffer);
+    }
+});
+
+function handleModeClick(myRadio)
+{
+    if (myRadio.value == 0)
+    {
+        fieldFixedSpeed.disabled = false;
+        fieldTargetPressure.disabled = true;
+        fieldMinSpeed.disabled = true;
+        fieldStepSize.disabled = true;
+        fieldHoldTime.disabled = true;
+    }
+    else
+    {
+        fieldFixedSpeed.disabled = true;
+        fieldTargetPressure.disabled = false;
+        fieldMinSpeed.disabled = false;
+        fieldStepSize.disabled = false;
+        fieldHoldTime.disabled = false;  
+    }
+}
+
+// bluetooth interface
+
+class blueToothSettings extends blueToothIf
+{
+    constructor ()
+    {
+        super ("Settings",   0, "3bfa30cb-f9f9-4122-9367-979de74970b6");
+        this.send = false;
+        this.sendData = null;
+    }
+
+    disconnected()
+    {
+        super.disconnected();
+        this.send = false;
+    }
+    
+    setRead(readValue)
+    {
+        super.setRead(readValue);
+
+        var mode = readValue.getUint16(0, true);
+        setRadioInput("fmode", readValue.getUint16(0, true));
+        fieldRampRate.value = readValue.getUint16(2, true);
+        fieldFixedSpeed.value = readValue.getUint16(4, true);
+        fieldDoorSpeed.value = readValue.getUint16(6, true);
+        fieldMinSpeed.value = readValue.getUint16(8, true);
+        fieldTargetPressure.value = readValue.getUint16(10, true);
+        fieldStepSize.value = readValue.getUint16(12, true);
+        fieldHoldTime.value = readValue.getUint16(14, true);
+        fieldStartPause.value = readValue.getUint16(16, true);
+        setRadioInput("fdoorMode", readValue.getUint16(18, true));
+        setRadioInput("falarmMode", readValue.getUint16(20, true));
+        setRadioInput("fco2Mode", readValue.getUint16(22, true));
+    
+        fieldFixedSpeed.disabled = mode == 1;
+        fieldTargetPressure.disabled = mode == 0;
+        fieldMinSpeed.disabled = mode == 0;
+        fieldStepSize.disabled = mode == 0;
+        fieldHoldTime.disabled = mode == 0;
+    }  
+    
+    sendSettings(data)
+    {
+        this.send = true;
+        this.sendData = data;
+    }
+    
+    run()
+    {
+        if (this.send)
+        {
+            this.send = false;
+            this.write(this.sendData);
+        }
+    }
+}
+
+//==========================================================
+//
+//          Status
+//
+//==========================================================
+
+// variables
+
+const sFanSpeedBar = document.querySelector("#sFanSpeedBar");
+const sPressureBar = document.querySelector("#sPressureBar");
+const sDoorState = document.querySelector("#sDoorState");
+const sAlarmState = document.querySelector("#sAlarmState");
+const sCO2State = document.querySelector("#sCO2State");
+const sMotorTime = document.querySelector("#sMotorTime");
+const sHepaFilterTime = document.querySelector("#sHepaFilterTime");
+const sMainFilterTime = document.querySelector("#sMainFilterTime");
+
+// bluetooth interface
+
+class blueToothStatus extends blueToothIf
+{
+    constructor ()
+    {
+        super ("Status", 0, "d65a4ca2-5c9a-43ff-aac3-3091ba7e165b");
+    }
+
+    valueToText(v, v0, v3, vx)
+    {
+        if (v == 3) return v3;
+        if (v == 0) return v0;
+        return vx;
+    }
+
+    decodeFanSpeed(fan)
+    {
+        let tempFan = (((fan * 100) + 0.5) / 255 >> 0);
+        if (tempFan > 100)
+        {
+            tempFan = 100;
+        }
+        return tempFan;
+    }
+    
+    setRead(readValue)
+    {
+        super.setRead(readValue);
+
+        let fan = this.decodeFanSpeed(readValue.getUint8(0));
+        sFanSpeedBar.style.width = fan + '%';
+        sFanSpeedBar.innerHTML = fan + '%';
+
+        sDoorState.value = this.valueToText(readValue.getUint8(1), "Closed", "Disabled", "Opened");
+        sAlarmState.value = this.valueToText(readValue.getUint8(2), "Inactive", "Disabled", "Alarmed");
+        sCO2State.value = this.valueToText(readValue.getUint8(3), "Inactive", "Disabled", "Alarmed");
+
+        //NOTE: With the pressure. need to scale to 100% (ie choose a range and if greater the set to 100)
+
+        let pressure = (readValue.getUint16(4, true) / 2 >> 0);
+        if (pressure > 100)
+        {
+            pressure = 100;
+        }
+  
+        sPressureBar.style.width = pressure + '%';
+        sPressureBar.innerHTML = readValue.getUint16(4, true) + 'pa';
+  
+        sHepaFilterTime.value = toHours(readValue.getUint32(6, true));
+        sMainFilterTime.value = toHours(readValue.getUint32(10, true));
+        sMotorTime.value = toHours(readValue.getUint32(14, true));
+    }
+    
+    run()
+    {
+        if (selectDisplay === "statusDiv")
+        {
+            bleiface.itemReadWithBusy(this);
+        }
+    }
+}    
+
+//==========================================================
+//
+//          General
+//
+//==========================================================
+
+// variables
+
+var protocolVersion = 0;
+
+// bluetooth interface
+
+class blueToothGeneral extends blueToothIf
+{
+    constructor ()
+    {
+        super ("General", 1, "59bb5014-1e25-4cdb-aab9-c675d7d5b608");
+        this.version = "";
+    }
+    
+    getVersion()
+    {
+        return this.version;
+    }
+    
+    setRead(readValue)
+    {
+        super.setRead(readValue);
+    
+        if (readValue.getUint8(0) == 0)
+        {
+            // this is the new version of the general message
+        
+            protocolVersion = readValue.getUint8(1);
+            this.version = readValue.getUint8(6) + "." + pad2(readValue.getUint8(7));
+                    }
         else
         {
-            if (!this.authorized)
-            {
-                this.timer = 5;
-                this.elementDbg.innerHTML = "Login failed";                
-            }
-            else
-            {
-                this.timer = 5;
-                this.elementDbg.innerHTML = "Successful Login"; 
-                this.elementPassword.value = "";
-            }
-        }
-    }    
+            protocolVersion = 0;
+            const decodedValue = new TextDecoder().decode(readValue);
     
-    handleActions()
-    {
-        if (this.sendLogin)
-        {
-            this.timer = 5;
-            this.elementDbg.innerHTML = "Trying to Login/Logout";
-            
-            this.sendLogin = false;
-            this.queryLogin = true;
-            this.count = 2;
-            BluetoothReadWait = 2;
-
-            const encodedValue = new TextEncoder().encode(this.sendPassword);
-            BluetoothCharacteristics[8].writeValue(encodedValue); 
-            
-            return true;
+            this.version = decodedValue;  
         }
-        
-        if (this.queryLogin)
-        {
-            if (this.count == 0)
-            {
-                this.timer = 5;
-                this.elementDbg.innerHTML = "Login/Logout failed. No response";
-                this.queryLogin = false;
-                this.setAuthorized(false);
-            }
-            else
-            {
-                this.count--;
-                BluetoothReadWait = 4;
-                
-                BluetoothCharacteristics[8].readValue(); 
-            }
-            return true;
-        }
-        return false;
+        bleiface.setMessage(DBG_CONNECT, "Version: " + this.version);  
     }    
 }
 
-function loginClicked()
+//==========================================================
+//
+//          Calibrate
+//
+//==========================================================
+
+// callback functions
+
+function calibratePoint(thePoint)
 {
-    authorizeControl.handleClicked();
+    if (calibrateControl)
+    {
+        calibrateControl.executeSetCalibrate(thePoint);
+    }                    
 }
+
+function eraseLog(theLog)
+{
+    if (calibrateControl)
+    {
+        calibrateControl.executeEraseLog(theLog);
+    }
+}
+
+// Calibrate class
 
 class calibrateClass
 {
@@ -2636,27 +2519,31 @@ class calibrateClass
     }   
 
     executeSetCalibrate(thePoint)
-    {  
+    { 
         this.send_req = false;
         this.send_idx = 0;
         
         if (thePoint == 0)
-        {    
+        {      
             this.send_cmd = 1;          // delete
         }
         else
         {       
             this.send_cmd = 0;          // set
             this.send_value = 0;
-            this.send_idx = thePoint - 1;      
+            this.send_idx = thePoint - 1;       
         }
         
         this.send_value = this.elementRealPressure.value;      
         this.send_req = true;
+        
+        bleiface.setMessage(DBG_INFO, "Sending calibrate: Cmd=" + this.send_cmd + ", Value=" + this.send_value + "Idx=" + this.send_idx);
     }
     
     executeEraseLog(theLog)
     {
+        bleiface.setMessage(DBG_INFO, "Erase Log: Log=" + theLog);
+
         this.send_req = false;
         this.send_cmd = theLog + 2;
         this.send_idx = 0;
@@ -2664,21 +2551,13 @@ class calibrateClass
         this.send_req = true;
     }
 
-    handleActions()
+    handleActions(item)
     {
         if (this.send_req)
         {
             this.send_req = false;
-            BluetoothReadWait = 2;
-
-            const buffer = new ArrayBuffer(24);
-            const view = new DataView(buffer);
             
-            view.setUint8(0, this.send_cmd);
-            view.setUint8(1, this.send_idx);
-            view.setUint16(2, this.send_value, true);
-            
-            BluetoothCharacteristics[9].writeValue(buffer); 
+            item.sendRequest(this.send_cmd, this.send_idx, this.send_value);
             
             if (this.send_cmd == 2)
             {
@@ -2695,29 +2574,994 @@ class calibrateClass
         
         if (selectDisplay === "calibrateDiv")
         {
-            BluetoothReadWait = 4;
-                
-            BluetoothCharacteristics[9].readValue(); 
+            bleiface.itemReadWithBusy(item);
+
             return true;
         }
         return false;
     }    
 }
 
-function calibratePoint(thePoint)
+// bluetooth interface
+   
+class blueToothCalibrate extends blueToothIf
 {
-    if (calibrateControl)
+    constructor ()
     {
-        calibrateControl.executeSetCalibrate(thePoint);
-    }                    
+        super ("Calibrate", 1, "aba886d1-094b-4808-87a8-6d1d73afd8fe");
+    }
+    
+    setRead(readValue)
+    {
+        super.setRead(readValue);
+
+        calibrateControl.processData(readValue);
+    }
+    
+    sendRequest(sendCmd, sendIdx, sendValue)
+    {
+        let data = new Uint8Array(4);
+        const buffer = new ArrayBuffer(4);
+        const view = new DataView(buffer);
+            
+        data[0] = sendCmd;
+        data[1] = sendIdx;
+        data[2] = sendValue & 0x00ff;
+        data[3] = (sendValue >> 8) & 0x00ff;
+        
+        this.write(data);
+    }
+    
+    run()
+    {
+        calibrateControl.handleActions(this);
+    }
+}    
+
+//==========================================================
+//
+//          Authorize
+//
+//==========================================================
+
+// callback events
+
+function loginClicked()
+{
+    authorizeControl.handleClicked();
 }
 
-function eraseLog(theLog)
+// authorize class
+
+class authorizeClass
 {
+    constructor()
+    {
+        this.authorized = false;
+        this.sendLogin = false;
+        this.sendPassword = "";
+        this.queryLogin = false;
+        this.count = 0;
+        this.timer = 0;
+        this.elementBtn = document.getElementById("loginBtn");
+        this.elementPassword = document.getElementById("loginPassword");
+        this.elementDbg = document.getElementById("loginDbg");
+        this.elementMenuItem = document.getElementById("menuItemLogin");
+        this.elementHeader = document.getElementById("loginDivHeader");
+        this.elementPasswordDiv = document.getElementById("loginPasswordRow");
+        this.calibrateMenuItem = 0;
+        this.settingMenuItem = 0;
+    }
+    
+    handleClicked()
+    {
+        if (!this.authorized)
+        {
+            this.sendPassword = this.elementPassword.value;
+            this.sendLogin = true;
+        }
+        else
+        {
+            this.sendPassword = "";
+            this.sendLogin = true;
+        }
+    }
+    
+    tick()
+    {
+        if (this.timer > 0)
+        {
+            this.timer--;
+            
+            if (this.timer == 0)
+            {
+                if (!this.authorized)
+                {
+                    this.elementDbg.innerHTML = "Enter password to login";
+                }
+                else
+                {
+                    this.elementDbg.innerHTML = "Click button to logout";
+                }
+                    
+            }
+        }
+    }
+    
+    restart()
+    {
+        this.setAuthorized(false);
+        this.sendLogin = true;
+        this.sendPassword = "";
+        this.queryLogin = false;
+        this.elementPassword.value = "";
+    }
+    
+    getAuthorized()
+    {
+        return this.authorized;
+    }
+    
+    setAuthorized(authorized)
+    {
+        if (authorized != this.authorized)
+        {
+            this.authorized = authorized;
+            if (authorized)
+            {
+                this.elementBtn.value = "Logout";  
+                this.elementMenuItem.innerHTML = "Logout";
+                this.elementHeader.innerHTML = "Logout";
+                this.elementPasswordDiv.style.display = "none";
+                
+                if (!this.calibrateMenuItem)
+                {
+                    this.calibrateMenuItem = document.createElement("a");
+                    this.calibrateMenuItem.setAttribute("href", "javascript:showDiv('calibrateDiv')");
+                    this.calibrateMenuItem.innerHTML = "Calibrate";
+                
+                    this.elementMenuItem.parentNode.insertBefore(this.calibrateMenuItem, this.elementMenuItem.nextSibling); 
+                }
+                if (!this.settingMenuItem)
+                {
+                    this.settingMenuItem = document.createElement("a");
+                    this.settingMenuItem.setAttribute("href", "javascript:showDiv('settingDiv')");
+                    this.settingMenuItem.innerHTML = "Settings";
+                
+                    this.elementMenuItem.parentNode.insertBefore(this.settingMenuItem, this.elementMenuItem.nextSibling); 
+                }
+            }
+            else
+            {
+                this.elementBtn.value = "Login";
+                this.elementMenuItem.innerHTML = "Login";
+                this.elementHeader.innerHTML = "Login";
+                this.elementPasswordDiv.style.display = "block";
+                
+                if (this.calibrateMenuItem)
+                {
+                    this.calibrateMenuItem.remove();
+                    this.calibrateMenuItem = 0;
+                }
+                if (this.settingMenuItem)
+                {
+                    this.settingMenuItem.remove();
+                    this.settingMenuItem = 0;
+                }
+            }
+            this.elementPassword.readOnly = authorized;
+        }
+        authorizeCommission();
+    }
+
+    processData(data)
+    {
+        const decodedValue = new TextDecoder().decode(data);
+        
+        let wasAuthorized = this.authorized;
+        
+        this.queryLogin = false;
+        this.setAuthorized(decodedValue == "Y");    
+        
+        if (this.sendPassword == "")
+        {
+            if (!this.authorized && wasAuthorized)
+            {
+                this.timer = 5;
+                this.elementDbg.innerHTML = "Successful Logout";                
+            }
+        }
+        else
+        {
+            if (!this.authorized)
+            {
+                this.timer = 5;
+                this.elementDbg.innerHTML = "Login failed";                
+            }
+            else
+            {
+                this.timer = 5;
+                this.elementDbg.innerHTML = "Successful Login"; 
+                this.elementPassword.value = "";
+            }
+        }
+    }    
+    
+    handleActions(item)
+    {
+        if (this.sendLogin)
+        {
+            this.timer = 5;
+            this.elementDbg.innerHTML = "Trying...";
+            
+            this.sendLogin = false;
+            this.queryLogin = true;
+            this.count = 2;
+
+            item.sendLogin(this.sendPassword);
+            
+            return true;
+        }
+        
+        if (this.queryLogin)
+        {
+            if (this.count == 0)
+            {
+                this.timer = 5;
+                this.elementDbg.innerHTML = "Login/Logout failed. No response";
+                this.queryLogin = false;
+                this.setAuthorized(false);
+            }
+            else
+            {
+                this.count--;
+                
+                bleiface.itemReadWithBusy(item);
+            }
+            return true;
+        }
+        return false;
+    }    
+}
+
+// bluetooth interface
+
+class blueToothAuthorize extends blueToothIf
+{
+    constructor ()
+    {
+        super ("Authorize", 1, "af297289-ad63-457c-bc81-de7db0450df7");
+    }
+    
+    setRead(readValue)
+    {
+        super.setRead(readValue);
+
+        authorizeControl.processData(readValue);
+    }
+    
+    sendLogin(password)
+    {
+        const encodedValue = new TextEncoder().encode(password);
+        
+        this.write(encodedValue);
+    }
+    
+    run()
+    {
+        authorizeControl.handleActions(this);
+    }
+}       
+
+//==========================================================
+//
+//          Alarm log blue tooth
+//
+//==========================================================
+
+// Event callback
+
+function gotoAlarmRec(recDir)
+{
+    if (alarmHistory)
+    {
+        alarmHistory.gotoRecord(recDir);
+    }
+}
+
+function saveAlarmRecords()
+{
+    if (alarmHistory)
+    {
+        alarmHistory.exportRecords();
+    }
+}
+
+// Alarm history class
+
+class alarmHistoryClass extends historyClass
+{
+    setExportFileHeader()
+    {
+        this.fileData = "Date,Pressure Alarm,CO2 Alarm,Door,Fan Speed,Pressure\r\n";
+    }
+        
+    dataValid(data)
+    {
+        return logDataValid(data);
+    }
+    
+    dataRecordNumber(data)
+    {
+        return logDataRecordNum(data);
+    }
+    
+    dataNumOfRecords(data)
+    {
+        return logDataNumOfRecords(data);
+    }
+    
+    dataAddToFileData(data)
+    {
+        this.fileData  += this.dataDate(data) + "," +
+                          this.dataRecordType(data) + "," +
+                          this.dataDoorState(data) + "," +
+                          this.dataFanSpeed(data) + "," +
+                          this.dataPressure(data) + "\r\n";
+    }
+    
+    dataAddDetailElements(detailsDiv, data)
+    {               
+        this.addRowElement(detailsDiv, "Door State", this.dataDoorState(data));
+        this.addRowElement(detailsDiv, "Fan Speed", this.dataFanSpeed(data));
+        this.addRowElement(detailsDiv, "Pressure", this.dataPressure(data));
+    }
+    
+    dataDate(data)
+    {
+        return logDataDate(data) + " " + logDataTime(data);
+    }
+    
+    dataRecordType(data)
+    {
+        if ((data.getUint8(13) & 0x80) == 0x80)
+        {
+            if ((data.getUint8(13) & 0x01) == 0x01)
+            {
+                return "CO2 Active";
+            }
+            return "CO2 Idle";
+        }
+        if ((data.getUint8(12) & 0x01) == 0x01)
+        {
+            return "Alarm Active";
+        }
+        return "Alarm Idle";
+    }
+    
+    dataDoorState(data)
+    {
+        if (data.getUint8(14) == 0)
+        {
+            return "Door Closed";
+        }
+        return "Door Opened";
+    }
+    
+    dataFanSpeed(data)
+    {
+        return data.getUint8(15);    
+    }
+    
+    dataPressure(data)
+    {
+        return data.getUint16(16, true);
+    }
+}
+
+// Alarm Bluetooth interface class
+
+class blueToothAlarm extends blueToothIf
+{
+    constructor ()
+    {
+        super ("Alarm", 1, "3df84905-2b48-4223-8588-7f52f8cbb71d");
+        this.id = 0;
+        this.retries = 0;
+    }
+
+    advanceId()
+    {
+        this.id++;
+        if (this.id > 200)
+        {
+            this.id = 0;
+        }    
+    }
+    
+    getId()
+    {
+        return this.id;
+    }
+    
+    setReadRecord(rec)
+    {
+        bleiface.setMessage(DBG_INFO, this.getName() + " set record to read " + rec);
+
+        this.advanceId();
+        this.retries = 0;
+        
+        let data = new Uint8Array(2);
+        data[0] = this.id;
+        data[1] = rec;
+        
+        this.write(data);
+    }
+
+    setGotoRecord(cmd, rec)
+    {
+        bleiface.setMessage(DBG_INFO, this.getName() + " set record to goto " + rec);
+
+        this.advanceId();
+        this.retries = 0;
+        
+        let data = new Uint8Array(4);
+        data[0] = this.id;
+        data[1] = cmd;
+        data[2] = rec & 0x00ff;
+        data[3] = (rec >> 8) & 0x00ff;
+        
+        this.write(data);
+    }
+    
+    setRead(readValue)
+    {
+        super.setRead(readValue);
+
+        if (this.isInit())
+        {
+            var id = readValue.getUint8(0);         
+            alarmHistory.handleRecordRead(id, readValue);        
+        }
+    }
+
+    run()
+    {
+        alarmHistory.handleHistoryLoading();
+    }
+}
+
+//==========================================================
+//
+//          Blue tooth device
+//
+//==========================================================
+    
+class blueToothDevice
+{
+    constructor()
+    {
+        this.msg = "";
+        
+        this.connectState = 0;
+        this.readingItem = null;
+        
+        this.device = null;
+        this.server = null;
+        
+        this.serviceUUID = new Array("0666a01a-035e-4a01-9bd8-77b2b56a6bd1",
+                                     "0666a01b-035e-4a01-9bd8-77b2b56a6bd1");
+        this.service = new Array(null, null);
+        
+        this.bleItem = new Array();
+        
+        this.bleItem.push(new blueToothCommission());
+        this.bleItem.push(new blueToothSettings());
+        this.bleItem.push(new blueToothStatus());
+        this.bleItem.push(new blueToothRtc());
+        
+        this.bleItem.push(new blueToothGeneral());
+        this.bleItem.push(new blueToothFilter());
+        this.bleItem.push(new blueToothAlarm());
+
+        this.bleItem.push(new blueToothTest());
+
+        this.bleItem.push(new blueToothAuthorize());
+        this.bleItem.push(new blueToothCalibrate());
+        
+        this.busy = false;
+        this.infoStr = "";
+        this.initDone = false;
+        this.tickCount = 0;
+    }
+    
+    disconnect()
+    {
+        if (this.isConnected())
+        {
+            this.connectState = 0;
+            this.device.gatt.disconnect();
+            connectingTicks.innerHTML = "";
+        }
+    }
+    
+    disconnected()
+    {
+        this.device = null;
+        this.service[0] = null;
+        this.service[1] = null;
+        this.server = null;
+        this.connectState = 0;
+        this.busy = false;
+        this.initDone = false;
+        this.tickCount = 0;
+        
+        this.bleItem.forEach((item) => item.disconnected());
+        connectingTicks.innerHTML = "";
+    }
+    
+    start()
+    {
+        connectingState.innerHTML = "";
+        this.tickCount = 0;
+        connectingTicks.innerHTML = "0";
+        this.setMessage(DBG_CONNECT, "Connecting to device");
+        this.connectState = 1;
+        this.bleItem.forEach((item) => item.start());
+    }
+    
+    done()
+    {
+        this.connectState = 2;
+        
+        this.bleItem.forEach((item) => item.done());
+
+        setTimeout(bluetoothPoll, 10);
+    }
+    
+    setError(error)
+    {
+        this.setMessage(DBG_ERROR, "Last: " + this.msg + "  Fail:Reason:" + error);
+        this.connectState = 3;    
+        connectingTicks.innerHTML = "";
+        this.bleItem.forEach((item) => item.failed());
+        this.device = null;
+        this.service[0] = null;
+        this.service[1] = null;
+        this.server = null;
+    }
+    
+    init()
+    {
+        let result = false;
+        if (!this.isBusy() && !this.initDone)
+        {
+            for (var item of this.bleItem)
+            {
+                if (!item.isInit())
+                {
+                    result = true;
+                    item.init();
+                }
+                if (this.isBusy())
+                {
+                    break;
+                }
+            }
+            if (!result)
+            {
+                this.initDone = true;
+                connectingTicks.innerHTML = "";
+                connectingState.innerHTML = "";              
+                
+                this.setMessage(DBG_CONNECT, "Connected to device");
+                this.setMessage(DBG_CONNECT, "");
+                this.setMessage(DBG_CONNECT, "Version : " + this.getItem("General").getVersion());
+                
+                activeLinks = "connectedLinks";
+
+                if (selectDisplay === "connectingDiv")
+                {
+                    showDiv("statusDiv");
+                }                
+            }
+        }
+        return this.isBusy() || result;
+    }
+
+    run()
+    {
+        if (!this.isBusy())
+        {
+            for (var item of this.bleItem)
+            {
+                item.run();
+                if (this.isBusy())
+                {
+                    break;
+                }
+            }
+        }
+        return this.isBusy();
+    }
+    
+    setBusy(infoStr)
+    {
+        this.busy = true;
+        this.infoStr = infoStr;
+    }
+    
+    clearBusy()
+    {
+        this.busy = false;
+    }
+    
+    isBusy()
+    {
+        return this.busy || (!this.isConnected);
+    }
+    
+    isConnected()
+    {
+        return this.connectState == 2;
+    }
+    
+    setDevice(device)
+    {
+        this.device = device;
+    }
+    
+    setServer(server)
+    {
+        this.server = server;
+    }
+    
+    setService(idx, service)
+    {
+        this.service[idx] = service;
+    }
+
+    setItem(name, characteristic)
+    {            
+        this.getItem(name).setCharactistic(characteristic);
+    }        
+    
+    setMessage(msgType, msg)
+    {
+        this.msg = msg;
+        switch (msgType)
+        {
+            case DBG_CONNECT:
+                connectingState.innerHTML += "<br>" + msg;
+            break;
+
+            case DBG_INFO:
+                //phdbg.innerHTML += "<br>" + msg;
+            break;
+
+            case DBG_ERROR:
+                connectingError.innerHTML += "<br>" + msg;
+            break;            
+        }
+    }
+    
+    getServiceUUID(idx)
+    {
+        return this.serviceUUID[idx].toLowerCase();
+    }
+    
+    serverConnect()
+    {
+        this.setMessage(DBG_CONNECT, "Discovering services");
+        return this.device.gatt.connect();
+    }
+    
+    serviceConnect(idx)
+    {
+        return this.server.getPrimaryService(this.serviceUUID[idx]);
+    }
+    
+    itemConnect(name)
+    {
+        this.setMessage(DBG_INFO, "Finding " + name);
+        return this.getItem(name).connect(this.service);    
+    }
+    
+    itemRead(name)
+    {
+        this.setMessage(DBG_INFO, "Reading " + name);
+        return this.getItem(name).read();    
+    }
+    
+    setRead(name, valueRead)
+    {
+        this.getItem(name).setRead(valueRead);
+    }
+    
+    itemReadWithBusy(item)
+    {
+        bleiface.setBusy(item.getName());
+        this.readingItem = item;
+        
+        item.read()
+            .then (cdata =>
+            {
+                bleiface.readingItem.setRead(cdata);
+                bleiface.clearBusy();
+                return true;
+            })
+            .catch (error =>
+            {
+                bleiface.setError(DBG_ERROR, "Reading " + bleiface.readingItem.getName() + " error: " + error);
+            }); 
+    }
+    
+    getItem(name)
+    {
+        for (var item of this.bleItem)
+        {
+            if (item.getName() === name)
+            {
+                return item;
+            }
+        }   
+        
+        setError(DBG_ERROR, "Unable to find '" + name + "' as a ble interface");
+        return null;
+    }
+    
+    tick()
+    {
+        if (this.connectState == 1 ||
+            (this.connectState == 2 && !this.initDone))
+        {
+            this.tickCount++;
+            connectingTicks.innerHTML = this.tickCount;
+        }
+    }
+}
+
+//==========================================================
+//
+//          Connect to blue tooth process
+//
+//==========================================================
+
+var bleiface = new blueToothDevice();   
+
+function isWebBluetoothEnabled() 
+{
+    if (!navigator.bluetooth) 
+    {
+        menuHide();
+        showDiv("connectingDiv");
+        connectingState.innerHTML = "Web Bluetooth API is not available in this browser/device!";
+        return false
+    }
+    return true
+}
+   
+function connectToBluetooth()
+{
+    bleiface.disconnected();
+    if (isWebBluetoothEnabled())
+    {
+        navigator.bluetooth.requestDevice({
+            filters: [{name: 'CLEANCAB'}],
+            optionalServices: [bleiface.getServiceUUID(0), bleiface.getServiceUUID(1)]
+        })
+        .then(device => 
+        {     
+            bleiface.start();
+            device.addEventListener('gattserverdisconnected', onDisconnected); 
+            bleiface.setDevice(device);
+            return bleiface.serverConnect();
+        })
+        .then(server => 
+        {
+            bleiface.setServer(server);
+            return bleiface.serviceConnect(0);
+        })
+        .then(service0 =>
+        {
+            bleiface.setService(0, service0);
+            
+            return bleiface.serviceConnect(1);
+        })
+        .then(service1 =>
+        {
+            bleiface.setService(1, service1);
+            
+            return bleiface.itemConnect("General");
+        })
+        .then(item0 =>
+        {
+            bleiface.setItem("General", item0);
+            
+            return bleiface.itemConnect("Test");
+        })
+        .then(item1 =>
+        {
+            bleiface.setItem("Test", item1);
+            
+            return bleiface.itemConnect("Filter");
+        })
+        .then(item2 =>
+        {
+            bleiface.setItem("Filter", item2);
+            
+            return bleiface.itemConnect("RTC");
+        })
+        .then(item3 =>
+        {
+            bleiface.setItem("RTC", item3);
+            
+            return bleiface.itemConnect("Commission");
+        })
+        .then(item4 =>
+        {
+            bleiface.setItem("Commission", item4);
+            
+            return bleiface.itemConnect("Settings");
+        })
+        .then(item5 =>
+        {
+            bleiface.setItem("Settings", item5);
+            
+            return bleiface.itemConnect("Status");
+        })
+        .then(item6 =>
+        {
+            bleiface.setItem("Status", item6);
+            
+            return bleiface.itemConnect("Calibrate");
+        })
+        .then(item7 =>
+        {
+            bleiface.setItem("Calibrate", item7);
+            
+            return bleiface.itemConnect("Authorize");
+        })
+        .then(item8 =>
+        {
+            bleiface.setItem("Authorize", item8);
+            
+            return bleiface.itemConnect("Alarm");
+        })
+        .then(item9 =>
+        {
+            bleiface.setItem("Alarm", item9);
+          
+            bleiface.setMessage(DBG_CONNECT, "Discover done. Reading...");
+            
+            return bleiface.itemRead("General");
+        })
+        .then(cdata =>
+        {
+            bleiface.setRead("General", cdata);
+            
+            return bleiface.itemRead("Commission");
+        })
+        .then(cdata =>
+        {
+            bleiface.setRead("Commission", cdata);
+            
+            return bleiface.itemRead("Settings");
+        })
+        .then(cdata =>
+        {
+            bleiface.setRead("Settings", cdata);
+            
+            return bleiface.itemRead("Status");
+        })
+        .then(cdata =>
+        {
+            bleiface.setRead("Status", cdata);
+            
+            bleiface.setMessage(DBG_CONNECT, "Reading done. Initializing...");            
+            return bleiface.done();
+        })
+        .catch(error =>
+        {
+            bleiface.setError(error);        
+        });
+    }
+}
+
+function onDisconnected(event)
+{
+  menuHide();
+  activeLinks = "idleLinks";
+  showDiv("connectingDiv");
+  connectingState.innerHTML = "Device disconnected";
+  //phdbg.innerHTML = "";
+}
+
+function connect()
+{
+    if (isWebBluetoothEnabled())
+    {
+        authorizeControl.restart();
+        calibrateControl.restart();
+    
+        testSwitch.checked = false;
+ 
+        menuHide();
+        showDiv("connectingDiv");
+        //connectingState.innerHTML = "Connecting...";
+ 
+        connectToBluetooth();        
+    }
+        
+/*
+  if (isWebBluetoothEnabled())
+  {
+      device.addEventListener('gattserverdisconnected', onDisconnected); 
+      
+      setTimeout(bluetoothPoll, 1000);
+      activeLinks = "connectedLinks";
+      connectingState.innerHTML = "Connected";
+    })
+    .catch(error => 
+    {
+      connectingState.innerHTML = "Connection Failed: " + error;
+    });
+  }
+  */
+}
+
+function disconnect()
+{
+    menuHide();
+    activeLinks = "idleLinks";
+    showDiv("connectingDiv");
+    connectingState.innerHTML = "Device disconnected";
+    bleiface.disconnect();
+    //phdbg.innerHTML = "";
+}
+
+function secondTimer()
+{
+    if (authorizeControl)
+    {
+        authorizeControl.tick();
+    }
     if (calibrateControl)
     {
-        calibrateControl.executeEraseLog(theLog);
+        calibrateControl.tick();
     }
+    if (bleiface)
+    {
+        bleiface.tick();
+    }
+
+    setTimeout(secondTimer, 500);
+}
+
+function bluetoothPoll()
+{    
+    if (bleiface.isConnected())
+    {
+        bleiface.init();
+        if (!bleiface.isBusy())
+        {
+            bleiface.run();
+        }
+        
+        if (bleiface.isBusy())
+        {
+            setTimeout(bluetoothPoll, 20);
+        }
+        else
+        {
+            setTimeout(bluetoothPoll, 200);
+        }
+    }
+}
+
+window.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
+    alert("Error occured: " + errorMsg);//or any message
+    return false;
 }
 
 </script>

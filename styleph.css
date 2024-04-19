@@ -431,7 +431,12 @@ hr {
   color: black;
 }
 
-.active {
+.topnav .active {
+  background-color: #04AA6D;
+  color: white;
+}
+
+.topnav .active:hover {
   background-color: #04AA6D;
   color: white;
 }
