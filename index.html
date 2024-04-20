@@ -4,6 +4,7 @@
     <title>CleanCab App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="styleph.css">
+    <link rel="manifest" href="manifest.json">
   </head>
   <body onload="init()">
 
@@ -182,18 +183,18 @@
         </div>
         <div class="row">
           <div class="col-35">
-            <label>Installer Name</label>
+            <label>Serial Number</label>
           </div>
           <div class="col-65">
-            <input type="text" id="filterInstallerName" value="">
+            <input type="text" id="filterSerialNumber" value="">
           </div>
         </div>
         <div class="row">
           <div class="col-35">
-            <label>Installer Id</label>
+            <label>Installer Name</label>
           </div>
           <div class="col-65">
-            <input type="text" id="filterInstallerId" value="">
+            <input type="text" id="filterInstallerName" value="">
           </div>
         </div>
         <div class="row">
@@ -226,18 +227,18 @@
     </div>
     <div class="row">
       <div class="col-35">
-        <label>Installer Name</label>
+        <label>Serial Number</label>
       </div>
       <div class="col-65">
-        <input type="text" id="hepaInstallerName" readonly value="">
+        <input type="text" id="hepaSerialNumber" readonly value="">
       </div>
     </div>
     <div class="row">
       <div class="col-35">
-        <label>Installer Id</label>
+        <label>Installer Name</label>
       </div>
       <div class="col-65">
-        <input type="text" id="hepaInstallerId" readonly value="">
+        <input type="text" id="hepaInstallerName" readonly value="">
       </div>
     </div>
   </div>
@@ -261,18 +262,18 @@
       </div>
       <div class="row">
         <div class="col-35">
-          <label>Installer Name</label>
+          <label>Serial Number</label>
         </div>
         <div class="col-65">
-          <input type="text" id="mainInstallerName" readonly value="">
+          <input type="text" id="mainSerialNumber" readonly value="">
         </div>
       </div>
       <div class="row">
         <div class="col-35">
-          <label>Installer Id</label>
+          <label>Installer Name</label>
         </div>
         <div class="col-65">
-          <input type="text" id="mainInstallerId" readonly value="">
+          <input type="text" id="mainInstallerName" readonly value="">
         </div>
       </div>
   </div>  
@@ -722,6 +723,25 @@
 </div>
 
 <script>
+
+//=====================================================
+//
+//      Service Worker
+//
+//=====================================================
+
+if ('serviceWorker' in navigator) 
+{
+  navigator.serviceWorker.register('/serviceworker.js')
+    .then(function(registration) 
+    {
+        console.log('ServiceWorker registration successful!');
+    })
+    .catch(function(err) 
+    {
+        console.log('ServiceWorker registration failed: ', err);
+    });
+}
 
 //=====================================================
 //
@@ -1565,17 +1585,17 @@ var addMainDiv = document.querySelector("#addMainDiv");
 
 var filterPartNumber = document.querySelector("#filterPartNumber");
 var filterInstallerName = document.querySelector("#filterInstallerName");
-var filterInstallerId = document.querySelector("#filterInstallerId");
+var filterSerialNumber = document.querySelector("#filterSerialNumber");
 
 const hepaInstalledDate = document.querySelector("#hepaInstalledDate");
 const hepaPartNumber = document.querySelector("#hepaPartNumber");
 const hepaInstallerName = document.querySelector("#hepaInstallerName");
-const hepaInstallerId = document.querySelector("#hepaInstallerId");
+const hepaSerialNumber = document.querySelector("#hepaSerialNumber");
 
 const mainInstalledDate = document.querySelector("#mainInstalledDate");
 const mainPartNumber = document.querySelector("#mainPartNumber");
 const mainInstallerName = document.querySelector("#mainInstallerName");
-const mainInstallerId = document.querySelector("#mainInstallerId");
+const mainSerialNumber = document.querySelector("#mainSerialNumber");
 
 //Filter event handlers
 
@@ -1629,7 +1649,7 @@ function filterSave()
         if (item)
         {
             item.addFilter(addingFilter - 1,
-                           filterPartNumber.value + "|" + filterInstallerName.value + "|" + filterInstallerId.value);
+                           filterPartNumber.value + "|" + filterInstallerName.value + "|" + filterSerialNumber.value);
         }
         
         if (addingFilter == 1)
@@ -1637,19 +1657,19 @@ function filterSave()
             hepaInstalledDate.value = getNowDateForInput();
             hepaPartNumber.value = filterPartNumber.value;
             hepaInstallerName.value = filterInstallerName.value;
-            hepaInstallerId.value = filterInstallerId.value;
+            hepaSerialNumber.value = filterSerialNumber.value;
         }
         else
         {
             mainInstalledDate.value = getNowDateForInput();
             mainPartNumber.value = filterPartNumber.value;
             mainInstallerName.value = filterInstallerName.value;
-            mainInstallerId.value = filterInstallerId.value;
+            mainSerialNumber.value = filterSerialNumber.value;
         }
         replaceFilter(addingFilter);    
         filterPartNumber.value = "";  
         filterInstallerName.value = "";
-        filterInstallerId.value = "";                
+        filterSerialNumber.value = "";                
     }
 }
 
@@ -1691,7 +1711,7 @@ class filterHistoryClass extends historyClass
 {
     setExportFileHeader()
     {
-        this.fileData = "Date,Filter Type,Hours run,Part Number,Installer Name,Installer Id\r\n";
+        this.fileData = "Date,Filter Type,Hours Run,Part Number,Serial Number,Installer Name\r\n";
     }
 
     dataValid(data)
@@ -1719,8 +1739,8 @@ class filterHistoryClass extends historyClass
         if (filterStrings.length >= 3)
         {
             this.fileData  += filterStrings[0] + "," +
-                              filterStrings[1] + "," +
-                              filterStrings[2] + "\r\n";
+                              filterStrings[2] + "," +
+                              filterStrings[1] + "\r\n";
         }
         else
         {
@@ -1736,8 +1756,8 @@ class filterHistoryClass extends historyClass
         if (filterStrings.length >= 3)
         {
             this.addRowElement(detailsDiv, "Part Number", filterStrings[0]);
+            this.addRowElement(detailsDiv, "Serial Number", filterStrings[2]);
             this.addRowElement(detailsDiv, "Installer Name", filterStrings[1]);
-            this.addRowElement(detailsDiv, "Installer Id", filterStrings[2]);
         }
     }
     
@@ -1900,7 +1920,7 @@ class blueToothFilter extends blueToothIf
                         {
                             hepaPartNumber.value = filterStrings[0];
                             hepaInstallerName.value = filterStrings[1];
-                            hepaInstallerId.value = filterStrings[2];
+                            hepaSerialNumber.value = filterStrings[2];
                         }
                     }
                 }
@@ -1939,7 +1959,7 @@ class blueToothFilter extends blueToothIf
                         {
                             mainPartNumber.value = filterStrings[0];
                             mainInstallerName.value = filterStrings[1];
-                            mainInstallerId.value = filterStrings[2];
+                            mainSerialNumber.value = filterStrings[2];
                         }
                     }
                 }
