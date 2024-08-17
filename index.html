@@ -86,6 +86,16 @@
         </div>
       </div>
     </div>
+    <div class="row" id="statusCO2Div">
+      <div class="col-25">
+        <label>CO2</label>
+      </div>
+      <div class="col-65">
+        <div class="row-progress">
+          <div id="sCO2Bar" class="container-progress" style="width:10%">400ppm</div>
+        </div>
+      </div>
+    </div>
     <div class="row">
       <div class="col-25">
         <label>Door</label>
@@ -136,6 +146,17 @@
       <div class="col-5">
         <label class="units">hrs</label>
       </div>
+    </div>
+    <div class="row" id="recirculateRunningDiv">
+        <div class="col-25">
+          <label>Recirculate</label>
+        </div>
+        <div class="col-65">
+          <input type="text" id="sRecirculateFilterTime" readonly value="123">
+        </div>
+        <div class="col-5">
+          <label class="units">hrs</label>
+        </div>
     </div>
     <div class="row">
       <div class="col-25">
@@ -775,14 +796,24 @@ var calibrateControl;
 function init()
 {
     selectDisplay = "";
-    activeLinks = "idleLinks";
+
+    //testing lines
+    //activeLinks = "idleLinks";
+    activeLinks = "connectedLinks";
+    // testing lines end
     
     filterHistory = new filterHistoryClass("filter", "Filter");
     alarmHistory = new alarmHistoryClass("alarm", "Alarm");
     authorizeControl = new authorizeClass();
     calibrateControl = new calibrateClass();
     
-    onDisconnected();
+    //onDisconnected();
+
+    // testing lines... removed \/
+    authorizeControl.setAuthorized(true);
+    protocolVersion = 2;
+    bleiface.protocolVersionSet();
+    // testing lines end
     
     setTimeout(secondTimer, 500);
 }
@@ -1419,7 +1450,12 @@ class blueToothIf
         
         return service[this.serviceIdx].getCharacteristic(this.characteristicUUID);
     }
-    
+
+    protocolVersionSet()
+    {
+
+    }
+
     isConnected()
     {
         return this.connectState == 2;
@@ -2180,7 +2216,7 @@ settingForm.addEventListener("submit", (event) =>
 {
     event.preventDefault();
   
-    const buffer = new ArrayBuffer(24);
+    const buffer = new ArrayBuffer(protocolVersion < 2 ? 24 : 20);
     const view = new DataView(buffer);
 
     view.setUint16( 0, getRadioInput("fmode"), true);
@@ -2193,8 +2229,12 @@ settingForm.addEventListener("submit", (event) =>
     view.setUint16(14, fieldHoldTime.value, true);
     view.setUint16(16, fieldStartPause.value, true);
     view.setUint16(18, getRadioInput("fdoorMode"), true);
-    view.setUint16(20, getRadioInput("falarmMode"), true);
-    view.setUint16(22, getRadioInput("fco2Mode"), true);
+
+    if (protocolVersion < 2)
+    {
+      view.setUint16(20, getRadioInput("falarmMode"), true);
+      view.setUint16(22, getRadioInput("fco2Mode"), true);
+    }
 
     var item = bleiface.getItem("Settings");
     if (item)
@@ -2239,7 +2279,25 @@ class blueToothSettings extends blueToothIf
         super.disconnected();
         this.send = false;
     }
-    
+
+    protocolVersionSet()
+    {
+      var alarmDiv = document.querySelector("#settingAlarmMode");
+      var co2Div = document.querySelector("#settingCO2Mode");
+
+      super.protocolVersionSet();
+      if (protocolVersion < 2)
+      {
+        alarmDiv.style.display = "block";
+        co2Div.style.display = "block";
+      }
+      else
+      {
+        alarmDiv.style.display = "none";
+        co2Div.style.display = "none";
+      }
+    }
+
     setRead(readValue)
     {
         super.setRead(readValue);
@@ -2255,9 +2313,12 @@ class blueToothSettings extends blueToothIf
         fieldHoldTime.value = readValue.getUint16(14, true);
         fieldStartPause.value = readValue.getUint16(16, true);
         setRadioInput("fdoorMode", readValue.getUint16(18, true));
-        setRadioInput("falarmMode", readValue.getUint16(20, true));
-        setRadioInput("fco2Mode", readValue.getUint16(22, true));
-    
+        if (protocolVersion < 2)
+        {
+          setRadioInput("falarmMode", readValue.getUint16(20, true));
+          setRadioInput("fco2Mode", readValue.getUint16(22, true));
+        }
+
         fieldFixedSpeed.disabled = mode == 1;
         fieldTargetPressure.disabled = mode == 0;
         fieldMinSpeed.disabled = mode == 0;
@@ -2296,6 +2357,7 @@ const sAlarmState = document.querySelector("#sAlarmState");
 const sCO2State = document.querySelector("#sCO2State");
 const sMotorTime = document.querySelector("#sMotorTime");
 const sHepaFilterTime = document.querySelector("#sHepaFilterTime");
+const sRecirculateFilterTime = document.querySelector("#sRecirculateFilterTime");
 const sMainFilterTime = document.querySelector("#sMainFilterTime");
 
 // bluetooth interface
@@ -2313,8 +2375,33 @@ class blueToothStatus extends blueToothIf
         if (v == 0) return v0;
         return vx;
     }
+    valueToText2(v, v0, v1, v2, v3)
+    {
+      if (v == 1) return v1;
+      if (v == 2) return v2;
+      if (v == 3) return v3;
+      return v0;
+    }
 
-    decodeFanSpeed(fan)
+    protocolVersionSet() {
+      super.protocolVersionSet();
+
+      var recirculateDiv = document.querySelector("#recirculateRunningDiv");
+      var statusCO2Div = document.querySelector("#statusCO2Div");
+
+      if (protocolVersion < 2)
+      {
+        recirculateDiv.style.display = "none";
+        statusCO2Div.style.display = "none";
+      }
+      else
+      {
+        recirculateDiv.style.display = "block";
+        statusCO2Div.style.display = "block";
+      }
+    }
+
+  decodeFanSpeed(fan)
     {
         let tempFan = (((fan * 100) + 0.5) / 255 >> 0);
         if (tempFan > 100)
@@ -2333,8 +2420,16 @@ class blueToothStatus extends blueToothIf
         sFanSpeedBar.innerHTML = fan + '%';
 
         sDoorState.value = this.valueToText(readValue.getUint8(1), "Closed", "Disabled", "Opened");
-        sAlarmState.value = this.valueToText(readValue.getUint8(2), "Inactive", "Disabled", "Alarmed");
-        sCO2State.value = this.valueToText(readValue.getUint8(3), "Inactive", "Disabled", "Alarmed");
+        if (protocolVersion < 2)
+        {
+          sAlarmState.value = this.valueToText(readValue.getUint8(2), "Inactive", "Disabled", "Alarmed");
+          sCO2State.value = this.valueToText(readValue.getUint8(3), "Inactive", "Disabled", "Alarmed");
+        }
+        else
+        {
+          sAlarmState.value = this.valueToText2(readValue.getUint8(2), "Good", "Good", "Alarmed", "Alarmed");
+          sCO2State.value = this.valueToText2(readValue.getUint8(3), "Good", "Info", "Warning", "Alarmed")
+        }
 
         //NOTE: With the pressure. need to scale to 100% (ie choose a range and if greater the set to 100)
 
@@ -2346,10 +2441,34 @@ class blueToothStatus extends blueToothIf
   
         sPressureBar.style.width = pressure + '%';
         sPressureBar.innerHTML = readValue.getUint16(4, true) + 'pa';
-  
-        sHepaFilterTime.value = toHours(readValue.getUint32(6, true));
-        sMainFilterTime.value = toHours(readValue.getUint32(10, true));
-        sMotorTime.value = toHours(readValue.getUint32(14, true));
+
+        var idx = 6;
+
+        if (protocolVersion >= 2)
+        {
+          let co2 = (readValue.getUint16(idx, true) / 100 >> 0);
+          if (co2 > 100)
+          {
+            co2 = 100;
+          }
+
+          sCO2Bar.style.width = co2 + 'ppm';
+          sCO2Bar.innerHTML = readValue.getUint16(idx, true) + 'ppm';
+
+          idx += 2;
+        }
+
+        sHepaFilterTime.value = toHours(readValue.getUint32(idx, true));
+        idx += 4;
+        sMainFilterTime.value = toHours(readValue.getUint32(idx, true));
+        idx += 4;
+        sMotorTime.value = toHours(readValue.getUint32(idx, true));
+        idx += 4;
+        if (protocolVersion >= 2)
+        {
+          sRecirculateFilterTime.value = toHours(readValue.getUint32(idx, true));
+          idx += 4;
+        }
     }
     
     run()
@@ -2396,7 +2515,7 @@ class blueToothGeneral extends blueToothIf
         
             protocolVersion = readValue.getUint8(1);
             this.version = readValue.getUint8(6) + "." + pad2(readValue.getUint8(7));
-                    }
+        }
         else
         {
             protocolVersion = 0;
@@ -2404,6 +2523,7 @@ class blueToothGeneral extends blueToothIf
     
             this.version = decodedValue;  
         }
+        bleiface.protocolVersionSet();
         bleiface.setMessage(DBG_CONNECT, "Version: " + this.version);  
     }    
 }
@@ -3118,6 +3238,11 @@ class blueToothDevice
         
         this.bleItem.forEach((item) => item.disconnected());
         connectingTicks.innerHTML = "";
+    }
+
+    protocolVersionSet()
+    {
+        this.bleItem.forEach((item) => item.protocolVersionSet());
     }
     
     start()
