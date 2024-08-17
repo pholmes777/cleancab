@@ -185,6 +185,14 @@
             <input id="addHepaBtn" type="button" value="Replace" onclick="replaceFilter(1)" class="btn">
         </div>
       </div>
+      <div class="row" id="addRecirculationDiv">
+        <div class="col-35">
+          <label>Recirculation Filter</label>
+        </div>          
+        <div class="col-65">
+            <input id="addRecirculationBtn" type="button" value="Replace" onclick="replaceFilter(3)" class="btn">
+        </div>
+      </div>
       <div class="row" id="addMainDiv">
         <div class="col-35">
           <label>Main Filter</label>
@@ -263,6 +271,41 @@
       </div>
     </div>
   </div>
+  <h3 id="hdrDisplayRecirculationDiv">Recirculation Filter Details</h3>
+  <div class="container" id="divDisplayRecirculationDiv">
+    <div class="row">
+      <div class="col-35">
+        <label>Installed Date</label>
+      </div>
+      <div class="col-65">
+        <input type="date" id="recirculationInstalledDate" readonly value="2024-02-18">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-35">
+        <label>Part Number</label>
+      </div>
+      <div class="col-65">
+        <input type="text" id="recirculationPartNumber" readonly value="">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-35">
+        <label>Serial Number</label>
+      </div>
+      <div class="col-65">
+        <input type="text" id="recirculationSerialNumber" readonly value="">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-35">
+        <label>Installer Name</label>
+      </div>
+      <div class="col-65">
+        <input type="text" id="recirculationInstallerName" readonly value="">
+      </div>
+    </div>
+  </div> 
   <h3>Main Filter Details</h3>
   <div class="container">
       <div class="row">
@@ -490,6 +533,7 @@
       </div>
     </div>
   </div>
+  
   <h3>Log Management</h3>
   <div class="container">
     <div class="row">
@@ -1615,23 +1659,15 @@ class blueToothTest extends blueToothIf
 var addingFilter = 0;
 var addHepaBtn = document.querySelector("#addHepaBtn");
 var addMainBtn = document.querySelector("#addMainBtn");
-var filterForm = document.querySelector("#filterForm");
+var addRecirculationBtn = document.querySelector("#addRecirculationBtn");
 var addHepaDiv = document.querySelector("#addHepaDiv");
 var addMainDiv = document.querySelector("#addMainDiv");
+var addRecirculationDiv = document.querySelector("#addRecirculationDiv");
+var filterForm = document.querySelector("#filterForm");
 
 var filterPartNumber = document.querySelector("#filterPartNumber");
 var filterInstallerName = document.querySelector("#filterInstallerName");
 var filterSerialNumber = document.querySelector("#filterSerialNumber");
-
-const hepaInstalledDate = document.querySelector("#hepaInstalledDate");
-const hepaPartNumber = document.querySelector("#hepaPartNumber");
-const hepaInstallerName = document.querySelector("#hepaInstallerName");
-const hepaSerialNumber = document.querySelector("#hepaSerialNumber");
-
-const mainInstalledDate = document.querySelector("#mainInstalledDate");
-const mainPartNumber = document.querySelector("#mainPartNumber");
-const mainInstallerName = document.querySelector("#mainInstallerName");
-const mainSerialNumber = document.querySelector("#mainSerialNumber");
 
 //Filter event handlers
 
@@ -1659,6 +1695,7 @@ function replaceFilter(filterType)
     
         addHepaBtn.value = "Replace";
         addMainBtn.value = "Replace";
+        addRecirculationBtn.value = "Replace";
         addingFilter = 0;
         filterForm.style.display="none";
     }
@@ -1669,12 +1706,23 @@ function replaceFilter(filterType)
             addHepaBtn.value = "Cancel Replace";
         if (filterType == 2)
             addMainBtn.value = "Cancel Replace";
+        if (filterType == 3)
+            addRecirculationBtn.value = "Cancel Replace";
         filterForm.style.display="block";
     }
-    addMainBtn.disabled = addingFilter == 1;
-    addHepaBtn.disabled = addingFilter == 2;
-    addHepaDiv.style.display = (addingFilter != 2) ? "block" : "none"
-    addMainDiv.style.display = (addingFilter != 1) ? "block" : "none"
+    addMainBtn.disabled = addingFilter != 0 && addingFilter != 2;
+    addHepaBtn.disabled = addingFilter != 0 && addingFilter != 1;
+    addRecirculationBtn.disabled = addingFilter != 0 && addingFilter != 3;
+    addHepaDiv.style.display = (addingFilter == 0 || addingFilter == 1) ? "block" : "none";
+    addMainDiv.style.display = (addingFilter == 0 || addingFilter == 2) ? "block" : "none";
+    if (protocolVersion < 2)
+    {
+        addRecirculationDiv.style.display = "none";
+    }
+    else
+    {
+        addRecirculationDiv.style.display = (addingFilter == 0 || addingFilter == 3) ? "block" : "none";
+    }
 }
 
 function filterSave()
@@ -1688,20 +1736,19 @@ function filterSave()
                            filterPartNumber.value + "|" + filterInstallerName.value + "|" + filterSerialNumber.value);
         }
         
-        if (addingFilter == 1)
+        var filterName = "hepa";
+        switch (addingFilter)
         {
-            hepaInstalledDate.value = getNowDateForInput();
-            hepaPartNumber.value = filterPartNumber.value;
-            hepaInstallerName.value = filterInstallerName.value;
-            hepaSerialNumber.value = filterSerialNumber.value;
+            case 1: filterName = "hepa";                break;
+            case 2: filterName = "main";                break;
+            case 3: filterName = "recirculation";       break;
         }
-        else
-        {
-            mainInstalledDate.value = getNowDateForInput();
-            mainPartNumber.value = filterPartNumber.value;
-            mainInstallerName.value = filterInstallerName.value;
-            mainSerialNumber.value = filterSerialNumber.value;
-        }
+        
+        document.querySelector("#" + filterName + "InstalledDate").value = getNowDateForInput();
+        document.querySelector("#" + filterName + "PartNumber").value = filterPartNumber.value;
+        document.querySelector("#" + filterName + "InstallerName").value = filterInstallerName.value;
+        document.querySelector("#" + filterName + "SerialNumber").value = filterSerialNumber.value;
+
         replaceFilter(addingFilter);    
         filterPartNumber.value = "";  
         filterInstallerName.value = "";
@@ -1710,17 +1757,6 @@ function filterSave()
 }
 
 // filter helper functions
-
-function filterDataFilterType(data)
-{
-    let offset = (protocolVersion == 0) ? 8 : 9;
-  
-    if (data.getUint8(offset) == 0)
-    {
-        return "Hepa Filter";
-    }
-    return "Main Filter";
-}
 
 function filterDataHoursRun(data)
 {
@@ -1804,7 +1840,20 @@ class filterHistoryClass extends historyClass
     
     dataRecordType(data)
     {
-        return filterDataFilterType(data);
+        let offset = (protocolVersion == 0) ? 8 : 9;
+  
+        switch (data.getUint8(offset))
+        {
+            case 0:
+                return "Hepa Filter";
+                
+            case 1:
+                return "Main Filter";
+                
+            case 2:
+                return "Recirculation Filter";
+        }
+        return "Unknown Filter";
     }
 }
 
@@ -1907,22 +1956,58 @@ class blueToothFilter extends blueToothIf
         }
     }
     
+    protocolVersionSet()
+    {
+        super.protocolVersionSet();
+        
+        var thehdr = document.querySelector("#hdrDisplayRecirculationDiv");
+        var thediv = document.querySelector("#divDisplayRecirculationDiv");
+        var theadd = document.querySelector("#addRecirculationDiv");
+        
+        thehdr.style.display = (protocolVersion < 2) ? "none" : "block";
+        thediv.style.display = (protocolVersion < 2) ? "none" : "block";
+        theadd.style.display = (protocolVersion < 2) ? "none" : "block";
+    }
+    
     init()
     {
-        switch (this.initState)
+        if (this.initState == 0)
         {
-            case 0:
-                bleiface.setMessage(DBG_CONNECT, "Reading current Hepa Filter");
-                this.initState++;
-                this.setReadRecord(1);               // read the current Hepa Filter
-            break;
-            
-            case 1:
+            bleiface.setMessage(DBG_CONNECT, "Reading first Filter");
+            this.initState++;
+            this.setReadRecord(1);               // read the current Hepa Filter
+        }
+        else
+        {
+            if ((this.initState & 0x01) == 0x01)
+            {
                 this.initState++;
                 bleiface.itemReadWithBusy(this);
-            break;
-
-            case 2:
+            }
+            else
+            {
+                var filterName = "hepa";        // current filter name
+                var filterIdx = 2;              // next filter to read. 0 = no more
+                var ok = true;
+                
+                switch (this.initState)
+                {
+                    case 2:
+                        filterName = "hepa";        
+                        filterIdx = 2;
+                    break;
+                    
+                    case 4:
+                        filterName = "main";
+                        filterIdx = (protocolVersion >= 2) ? 6 : 0;
+                    break;
+                    
+                    case 6:
+                        filterName = "recirculation";
+                        filterIdx = 0;
+                    break;
+                }
+                
                 if (!this.isValueValid() ||
                     this.getValue().getUint8(0) != this.id)
                 {
@@ -1939,68 +2024,44 @@ class blueToothFilter extends blueToothIf
                     this.retries++;
                     if (this.retries > 3)
                     {
-                        bleiface.setError("Failed to read current HEPA Filter");
-                        break;
+                        bleiface.setError("Failed to read current " + filterName + " Filter");
                     }
-                    bleiface.itemReadWithBusy(this);
-                    break;
+                    else
+                    {
+                        bleiface.itemReadWithBusy(this);
+                    }
+                    ok = false;
                 }
                 else
                 {
-                    this.initState++;
+                    if (filterIdx == 0)
+                    {
+                        super.init();
+                    }
+                    else
+                    {
+                        this.initState++;
+                    }
                     if (logDataValid(this.getValue()))
                     {
-                        hepaInstalledDate.value = logDataDate(this.getValue());
+                        document.querySelector("#" + filterName + "InstalledDate").value = logDataDate(this.getValue());
                         const filterStrings = filterDataStrings(this.getValue());
                         if (filterStrings.length >= 3)
                         {
-                            hepaPartNumber.value = filterStrings[0];
-                            hepaInstallerName.value = filterStrings[1];
-                            hepaSerialNumber.value = filterStrings[2];
+                            document.querySelector("#" + filterName + "PartNumber").value = filterStrings[0];
+                            document.querySelector("#" + filterName + "InstallerName").value = filterStrings[1];
+                            document.querySelector("#" + filterName + "SerialNumber").value = filterStrings[2];
                         }
                     }
                 }
-                
-                bleiface.setMessage(DBG_CONNECT, "Reading current Main Filter");
-                
-                this.setReadRecord(2);               // read the current Main Filter
-            break;
-            
-            case 3:
-                this.initState++;
-                bleiface.itemReadWithBusy(this);
-            break;
-
-            case 4:
-                if (!this.isValueValid() ||
-                    this.getValue().getUint8(0) != this.id)
+                if (ok && filterIdx != 0)
                 {
-                    this.retries++;
-                    if (this.retries > 3)
-                    {
-                        bleiface.setError("Failed to read current Main Filter");
-                        break;
-                    }
-                    bleiface.itemReadWithBusy(this);
-                    break;
+                    bleiface.setMessage(DBG_CONNECT, "Reading current next Filter");
+                
+                    this.setReadRecord(filterIdx);   // read the next Filter
                 }
-                else
-                {
-                    super.init()
-                    if (logDataValid(this.getValue()))
-                    {
-                        mainInstalledDate.value = logDataDate(this.getValue());
-                        const filterStrings = filterDataStrings(this.getValue());
-                        if (filterStrings.length >= 3)
-                        {
-                            mainPartNumber.value = filterStrings[0];
-                            mainInstallerName.value = filterStrings[1];
-                            mainSerialNumber.value = filterStrings[2];
-                        }
-                    }
-                }
-            break;
-        }    
+            }
+        }
     }
     
     setRead(readValue)
@@ -2377,13 +2438,14 @@ class blueToothStatus extends blueToothIf
     }
     valueToText2(v, v0, v1, v2, v3)
     {
-      if (v == 1) return v1;
-      if (v == 2) return v2;
-      if (v == 3) return v3;
-      return v0;
+        if (v == 1) return v1;
+        if (v == 2) return v2;
+        if (v == 3) return v3;
+        return v0;
     }
 
-    protocolVersionSet() {
+    protocolVersionSet() 
+    {
       super.protocolVersionSet();
 
       var recirculateDiv = document.querySelector("#recirculateRunningDiv");
@@ -2401,7 +2463,7 @@ class blueToothStatus extends blueToothIf
       }
     }
 
-  decodeFanSpeed(fan)
+    decodeFanSpeed(fan)
     {
         let tempFan = (((fan * 100) + 0.5) / 255 >> 0);
         if (tempFan > 100)
@@ -2456,18 +2518,28 @@ class blueToothStatus extends blueToothIf
           sCO2Bar.innerHTML = readValue.getUint16(idx, true) + 'ppm';
 
           idx += 2;
-        }
-
-        sHepaFilterTime.value = toHours(readValue.getUint32(idx, true));
-        idx += 4;
-        sMainFilterTime.value = toHours(readValue.getUint32(idx, true));
-        idx += 4;
-        sMotorTime.value = toHours(readValue.getUint32(idx, true));
-        idx += 4;
-        if (protocolVersion >= 2)
-        {
+          
+          // skip temperature and humity
+          
+          idx += 4;
+          
+          sMainFilterTime.value = toHours(readValue.getUint32(idx, true));
+          idx += 4;
+          sHepaFilterTime.value = toHours(readValue.getUint32(idx, true));
+          idx += 4;
+          sMotorTime.value = toHours(readValue.getUint32(idx, true));
+          idx += 4;
           sRecirculateFilterTime.value = toHours(readValue.getUint32(idx, true));
           idx += 4;
+        }
+        else
+        {
+            sHepaFilterTime.value = toHours(readValue.getUint32(idx, true));
+            idx += 4;
+            sMainFilterTime.value = toHours(readValue.getUint32(idx, true));
+            idx += 4;
+            sMotorTime.value = toHours(readValue.getUint32(idx, true));
+            idx += 4;
         }
     }
     
@@ -2738,6 +2810,19 @@ class blueToothCalibrate extends blueToothIf
         calibrateControl.processData(readValue);
     }
     
+    connect(service)
+    {
+        if (protocolVersion < 2)
+        {
+            return super.connect(service);
+        }
+        this.characteristic = null;
+        this.readValue = null;
+        this.validIsValid = false;
+        this.connectState = 2;
+        return null;
+    }
+    
     sendRequest(sendCmd, sendIdx, sendValue)
     {
         let data = new Uint8Array(4);
@@ -2856,11 +2941,14 @@ class authorizeClass
                 
                 if (!this.calibrateMenuItem)
                 {
-                    this.calibrateMenuItem = document.createElement("a");
-                    this.calibrateMenuItem.setAttribute("href", "javascript:showDiv('calibrateDiv')");
-                    this.calibrateMenuItem.innerHTML = "Calibrate";
+                    if (protocolVersion < 2)
+                    {
+                        this.calibrateMenuItem = document.createElement("a");
+                        this.calibrateMenuItem.setAttribute("href", "javascript:showDiv('calibrateDiv')");
+                        this.calibrateMenuItem.innerHTML = "Calibrate";
                 
-                    this.elementMenuItem.parentNode.insertBefore(this.calibrateMenuItem, this.elementMenuItem.nextSibling); 
+                        this.elementMenuItem.parentNode.insertBefore(this.calibrateMenuItem, this.elementMenuItem.nextSibling); 
+                    }
                 }
                 if (!this.settingMenuItem)
                 {
@@ -3563,7 +3651,8 @@ function connectToBluetooth()
         })
         .then(item7 =>
         {
-            bleiface.setItem("Calibrate", item7);
+            if (item7 != null)
+                bleiface.setItem("Calibrate", item7);
             
             return bleiface.itemConnect("Authorize");
         })
