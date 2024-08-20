@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="styleph.css">
     <link rel="manifest" href="manifest.json">
+    <!--link rel="stylesheet" type="text/css" href="static/styleph.css"-->
+    <!--link rel="manifest" href="static/manifest.json"-->
   </head>
   <body onload="init()">
 
@@ -52,6 +54,7 @@
   <div class="container">
     <div class="row">
       <div style="width: 100%;height: 150px;background-image: url('cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;">
+      <!--div style="width: 100%;height: 150px;background-image: url('static/cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;"-->
       </div>
     </div>
     <div class="row">
@@ -560,11 +563,99 @@
   </div>
 </div>
 
+<div id="testDiv" class="hiddenitemdiv">
+  <h3>Calibration</h3>
+  <div class="container">
+    <div class="row">
+        <p id="testResultsDbg"></p>
+    </div>
+    <div class="row">
+      <div class="col-25">
+        <label>Pressure Reading</label>
+      </div>
+      <div class="col-65">
+        <div class="row-progress">
+          <div id="testPressureBar" class="container-progress" style="width:10%">10%</div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+        <label>Real Pressure</label>
+      </div>
+      <div class="col-65">
+        <input type="number" id="testRealPressure" min="0" max="300" value="0">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+      </div>
+      <div class="col-65">
+        <input type="button" value="Set Pressure" onclick="testCalibratePoint(1)">
+      </div>
+    </div>
+  </div>    
+
+  <div class="container">
+    <div class="row">
+      <div class="col-25">
+        <label>CO2 Reading</label>
+      </div>
+      <div class="col-65">
+        <div class="row-progress">
+          <div id="testCO2Bar" class="container-progress" style="width:10%">10%</div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+        <label>Real CO2</label>
+      </div>
+      <div class="col-65">
+        <input type="number" id="testRealCO2" min="400" max="2000" value="400">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+      </div>
+      <div class="col-65">
+        <input type="button" value="Set CO2" onclick="testCalibratePoint(0)">
+      </div>
+    </div>
+  </div>
+  
+  <h3>Log Management</h3>
+  <div class="container">
+    <div class="row">
+      <div class="col-25">
+      </div>
+      <div class="col-65">
+        <input type="button" value="Erase Filter Log" onclick="testEraseLog(0)">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+      </div>
+      <div class="col-65">
+        <input type="button" value="Erase Alarm Log" onclick="testEraseLog(1)">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+      </div>
+      <div class="col-65">
+        <input type="button" value="Erase Running Counts" onclick="testEraseLog(2)">
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="contactDiv" class="hiddenitemdiv">   
   <h3>Contact</h3>
   <div class="container">
     <div class="row">
       <div style="width: 100%;height: 150px;background-image: url('cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;">
+      <!--div style="width: 100%;height: 150px;background-image: url('static/cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;"-->
       </div>
     </div>
     <div class="row">
@@ -756,6 +847,211 @@
   </div>
 </div>
 
+<div id="alarmSettingDiv" class="hiddenitemdiv">             
+  <h3>Settings</h3>
+  <div class="container">
+    <form id="alarmSettingForm">
+      <h3>Pressure</h3>
+      <div class="container">
+        <div class="row">  
+          <div class="col-40">
+            <label>Target</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Minimum pressure required in the cabin</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasPressureThreshold" name="fasPressureThreshold" min="1" max="200" placeholder="25">
+          </div>
+          <div class="col-10">
+            <label class="units">pa</label>
+          </div>
+        </div>
+        <div class="row">  
+          <div class="col-40">
+            <label>On Delay</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Time before alarm is generated when pressure is below the target</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasPressureOnTime" name="fasPressureOnTime" min="1" max="240" placeholder="120">
+          </div>
+          <div class="col-10">
+            <label class="units">sec</label>
+          </div>
+        </div>
+        <div class="row">  
+          <div class="col-40">
+            <label>Off Delay</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Time before alarm is turned off when pressure is ok</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasPressureOffTime" name="fasPressureOffTime" min="1" max="30" placeholder="1">
+          </div>
+          <div class="col-10">
+            <label class="units">sec</label>
+          </div>
+        </div>      
+      </div>
+      <h3>CO2 - Alarm</h3>
+      <div class="container">
+        <div class="row">  
+          <div class="col-40">
+            <label>Warning Target</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Warning level for CO2 in the cabin</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasCO2WarningThreshold" min="400" max="10000" placeholder="1000">
+          </div>
+          <div class="col-10">
+            <label class="units">ppm</label>
+          </div>
+        </div>
+        <div class="row"> 
+          <div class="col-40">
+            <label>Alarm Target</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Alarm level for CO2 in the cabin</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasCO2AlarmThreshold" min="400" max="10000" placeholder="1000">
+          </div>
+          <div class="col-10">
+            <label class="units">ppm</label>
+          </div>
+        </div>
+        <div class="row">  
+          <div class="col-40">
+            <label>On Delay</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Time before alarm is generated when CO2 is above the targets</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasCO2AlarmOnTime" min="1" max="240" placeholder="120">
+          </div>
+          <div class="col-10">
+            <label class="units">sec</label>
+          </div>
+        </div>
+        <div class="row">  
+          <div class="col-40">
+            <label>Off Delay</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Time before alarm is turned off when CO2 is ok</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasCO2AlarmOffTime" min="1" max="30" placeholder="1">
+          </div>
+          <div class="col-10">
+            <label class="units">sec</label>
+          </div>
+        </div>  
+      </div>      
+      <h3>Fan - Warning</h3>
+      <div class="container">
+        <div class="row">  
+          <div class="col-40">
+            <label>Target</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Alarm level for Fan speed</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasFanThreshold" min="0" max="100" placeholder="80">
+          </div>
+          <div class="col-10">
+            <label class="units">%</label>
+          </div>
+        </div>
+        <div class="row">  
+          <div class="col-40">
+            <label>On Delay</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Time before warning is generated when Fan speed is above the target</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasFanOnTime" min="1" max="240" placeholder="120">
+          </div>
+          <div class="col-10">
+            <label class="units">sec</label>
+          </div>
+        </div>
+        <div class="row">  
+          <div class="col-40">
+            <label>Off Delay</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Time before warning is turned off when Fan speed is ok</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasFanOffTime" min="1" max="30" placeholder="1">
+          </div>
+          <div class="col-10">
+            <label class="units">sec</label>
+          </div>
+        </div>      
+      </div>
+      <h3>Filter - Expected Life</h3>
+      <div class="container">
+        <div class="row">  
+          <div class="col-40">
+            <label>HEPA</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Expect life of the HEPA filter</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasFilterLifeHepa" min="100" max="20000" placeholder="500">
+          </div>
+          <div class="col-10">
+            <label class="units">hrs</label>
+          </div>
+        </div>
+        <div class="row">  
+          <div class="col-40">
+            <label>Recirculation</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Expect life of the Recirculation HEPA filter</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasFilterLifeRecirculation" min="100" max="20000" placeholder="500">
+          </div>
+          <div class="col-10">
+            <label class="units">hrs</label>
+          </div>
+        </div>
+        <div class="row">  
+          <div class="col-40">
+            <label>Main</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Expect life of the Main filter</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasFilterLifeMain" min="100" max="20000" placeholder="500">
+          </div>
+          <div class="col-10">
+            <label class="units">hrs</label>
+          </div>
+        </div>        
+      </div>      
+      <div class="row">
+        <input id="alarmSettingSaveBtn" type="submit" value="Save Settings" class="btn">
+      </div>
+    </form> 
+  </div>
+</div>
+
 <div id="loginDiv" class="hiddenitemdiv">             
   <h3 id="loginDivHeader">Login</h3>
   <div class="container">
@@ -798,6 +1094,7 @@
 if ('serviceWorker' in navigator) 
 {
   navigator.serviceWorker.register('serviceworker.js')
+//  navigator.serviceWorker.register('static/serviceworker.js')
     .then(function(registration) 
     {
         console.log('ServiceWorker registration successful!');
@@ -815,8 +1112,8 @@ if ('serviceWorker' in navigator)
 //=====================================================
 
 //const phdbg = document.querySelector("#phdbg");
-//var phdbgc = 0;
-//
+var phdbgc = 0;
+
 //function phdbgClear()
 //{
 //    phdbg.innerHTML = "";
@@ -836,27 +1133,28 @@ var filterHistory;
 var alarmHistory;
 var authorizeControl;
 var calibrateControl;
+var testControl;
 
 function init()
 {
     selectDisplay = "";
 
     //testing lines
-    //activeLinks = "idleLinks";
-    activeLinks = "connectedLinks";
+    activeLinks = "idleLinks";
+    //activeLinks = "connectedLinks";
     // testing lines end
     
     filterHistory = new filterHistoryClass("filter", "Filter");
     alarmHistory = new alarmHistoryClass("alarm", "Alarm");
     authorizeControl = new authorizeClass();
     calibrateControl = new calibrateClass();
-    
-    //onDisconnected();
+    testControl = new testClass();
 
     // testing lines... removed \/
-    authorizeControl.setAuthorized(true);
-    protocolVersion = 2;
-    bleiface.protocolVersionSet();
+    onDisconnected();
+    //protocolVersion = 2;
+    //authorizeControl.setAuthorized(true);
+    //bleiface.protocolVersionSet();
     // testing lines end
     
     setTimeout(secondTimer, 500);
@@ -1588,12 +1886,189 @@ var testSwitch = document.querySelector("#testModeCheckbox");
 
 function testModeClicked()
 {
-    let item = bleiface.getItem("Test");
-
-    if (item)
+    if (testControl)
     {
-        item.setTestState(testSwitch.checked);
+        testControl.setTestState(testSwitch.checked);
     }
+}
+
+function testEraseLog(theLog)
+{
+    if (testControl)
+    {
+        testControl.executeEraseLog(theLog);
+    }
+}
+
+function testCalibratePoint(thePoint)
+{
+    if (testControl)
+    {
+        testControl.executeSetCalibrate(thePoint);
+    }
+}
+
+
+class testClass
+{
+    constructor()
+    {
+        this.elementPressureBar = document.getElementById("testPressureBar");
+        this.elementCO2Bar = document.getElementById("testCO2Bar");
+        this.elementDbg = document.getElementById("testResultsDbg");
+        this.elementRealPressure = document.getElementById("testRealPressure");
+        this.elementRealCO2 = document.getElementById("testRealCO2");
+        
+        this.pressure = 0;
+        this.co2 = 0;
+        
+        this.send_req = false;
+        this.send_cmd = 0;
+        this.send_value = 0;
+        this.timer = 0;
+        
+        this.deleteAlarm = false;
+        this.deleteFilter = false;
+    }
+
+    tick()
+    {
+        if (this.timer > 0)
+        {
+            this.timer--;
+            if (this.timer == 0)
+            {
+                this.elementDbg.innerHTML = "";
+            }
+        }
+    }
+    
+    restart()
+    {
+        this.pressure = 0;
+        this.co2 = 0;
+        
+        this.elementPressureBar.style.width = '0%';
+        this.elementPressureBar.innerHTML = "0";
+        
+        this.elementCO2Bar.style.width = '0%';
+        this.elementCO2Bar.innerHTML = '0';   
+
+        this.send_req = false;        
+
+        this.deleteAlarm = false;
+        this.deleteFilter = false;
+    }
+
+    processData(data)
+    {
+        this.testState = data.getUint8(0) != 0;
+        
+        if (protocolVersion >= 2)
+        {
+            this.pressure = data.getInt16(1, true);
+            this.co2 = data.getUint16(3, true);
+
+            let temp = (((this.co2 * 100) + 0.5) / 10000 >> 0);
+            if (temp > 100)
+            {
+                temp = 100;
+            }
+            this.elementCO2Bar.style.width = temp + '%';
+            this.elementCO2Bar.innerHTML = this.co2;
+
+            let temp1 = (((this.pressure * 100) + 0.5) / 500 >> 0);
+            if (temp1 > 100)
+            {
+                temp1 = 100;
+            }
+            if (temp1 < 0)
+            {
+                temp1 = 0;
+            }
+            this.elementPressureBar.style.width = temp + '%';
+            this.elementPressureBar.innerHTML = this.pressure;
+            
+            if (this.deleteAlarm && (data.getUint8(5) == 0))
+            {
+                this.deleteAlarm = false;
+                this.elementDbg.innerHTML = "Alarm Log Deleted";    
+                this.timer = 5;
+            }
+            if (this.deleteFilter && (data.getUint8(6) == 0))
+            {
+                this.deleteFilter = false;
+                this.elementDbg.innerHTML = "Filter Log Deleted";    
+                this.timer = 5;
+            }
+        }
+    }   
+
+    executeSetCalibrate(theIdx)
+    { 
+        this.send_req = false;
+        
+        this.send_cmd = 1 + theIdx;
+        if (theIdx == 1)
+        {
+            this.send_value = this.elementRealPressure.value;     
+        }            
+        else
+        {
+            this.send_value = this.elementRealCO2.value;
+        }
+        this.send_req = true;
+        
+        bleiface.setMessage(DBG_INFO, "Sending calibrate: Cmd=" + this.send_cmd + ", Value=" + this.send_value);
+    }
+    
+    executeEraseLog(theLog)
+    {
+        bleiface.setMessage(DBG_INFO, "Erase Log: Log=" + theLog);
+
+        this.send_req = false;
+        this.send_cmd = theLog + 3;
+        this.send_value = 0;
+        this.send_req = true;
+    }
+    
+    setTestState(on)
+    {
+        this.send_req = false;
+        this.send_cmd = 0;
+        this.send_value = on ? 1 : 0;
+        this.send_req = true;
+    }
+    
+    handleActions(item)
+    {
+        if (this.send_req)
+        {
+            this.send_req = false;
+            
+            item.sendRequest(this.send_cmd, this.send_value);
+            
+            if (this.send_cmd == 3)
+            {
+                this.deleteFilter = true;
+                this.elementDbg.innerHTML = "Deleting Filter Log...";
+            }
+            if (this.send_cmd == 4)
+            {
+                this.deleteAlarm = true;
+                this.elementDbg.innerHTML = "Deleting Alarm Log...";
+            }
+            return true;
+        }
+        
+        if (selectDisplay === "testDiv")
+        {
+            bleiface.itemReadWithBusy(item);
+
+            return true;
+        }
+        return false;
+    }    
 }
 
 // Bluetooth interface
@@ -1604,27 +2079,33 @@ class blueToothTest extends blueToothIf
     {
         super ("Test", 0, "546a24ea-ec5b-461b-9cce-b9bce932a72c");
         this.send = false;
-        this.testState = false;
     }
+  
+    setRead(readValue)
+    {
+        super.setRead(readValue);
 
-    disconnected()
-    {
-        super.disconnected();
-        this.send = false;
-        this.testState = false;
+        testControl.processData(readValue);
     }
     
-    writeTestState(on)
+    sendRequest(sendCmd, sendValue)
     {
-        let data = new Uint8Array(1);
-        data[0] = on ? 1 : 0;
-        this.write(data);
-    }
-    
-    setTestState(on)
-    {
-        this.send = true;   
-        this.testState = on;        
+        if (protocolVersion < 2)
+        {
+            let data = new Uint8Array(1);
+            data[0] = sendValue;
+            this.write(data);
+        }
+        else
+        {
+            let data = new Uint8Array(3);
+            
+            data[0] = sendCmd;
+            data[1] = sendValue & 0x00ff;
+            data[2] = (sendValue >> 8) & 0x00ff;
+        
+            this.write(data);
+        }
     }
     
     init()
@@ -1634,17 +2115,13 @@ class blueToothTest extends blueToothIf
             super.init();
             
             bleiface.setMessage(DBG_CONNECT, "Turning off Test Mode");
-            this.writeTestState(false);
+            testControl.setTestState(false);
         }
     }
     
     run()
     {
-        if (this.send)
-        {
-            this.send = false;
-            this.writeTestState(this.testState);
-        }
+        testControl.handleActions(this);
     }
 }
 
@@ -2253,6 +2730,140 @@ class blueToothCommission extends blueToothIf
 
 //==========================================================
 //
+//          Alarm Settings
+//
+//==========================================================
+
+
+const alarmSettingForm = document.querySelector("#alarmSettingForm");
+
+// Settings fields
+const fieldPressureThreshold = document.querySelector("#fasPressureThreshold");
+const fieldPressureOnTime = document.querySelector("#fasPressureOnTime");
+const fieldPressureOffTime = document.querySelector("#fasPressureOffTime");
+
+const fieldCO2AlarmThreshold = document.querySelector("#fasCO2AlarmThreshold");
+const fieldCO2WarningThreshold = document.querySelector("#fasCO2WarningThreshold");
+const fieldCO2AlarmOnTime = document.querySelector("#fasCO2AlarmOnTime");
+const fieldCO2AlarmOffTime = document.querySelector("#fasCO2AlarmOffTime");
+
+const fieldFanThreshold = document.querySelector("#fasFanThreshold");
+const fieldFanOnTime = document.querySelector("#fasFanOnTime");
+const fieldFanOffTime = document.querySelector("#fasFanOffTime");
+
+const fieldFilterLifeMain = document.querySelector("#fasFilterLifeMain");
+const fieldFilterLifeHepa = document.querySelector("#fasFilterLifeHepa");
+const fieldFilterLifeRecirculation = document.querySelector("#fasFilterLifeRecirculation");
+
+alarmSettingForm.addEventListener("submit", (event) => 
+{
+    event.preventDefault();
+  
+    var cdata = fieldPressureThreshold.value + ',' + (fieldPressureOnTime.value * 1000) + ',' + (fieldPressureOffTime.value * 1000) + '|' +
+                fieldCO2WarningThreshold.value + ',' + (fieldCO2AlarmOnTime.value * 1000) + ',' + (fieldCO2AlarmOffTime.value * 1000) + '|' +
+                fieldCO2AlarmThreshold.value + ',' + (fieldCO2AlarmOnTime.value * 1000) + ',' + (fieldCO2AlarmOffTime.value * 1000) + '|' +
+                fieldFanThreshold.value + ',' + (fieldFanOnTime.value * 1000) + ',' + (fieldFanOffTime.value * 1000) + '|' +
+                fieldFilterLifeHepa.value + ',' + fieldFilterLifeMain.value + ',' + fieldFilterLifeRecirculation.value;
+
+    var item = bleiface.getItem("AlarmSettings");
+    if (item)
+    {
+        item.sendAlarmSettings(cdata);
+    }
+});
+
+// bluetooth interface
+
+class blueToothAlarmSettings extends blueToothIf
+{
+    constructor ()
+    {
+        super ("AlarmSettings",   1, "8042b980-80ab-4ccb-8b19-5a27910035a8");
+        this.send = false;
+        this.sendData = null;
+    }
+
+    disconnected()
+    {
+        super.disconnected();
+        this.send = false;
+    }
+
+    setRead(readValue)
+    {
+        super.setRead(readValue);
+
+        const decodedValue = new TextDecoder().decode(readValue);
+
+        const myArray = decodedValue.split("|");
+    
+        if (myArray.length >= 5)
+        {
+            // todo. It goes expected life
+            
+            const presArray = myArray[0].split(',');
+            if (presArray.length >= 3)
+            {
+                fieldPressureThreshold.value = presArray[0];
+                fieldPressureOnTime.value = ((parseInt(presArray[1], 10) + 500) / 1000) >> 0;
+                fieldPressureOffTime.value = ((parseInt(presArray[2], 10) + 500) / 1000) >> 0;
+            }
+            
+            const co2WarningArray = myArray[1].split(',');
+            if (co2WarningArray.length >= 3)
+            {
+                fieldCO2WarningThreshold.value = co2WarningArray[0];
+                //fieldCO2WarningOnTime.value = (co2WarningArray[1] / 1000) >> 0;
+                //fieldCO2WarningOffTime.value = (co2WarningArray[2] / 1000) >> 0;
+            }        
+
+            const co2AlarmArray = myArray[2].split(',');
+            if (co2AlarmArray.length >= 3)
+            {
+                fieldCO2AlarmThreshold.value = co2AlarmArray[0];
+                fieldCO2AlarmOnTime.value = ((parseInt(co2AlarmArray[1], 10) + 500) / 1000) >> 0;
+                fieldCO2AlarmOffTime.value = ((parseInt(co2AlarmArray[2], 10) + 500) / 1000) >> 0;
+            }     
+
+            const fanAlarmArray = myArray[3].split(',');
+            if (fanAlarmArray.length >= 3)
+            {
+                fieldFanThreshold.value = fanAlarmArray[0];
+                fieldFanOnTime.value = ((parseInt(fanAlarmArray[1], 10) + 500) / 1000) >> 0;
+                fieldFanOffTime.value = ((parseInt(fanAlarmArray[2], 10) + 500) / 1000) >> 0;
+            }    
+
+            const filterLifeArray = myArray[4].split(',');
+            if (filterLifeArray.length >= 3)
+            {
+                fieldFilterLifeMain.value = filterLifeArray[1];
+                fieldFilterLifeHepa.value = filterLifeArray[0];
+                fieldFilterLifeRecirculation.value = filterLifeArray[2];
+            }
+        }
+    }  
+    
+    sendAlarmSettings(data)
+    {
+        this.send = true;
+        this.sendData = data;
+    }
+    
+    run()
+    {
+        if (this.send)
+        {      
+            this.send = false;
+            
+            const encodedValue = new TextEncoder().encode(this.sendData);
+            
+            this.write(encodedValue);
+        }
+    }
+}
+
+//==========================================================
+//
 //          Settings
 //
 //==========================================================
@@ -2820,7 +3431,7 @@ class blueToothCalibrate extends blueToothIf
         this.readValue = null;
         this.validIsValid = false;
         this.connectState = 2;
-        return null;
+        return true;
     }
     
     sendRequest(sendCmd, sendIdx, sendValue)
@@ -2876,6 +3487,8 @@ class authorizeClass
         this.elementPasswordDiv = document.getElementById("loginPasswordRow");
         this.calibrateMenuItem = 0;
         this.settingMenuItem = 0;
+        this.alarmSettingMenuItem = 0;
+        this.testMenuItem = 0;
     }
     
     handleClicked()
@@ -2958,6 +3571,28 @@ class authorizeClass
                 
                     this.elementMenuItem.parentNode.insertBefore(this.settingMenuItem, this.elementMenuItem.nextSibling); 
                 }
+                if (!this.alarmSettingMenuItem)
+                {
+                    if (protocolVersion >= 2)
+                    {
+                        this.alarmSettingMenuItem = document.createElement("a");
+                        this.alarmSettingMenuItem.setAttribute("href", "javascript:showDiv('alarmSettingDiv')");
+                        this.alarmSettingMenuItem.innerHTML = "Alarm Settings";
+                
+                        this.elementMenuItem.parentNode.insertBefore(this.alarmSettingMenuItem, this.elementMenuItem.nextSibling); 
+                    }
+                }
+                if (!this.testMenuItem)
+                {
+                    if (protocolVersion >= 2)
+                    {
+                        this.testMenuItem = document.createElement("a");
+                        this.testMenuItem.setAttribute("href", "javascript:showDiv('testDiv')");
+                        this.testMenuItem.innerHTML = "Calibrate";
+                
+                        this.elementMenuItem.parentNode.insertBefore(this.testMenuItem, this.elementMenuItem.nextSibling); 
+                    }
+                }
             }
             else
             {
@@ -2975,6 +3610,16 @@ class authorizeClass
                 {
                     this.settingMenuItem.remove();
                     this.settingMenuItem = 0;
+                }
+                if (this.alarmSettingMenuItem)
+                {
+                    this.alarmSettingMenuItem.remove();
+                    this.alarmSettingMenuItem = 0;
+                }
+                if (this.testMenuItem)
+                {
+                    this.testMenuItem.remove();
+                    this.testMenuItem = 0;
                 }
             }
             this.elementPassword.readOnly = authorized;
@@ -3111,7 +3756,10 @@ class alarmHistoryClass extends historyClass
 {
     setExportFileHeader()
     {
-        this.fileData = "Date,Pressure Alarm,CO2 Alarm,Door,Fan Speed,Pressure\r\n";
+        if (protocolVersion < 2)
+            this.fileData = "Date,Pressure Alarm,CO2 Alarm,Door,Fan Speed,Pressure\r\n";
+        else
+            this.fileData = "Date,Pressure Alarm,CO2 Alarm,Door,Fan Speed,Pressure,CO2\r\n";
     }
         
     dataValid(data)
@@ -3135,7 +3783,12 @@ class alarmHistoryClass extends historyClass
                           this.dataRecordType(data) + "," +
                           this.dataDoorState(data) + "," +
                           this.dataFanSpeed(data) + "," +
-                          this.dataPressure(data) + "\r\n";
+                          this.dataPressure(data);
+        if (protocolVersion >= 2)
+        {
+            this.fileData += this.dataCO2(data);
+        }
+        this.fileData += "\r\n";
     }
     
     dataAddDetailElements(detailsDiv, data)
@@ -3143,6 +3796,10 @@ class alarmHistoryClass extends historyClass
         this.addRowElement(detailsDiv, "Door State", this.dataDoorState(data));
         this.addRowElement(detailsDiv, "Fan Speed", this.dataFanSpeed(data));
         this.addRowElement(detailsDiv, "Pressure", this.dataPressure(data));
+        if (protocolVersion >= 2)
+        {
+            this.addRowElement(detailsDiv, "CO2", this.dataCO2(data));
+        }
     }
     
     dataDate(data)
@@ -3154,13 +3811,28 @@ class alarmHistoryClass extends historyClass
     {
         if ((data.getUint8(13) & 0x80) == 0x80)
         {
-            if ((data.getUint8(13) & 0x01) == 0x01)
+            if (protocolVersion < 2)
             {
-                return "CO2 Active";
+                if ((data.getUint8(13) & 0x01) == 0x01)
+                {
+                    return "CO2 Active";
+                }
+            }
+            else
+            {
+                switch (data.getUint8(13) & 0x03)
+                {
+                    case 0x01:
+                        return "CO2 Info";
+                    case 0x02:
+                        return "CO2 Warning";
+                    case 0x03:
+                        return "CO2 Active";
+                }                   
             }
             return "CO2 Idle";
         }
-        if ((data.getUint8(12) & 0x01) == 0x01)
+        if ((data.getUint8(12) & 0x03) != 0)
         {
             return "Alarm Active";
         }
@@ -3184,6 +3856,11 @@ class alarmHistoryClass extends historyClass
     dataPressure(data)
     {
         return data.getUint16(16, true);
+    }
+    
+    dataCO2(data)
+    {
+        return data.getUint16(18, true);
     }
 }
 
@@ -3285,6 +3962,7 @@ class blueToothDevice
         
         this.bleItem.push(new blueToothCommission());
         this.bleItem.push(new blueToothSettings());
+        this.bleItem.push(new blueToothAlarmSettings());
         this.bleItem.push(new blueToothStatus());
         this.bleItem.push(new blueToothRtc());
         
@@ -3610,6 +4288,14 @@ function connectToBluetooth()
         .then(item0 =>
         {
             bleiface.setItem("General", item0);
+         
+            // need to know the protocol version, so get it now
+            
+            return bleiface.itemRead("General");
+        })
+        .then(cdata =>
+        {
+            bleiface.setRead("General", cdata);
             
             return bleiface.itemConnect("Test");
         })
@@ -3643,16 +4329,33 @@ function connectToBluetooth()
             
             return bleiface.itemConnect("Status");
         })
+        .then(item51 =>
+        {
+            bleiface.setItem("Status", item51);
+            
+            if (protocolVersion >= 2)
+                return bleiface.itemConnect("AlarmSettings");
+            else
+                return true;
+        })
         .then(item6 =>
         {
-            bleiface.setItem("Status", item6);
+            if (protocolVersion >= 2)
+            {
+                bleiface.setItem("AlarmSettings", item6);
+            }
             
-            return bleiface.itemConnect("Calibrate");
+            if (protocolVersion < 2)
+                return bleiface.itemConnect("Calibrate");
+            else
+                return true;
         })
         .then(item7 =>
         {
-            if (item7 != null)
+            if (protocolVersion < 2)
+            {
                 bleiface.setItem("Calibrate", item7);
+            }
             
             return bleiface.itemConnect("Authorize");
         })
@@ -3686,6 +4389,20 @@ function connectToBluetooth()
         {
             bleiface.setRead("Settings", cdata);
             
+            if (protocolVersion >= 2)
+            {
+                return bleiface.itemRead("AlarmSettings");
+            }
+            else
+            {
+                return true;
+            }
+        })
+        .then(cdata =>
+        {
+            if (protocolVersion >= 2)
+                bleiface.setRead("AlarmSettings", cdata);
+            
             return bleiface.itemRead("Status");
         })
         .then(cdata =>
@@ -3717,6 +4434,7 @@ function connect()
     {
         authorizeControl.restart();
         calibrateControl.restart();
+        testControl.restart();
     
         testSwitch.checked = false;
  
@@ -3763,6 +4481,10 @@ function secondTimer()
     if (calibrateControl)
     {
         calibrateControl.tick();
+    }
+    if (testControl)
+    {
+        testControl.tick();
     }
     if (bleiface)
     {
