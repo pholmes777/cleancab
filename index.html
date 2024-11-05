@@ -3,10 +3,10 @@
   <head>
     <title>CleanCab App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="styleph.css">
-    <link rel="manifest" href="manifest.json">
-    <!--link rel="stylesheet" type="text/css" href="static/styleph.css"-->
-    <!--link rel="manifest" href="static/manifest.json"-->
+    <!--link rel="stylesheet" type="text/css" href="styleph.css"-->
+    <!--link rel="manifest" href="manifest.json"-->
+    <link rel="stylesheet" type="text/css" href="static/styleph.css">
+    <link rel="manifest" href="static/manifest.json">
   </head>
   <body onload="init()">
 
@@ -25,6 +25,7 @@
     <a href="javascript:disconnect()">Disconnect</a>
     <a id="menuItemLogin" href="javascript:showDiv('loginDiv')">Login</a>
     <a href="javascript:showDiv('statusDiv')">Status</a>
+    <a href="javascript:showDiv('status1Div')">Running Times</a>
     <a href="javascript:showDiv('commissionDiv')">Commission</a>
     <a href="javascript:showDiv('alarmHistoryDiv')">Alarm History</a>
     <a href="javascript:showDiv('filterDetailsDiv')">Filter Details</a>
@@ -53,8 +54,8 @@
   <h3>Connection</h3>
   <div class="container">
     <div class="row">
-      <div style="width: 100%;height: 150px;background-image: url('cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;">
-      <!--div style="width: 100%;height: 150px;background-image: url('static/cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;"-->
+      <!--div style="width: 100%;height: 150px;background-image: url('cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;"-->
+      <div style="width: 100%;height: 150px;background-image: url('static/cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;">
       </div>
     </div>
     <div class="row">
@@ -70,27 +71,27 @@
   <div class="container">
     <form>
     <div class="row">
-      <div class="col-25">
+      <div class="col-35">
         <label>Fan</label>
       </div>
       <div class="col-65">
         <div class="row-progress">
           <div id="sFanSpeedBar" class="container-progress" style="width:10%">10%</div>
         </div>
-      </div>
+      </div>    
     </div>
     <div class="row">
-      <div class="col-25">
+      <div class="col-35">
         <label>Pressure</label>
       </div>
       <div class="col-65">
         <div class="row-progress">
           <div id="sPressureBar" class="container-progress" style="width:10%">10pa</div>
         </div>
-      </div>
+      </div>   
     </div>
     <div class="row" id="statusCO2Div">
-      <div class="col-25">
+      <div class="col-35">
         <label>CO2</label>
       </div>
       <div class="col-65">
@@ -99,8 +100,32 @@
         </div>
       </div>
     </div>
+    <div class="row" id="atmosphericDiv">
+      <div class="col-35">
+        <label>Atmospheric Pressure</label>
+      </div>
+      <div class="col-65">
+        <input type="text" id="sAtmosphericPressure" readonly value="unknown">
+      </div>
+    </div>    
+    <div class="row" id="temperatureDiv">
+      <div class="col-35">
+        <label>Temperature</label>
+      </div>
+      <div class="col-65">
+        <input type="text" id="sTemperature" readonly value="unknown">
+      </div>
+    </div>  
+    <div class="row" id="humityDiv">
+      <div class="col-35">
+        <label>Humity</label>
+      </div>
+      <div class="col-65">
+        <input type="text" id="sHumity" readonly value="unknown">
+      </div>
+    </div>      
     <div class="row">
-      <div class="col-25">
+      <div class="col-35">
         <label>Door</label>
       </div>
       <div class="col-65">
@@ -108,7 +133,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-25">
+      <div class="col-35">
         <label>Alarm</label>
       </div>
       <div class="col-65">
@@ -116,7 +141,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-25">
+      <div class="col-35">
         <label>CO2</label>
       </div>
       <div class="col-65">
@@ -125,6 +150,9 @@
     </div>
     </form>
   </div>
+</div>  
+
+<div id="status1Div" class="hiddenitemdiv"> 
   <h3>Running Times</h3>
   <div class="container">
     <form>
@@ -579,21 +607,27 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-25">
-        <label>Real Pressure</label>
+    <form id="testPressureForm">
+      <div class="row">
+        <div class="col-25">
+          <label>Real Pressure</label>
+        </div>
+        <div class="col-65">
+          <input type="number" id="testRealPressure" min="0" max="300" value="0">
+        </div>
+        <div class="col-5">
+          <label class="units">pa</label>
+        </div>
       </div>
-      <div class="col-65">
-        <input type="number" id="testRealPressure" min="0" max="300" value="0">
+      <div class="row">
+        <div class="col-25">
+        </div>
+        <div class="col-65">
+          <input type="submit" value="Set Pressure" class="btn">
+          <!--input type="button" value="Set Pressure" onclick="testCalibratePoint(1)"-->
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-25">
-      </div>
-      <div class="col-65">
-        <input type="button" value="Set Pressure" onclick="testCalibratePoint(1)">
-      </div>
-    </div>
+    </form>
   </div>    
 
   <div class="container">
@@ -607,21 +641,27 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-25">
-        <label>Real CO2</label>
+    <form id="testCO2Form">
+      <div class="row">
+        <div class="col-25">
+          <label>Real CO2</label>
+        </div>
+        <div class="col-65">
+          <input type="number" id="testRealCO2" min="400" max="2000" value="400">
+        </div>
+        <div class="col-5">
+          <label class="units">ppm</label>
+        </div>
       </div>
-      <div class="col-65">
-        <input type="number" id="testRealCO2" min="400" max="2000" value="400">
+      <div class="row">
+        <div class="col-25">
+        </div>
+        <div class="col-65">
+          <input type="submit" value="Set CO2" class="btn">
+          <!--input type="button" value="Set CO2" onclick="testCalibratePoint(0)"-->
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-25">
-      </div>
-      <div class="col-65">
-        <input type="button" value="Set CO2" onclick="testCalibratePoint(0)">
-      </div>
-    </div>
+    </form>
   </div>
   
   <h3>Log Management</h3>
@@ -654,8 +694,8 @@
   <h3>Contact</h3>
   <div class="container">
     <div class="row">
-      <div style="width: 100%;height: 150px;background-image: url('cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;">
-      <!--div style="width: 100%;height: 150px;background-image: url('static/cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;"-->
+      <!--div style="width: 100%;height: 150px;background-image: url('cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;"-->
+      <div style="width: 100%;height: 150px;background-image: url('static/cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;">
       </div>
     </div>
     <div class="row">
@@ -699,7 +739,7 @@
           <div class="tooltip">?<span class="tooltiptext">How fast the blower changes speed. Default is 20ms</span></div>
         </div>
         <div class="col-50">
-          <input type="number" id="frampRate" name="frampRate" min="1" max="200" placeholder="20">
+          <input type="number" id="frampRate" name="frampRate" min="1" max="200" placeholder="20" required="true">
         </div>
         <div class="col-5">
           <label class="units">ms</label>
@@ -713,7 +753,7 @@
           <div class="tooltip">?<span class="tooltiptext">The time to hold the fan at max speed after power on</span></div>
         </div>
         <div class="col-50">
-          <input type="number" id="fstartPause" name="fstartPause" min="0" max="300" placeholder="30">
+          <input type="number" id="fstartPause" name="fstartPause" min="0" max="300" placeholder="30" required="true">
         </div>
         <div class="col-5">
           <label class="units">sec</label>
@@ -727,7 +767,7 @@
           <div class="tooltip">?<span class="tooltiptext">The fan speed when the door is opened</span></div>
         </div>
         <div class="col-50">
-          <input type="number" id="fdoorSpeed" name="fdoorSpeed" min="0" max="100" placeholder="20">
+          <input type="number" id="fdoorSpeed" name="fdoorSpeed" min="0" max="100" placeholder="20" required="true">
         </div>
         <div class="col-5">
           <label class="units">%</label>
@@ -741,7 +781,7 @@
           <div class="tooltip">?<span class="tooltiptext">The required fan speed</span></div>
         </div>
         <div class="col-50">
-          <input type="number" id="ffixedSpeed" name="ffixedSpeed" min="0" max="100" placeholder="70">
+          <input type="number" id="ffixedSpeed" name="ffixedSpeed" min="0" max="100" placeholder="70" required="true">
         </div>
         <div class="col-5">
           <label class="units">%</label>
@@ -755,7 +795,7 @@
           <div class="tooltip">?<span class="tooltiptext">The target pressure for the cabin (pa)</span></div>
         </div>
         <div class="col-50">
-          <input type="number" id="ftargetPressure" name="ftargetPressure" min="10" max="200" placeholder="30" disabled>
+          <input type="number" id="ftargetPressure" name="ftargetPressure" min="10" max="200" placeholder="30" disabled required="true">
         </div>
         <div class="col-5">
           <label class="units">pa</label>
@@ -769,7 +809,7 @@
           <div class="tooltip">?<span class="tooltiptext">The fan speed change amount to obtain the target pressure</span></div>
         </div>
         <div class="col-50">
-          <input type="number" id="fstepSize" name="fstepSize" min="1" max="100" placeholder="10" disabled>
+          <input type="number" id="fstepSize" name="fstepSize" min="1" max="100" placeholder="10" disabled required="true">
         </div>
         <div class="col-5">
           <label class="units">%</label>
@@ -783,7 +823,7 @@
           <div class="tooltip">?<span class="tooltiptext">The rate at which the fan speed is updated to obtain the target pressure</span></div>
         </div>
         <div class="col-50">
-          <input type="number" id="fholdTime" name="fholdTime" min="0" max="300" placeholder="30" disabled>
+          <input type="number" id="fholdTime" name="fholdTime" min="0" max="300" placeholder="30" disabled required="true">
         </div>
         <div class="col-5">
           <label class="units">sec</label>
@@ -797,7 +837,7 @@
           <div class="tooltip">?<span class="tooltiptext">The minimum fan speed</span></div>
         </div>
         <div class="col-50">
-          <input type="number" id="fminSpeed" name="fminSpeed" min="0" max="100" placeholder="10" disabled>
+          <input type="number" id="fminSpeed" name="fminSpeed" min="0" max="100" placeholder="10" disabled required="true">
         </div>
         <div class="col-5">
           <label class="units">%</label>
@@ -861,7 +901,7 @@
             <div class="tooltip">?<span class="tooltiptext">Minimum pressure required in the cabin</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasPressureThreshold" name="fasPressureThreshold" min="1" max="200" placeholder="25">
+            <input type="number" id="fasPressureThreshold" name="fasPressureThreshold" min="1" max="200" placeholder="25" required="true">
           </div>
           <div class="col-10">
             <label class="units">pa</label>
@@ -875,7 +915,7 @@
             <div class="tooltip">?<span class="tooltiptext">Time before alarm is generated when pressure is below the target</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasPressureOnTime" name="fasPressureOnTime" min="1" max="240" placeholder="120">
+            <input type="number" id="fasPressureOnTime" name="fasPressureOnTime" min="1" max="240" placeholder="120" required="true">
           </div>
           <div class="col-10">
             <label class="units">sec</label>
@@ -889,7 +929,7 @@
             <div class="tooltip">?<span class="tooltiptext">Time before alarm is turned off when pressure is ok</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasPressureOffTime" name="fasPressureOffTime" min="1" max="30" placeholder="1">
+            <input type="number" id="fasPressureOffTime" name="fasPressureOffTime" min="1" max="30" placeholder="1" required="true">
           </div>
           <div class="col-10">
             <label class="units">sec</label>
@@ -906,7 +946,7 @@
             <div class="tooltip">?<span class="tooltiptext">Warning level for CO2 in the cabin</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasCO2WarningThreshold" min="400" max="10000" placeholder="1000">
+            <input type="number" id="fasCO2WarningThreshold" min="400" max="10000" placeholder="1000" required="true">
           </div>
           <div class="col-10">
             <label class="units">ppm</label>
@@ -920,7 +960,7 @@
             <div class="tooltip">?<span class="tooltiptext">Alarm level for CO2 in the cabin</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasCO2AlarmThreshold" min="400" max="10000" placeholder="1000">
+            <input type="number" id="fasCO2AlarmThreshold" min="400" max="10000" placeholder="1000" required="true">
           </div>
           <div class="col-10">
             <label class="units">ppm</label>
@@ -934,7 +974,7 @@
             <div class="tooltip">?<span class="tooltiptext">Time before alarm is generated when CO2 is above the targets</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasCO2AlarmOnTime" min="1" max="240" placeholder="120">
+            <input type="number" id="fasCO2AlarmOnTime" min="1" max="240" placeholder="120" required="true">
           </div>
           <div class="col-10">
             <label class="units">sec</label>
@@ -948,7 +988,7 @@
             <div class="tooltip">?<span class="tooltiptext">Time before alarm is turned off when CO2 is ok</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasCO2AlarmOffTime" min="1" max="30" placeholder="1">
+            <input type="number" id="fasCO2AlarmOffTime" min="1" max="30" placeholder="1" required="true">
           </div>
           <div class="col-10">
             <label class="units">sec</label>
@@ -965,7 +1005,7 @@
             <div class="tooltip">?<span class="tooltiptext">Alarm level for Fan speed</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasFanThreshold" min="0" max="100" placeholder="80">
+            <input type="number" id="fasFanThreshold" min="0" max="100" placeholder="80" required="true">
           </div>
           <div class="col-10">
             <label class="units">%</label>
@@ -979,7 +1019,7 @@
             <div class="tooltip">?<span class="tooltiptext">Time before warning is generated when Fan speed is above the target</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasFanOnTime" min="1" max="240" placeholder="120">
+            <input type="number" id="fasFanOnTime" min="1" max="240" placeholder="120" required="true">
           </div>
           <div class="col-10">
             <label class="units">sec</label>
@@ -993,7 +1033,7 @@
             <div class="tooltip">?<span class="tooltiptext">Time before warning is turned off when Fan speed is ok</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasFanOffTime" min="1" max="30" placeholder="1">
+            <input type="number" id="fasFanOffTime" min="1" max="30" placeholder="1" required="true">
           </div>
           <div class="col-10">
             <label class="units">sec</label>
@@ -1010,7 +1050,7 @@
             <div class="tooltip">?<span class="tooltiptext">Expect life of the HEPA filter</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasFilterLifeHepa" min="100" max="20000" placeholder="500">
+            <input type="number" id="fasFilterLifeHepa" min="100" max="20000" placeholder="500" required="true">
           </div>
           <div class="col-10">
             <label class="units">hrs</label>
@@ -1024,7 +1064,7 @@
             <div class="tooltip">?<span class="tooltiptext">Expect life of the Recirculation HEPA filter</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasFilterLifeRecirculation" min="100" max="20000" placeholder="500">
+            <input type="number" id="fasFilterLifeRecirculation" min="100" max="20000" placeholder="500" required="true">
           </div>
           <div class="col-10">
             <label class="units">hrs</label>
@@ -1038,13 +1078,92 @@
             <div class="tooltip">?<span class="tooltiptext">Expect life of the Main filter</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasFilterLifeMain" min="100" max="20000" placeholder="500">
+            <input type="number" id="fasFilterLifeMain" min="100" max="20000" placeholder="500" required="true">
           </div>
           <div class="col-10">
             <label class="units">hrs</label>
           </div>
         </div>        
       </div>      
+      <h3>General</h3>
+      <div class="container">
+        <div class="row">  
+          <div class="col-40">
+            <label>Urgent Mute</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Time to mute the buzzer for Urgent alarms</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasMuteDuration" min="1" max="30" placeholder="10" required="true">
+          </div>
+          <div class="col-10">
+            <label class="units">min</label>
+          </div>
+        </div>
+        <div class="row">  
+          <div class="col-40">
+            <label>Info Mute</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Time to mute the buzzer for Info alarms</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasMuteInfoDuration" min="1" max="300" placeholder="60" required="true">
+          </div>
+          <div class="col-10">
+            <label class="units">min</label>
+          </div>
+        </div>
+      </div>
+
+
+
+      <h3>CO2 Flush</h3>
+      <div class="container">
+        <div class="row">  
+          <div class="col-40">
+            <label>Start Level</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">The CO2 level to start the flush process</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasCO2FlushLevelOn" min="1000" max="10000" placeholder="1500" required="true">
+          </div>
+          <div class="col-10">
+            <label class="units">ppm</label>
+          </div>
+        </div>
+        <div class="row">  
+          <div class="col-40">
+            <label>Stop Level</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">The CO2 level to stop the flush process</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasCO2FlushLevelOff" min="500" max="10000" placeholder="1000" required="true">
+          </div>
+          <div class="col-10">
+            <label class="units">ppm</label>
+          </div>
+        </div>
+        <div class="row">  
+          <div class="col-40">
+            <label>Flush Pressure</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">The target pressure to use to flush</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasCO2FlushTarget" min="1" max="200" placeholder="100" required="true">
+          </div>
+          <div class="col-10">
+            <label class="units">pa</label>
+          </div>
+        </div>        
+      </div>
       <div class="row">
         <input id="alarmSettingSaveBtn" type="submit" value="Save Settings" class="btn">
       </div>
@@ -1113,6 +1232,7 @@ if ('serviceWorker' in navigator)
 
 //const phdbg = document.querySelector("#phdbg");
 var phdbgc = 0;
+var menuDisabled=false;
 
 //function phdbgClear()
 //{
@@ -1122,6 +1242,7 @@ var phdbgc = 0;
 const DBG_INFO = 0;
 const DBG_CONNECT = 1;
 const DBG_DEBUG = 2;
+const DBG_ERROR = 3;
 
 
 const connectingState = document.querySelector("#connectingState");
@@ -1177,14 +1298,17 @@ function menuHide()
 
 function toggleMenu()
 {
-    var x = document.getElementById(activeLinks);
-    if (x.style.display === "block")
+    if (!menuDisabled)
     {
-        x.style.display = "none";
-    }
-    else
-    {
-        x.style.display = "block";
+        var x = document.getElementById(activeLinks);
+        if (x.style.display === "block")
+        {
+            x.style.display = "none";
+        }
+        else
+        {
+            x.style.display = "block";
+        }
     }
 }
 
@@ -1881,6 +2005,22 @@ class blueToothIf
 // Variables
 
 var testSwitch = document.querySelector("#testModeCheckbox");
+var testPressureForm = document.querySelector("#testPressureForm");
+var testCO2Form = document.querySelector("#testCO2Form");
+
+testPressureForm.addEventListener("submit", (event) => 
+{
+    event.preventDefault();
+
+    testControl.executeSetCalibrate(1);
+});
+
+testCO2Form.addEventListener("submit", (event) => 
+{
+    event.preventDefault();
+
+    testControl.executeSetCalibrate(0);
+});
 
 // Callback events
 
@@ -2013,7 +2153,7 @@ class testClass
         {
             this.send_value = this.elementRealPressure.value;     
         }            
-        else
+        else if (theIdx == 0)
         {
             this.send_value = this.elementRealCO2.value;
         }
@@ -2027,7 +2167,7 @@ class testClass
         bleiface.setMessage(DBG_INFO, "Erase Log: Log=" + theLog);
 
         this.send_req = false;
-        this.send_cmd = theLog + 3;
+        this.send_cmd = theLog + 4;
         this.send_value = 0;
         this.send_req = true;
     }
@@ -2754,21 +2894,58 @@ const fieldFanOffTime = document.querySelector("#fasFanOffTime");
 const fieldFilterLifeMain = document.querySelector("#fasFilterLifeMain");
 const fieldFilterLifeHepa = document.querySelector("#fasFilterLifeHepa");
 const fieldFilterLifeRecirculation = document.querySelector("#fasFilterLifeRecirculation");
+const fieldMuteDuration = document.querySelector("#fasMuteDuration");
+const fieldMuteInfoDuration = document.querySelector("#fasMuteInfoDuration");
+
+const fieldCO2FlushLevelOn = document.querySelector("#fasCO2FlushLevelOn");
+const fieldCO2FlushLevelOff = document.querySelector("#fasCO2FlushLevelOff");
+const fieldCO2FlushTarget = document.querySelector("#fasCO2FlushTarget");
 
 alarmSettingForm.addEventListener("submit", (event) => 
 {
     event.preventDefault();
-  
-    var cdata = fieldPressureThreshold.value + ',' + (fieldPressureOnTime.value * 1000) + ',' + (fieldPressureOffTime.value * 1000) + '|' +
-                fieldCO2WarningThreshold.value + ',' + (fieldCO2AlarmOnTime.value * 1000) + ',' + (fieldCO2AlarmOffTime.value * 1000) + '|' +
-                fieldCO2AlarmThreshold.value + ',' + (fieldCO2AlarmOnTime.value * 1000) + ',' + (fieldCO2AlarmOffTime.value * 1000) + '|' +
-                fieldFanThreshold.value + ',' + (fieldFanOnTime.value * 1000) + ',' + (fieldFanOffTime.value * 1000) + '|' +
-                fieldFilterLifeHepa.value + ',' + fieldFilterLifeMain.value + ',' + fieldFilterLifeRecirculation.value;
+    const buffer = new ArrayBuffer(96);
+    const view = new DataView(buffer);
 
+    view.setUint32( 0, fieldPressureThreshold.value, true);
+    view.setUint32( 4, fieldPressureOnTime.value * 1000, true);
+    view.setUint32( 8, fieldPressureOffTime.value * 1000, true);
+    view.setUint32(12, 1, true);            // sample time (40ms)
+    view.setUint32(16, 4, true);           // number of samples
+    
+    view.setUint32(20, fieldCO2WarningThreshold.value, true);
+    view.setUint32(24, fieldCO2AlarmOnTime.value * 1000, true);
+    view.setUint32(28, fieldCO2AlarmOffTime.value * 1000, true);
+    
+    view.setUint32(32, fieldCO2AlarmThreshold.value, true);
+    view.setUint32(36, fieldCO2AlarmOnTime.value * 1000, true);
+    view.setUint32(40, fieldCO2AlarmOffTime.value * 1000, true);    
+    view.setUint32(44, 2, true);            // sample time
+    view.setUint32(48, 2, true);           // number of samples
+
+    view.setUint32(52, fieldFanThreshold.value, true);
+    view.setUint32(56, fieldFanOnTime.value * 1000, true);
+    view.setUint32(60, fieldFanOffTime.value * 1000, true);
+
+    view.setUint32(64, fieldFilterLifeHepa.value, true);
+    view.setUint32(68, fieldFilterLifeMain.value, true);
+    view.setUint32(72, fieldFilterLifeRecirculation.value, true);
+  
+    view.setUint32(76, fieldMuteDuration.value, true);
+    view.setUint32(80, fieldMuteInfoDuration.value, true);   
+    
+    if (fieldCO2FlushLevelOff.value >= fieldCO2FlushLevelOn.value)
+    {
+        fieldCO2FlushLevelOff.value = fieldCO2FlushLevelOn.value - 200;
+    }
+    view.setUint32(84, fieldCO2FlushLevelOff.value, true);        // when flush can be turned off once started
+    view.setUint32(88, fieldCO2FlushLevelOn.value, true);   // when to start the flush process
+    view.setUint32(92, fieldCO2FlushTarget.value, true);          // target pressure for the flush
+    
     var item = bleiface.getItem("AlarmSettings");
     if (item)
     {
-        item.sendAlarmSettings(cdata);
+        item.sendAlarmSettings(buffer);
     }
 });
 
@@ -2793,54 +2970,30 @@ class blueToothAlarmSettings extends blueToothIf
     {
         super.setRead(readValue);
 
-        const decodedValue = new TextDecoder().decode(readValue);
+        bleiface.setMessage(DBG_INFO, "Read alarm: Len=" + readValue.byteLength);
 
-        const myArray = decodedValue.split("|");
-    
-        if (myArray.length >= 5)
-        {
-            // todo. It goes expected life
-            
-            const presArray = myArray[0].split(',');
-            if (presArray.length >= 3)
-            {
-                fieldPressureThreshold.value = presArray[0];
-                fieldPressureOnTime.value = ((parseInt(presArray[1], 10) + 500) / 1000) >> 0;
-                fieldPressureOffTime.value = ((parseInt(presArray[2], 10) + 500) / 1000) >> 0;
-            }
-            
-            const co2WarningArray = myArray[1].split(',');
-            if (co2WarningArray.length >= 3)
-            {
-                fieldCO2WarningThreshold.value = co2WarningArray[0];
-                //fieldCO2WarningOnTime.value = (co2WarningArray[1] / 1000) >> 0;
-                //fieldCO2WarningOffTime.value = (co2WarningArray[2] / 1000) >> 0;
-            }        
+        fieldPressureThreshold.value = readValue.getUint32(0, true);
+        fieldPressureOnTime.value = ((readValue.getUint32(4, true) + 500) / 1000) >> 0;
+        fieldPressureOffTime.value = ((readValue.getUint32(8, true) + 500) / 1000) >> 0;
+        fieldCO2WarningThreshold.value = readValue.getUint32(20, true);
 
-            const co2AlarmArray = myArray[2].split(',');
-            if (co2AlarmArray.length >= 3)
-            {
-                fieldCO2AlarmThreshold.value = co2AlarmArray[0];
-                fieldCO2AlarmOnTime.value = ((parseInt(co2AlarmArray[1], 10) + 500) / 1000) >> 0;
-                fieldCO2AlarmOffTime.value = ((parseInt(co2AlarmArray[2], 10) + 500) / 1000) >> 0;
-            }     
-
-            const fanAlarmArray = myArray[3].split(',');
-            if (fanAlarmArray.length >= 3)
-            {
-                fieldFanThreshold.value = fanAlarmArray[0];
-                fieldFanOnTime.value = ((parseInt(fanAlarmArray[1], 10) + 500) / 1000) >> 0;
-                fieldFanOffTime.value = ((parseInt(fanAlarmArray[2], 10) + 500) / 1000) >> 0;
-            }    
-
-            const filterLifeArray = myArray[4].split(',');
-            if (filterLifeArray.length >= 3)
-            {
-                fieldFilterLifeMain.value = filterLifeArray[1];
-                fieldFilterLifeHepa.value = filterLifeArray[0];
-                fieldFilterLifeRecirculation.value = filterLifeArray[2];
-            }
-        }
+        fieldCO2AlarmThreshold.value = readValue.getUint32(32, true);
+        fieldCO2AlarmOnTime.value = ((readValue.getUint32(36, true) + 500) / 1000) >> 0;
+        fieldCO2AlarmOffTime.value = ((readValue.getUint32(40, true) + 500) / 1000) >> 0;
+        fieldFanThreshold.value = readValue.getUint32(52, true);
+        fieldFanOnTime.value = ((readValue.getUint32(56, true) + 500) / 1000) >> 0;
+        fieldFanOffTime.value = ((readValue.getUint32(60, true) + 500) / 1000) >> 0;
+        fieldFilterLifeHepa.value = readValue.getUint32(64, true);
+        fieldFilterLifeMain.value = readValue.getUint32(68, true);
+        fieldFilterLifeRecirculation.value = readValue.getUint32(72, true);
+        fieldMuteDuration.value = readValue.getUint32(76, true);
+        fieldMuteInfoDuration.value = readValue.getUint32(80, true);
+        
+        fieldCO2FlushLevelOff.value = readValue.getUint32(84, true);
+        fieldCO2FlushLevelOn.value = readValue.getUint32(88, true);
+        fieldCO2FlushTarget.value = readValue.getUint32(92, true);
+        
+        bleiface.setMessage(DBG_INFO, "Read alarm: Len=xx");
     }  
     
     sendAlarmSettings(data)
@@ -2855,9 +3008,7 @@ class blueToothAlarmSettings extends blueToothIf
         {      
             this.send = false;
             
-            const encodedValue = new TextEncoder().encode(this.sendData);
-            
-            this.write(encodedValue);
+            this.write(this.sendData);
         }
     }
 }
@@ -3024,6 +3175,10 @@ class blueToothSettings extends blueToothIf
 
 const sFanSpeedBar = document.querySelector("#sFanSpeedBar");
 const sPressureBar = document.querySelector("#sPressureBar");
+const sCO2Bar = document.querySelector("#sCO2Bar");
+const sAtmosphericPressure = document.querySelector("#sAtmosphericPressure");
+const sTemperature = document.querySelector("#sTemperature");
+const sHumity = document.querySelector("#sHumity");
 const sDoorState = document.querySelector("#sDoorState");
 const sAlarmState = document.querySelector("#sAlarmState");
 const sCO2State = document.querySelector("#sCO2State");
@@ -3061,16 +3216,25 @@ class blueToothStatus extends blueToothIf
 
       var recirculateDiv = document.querySelector("#recirculateRunningDiv");
       var statusCO2Div = document.querySelector("#statusCO2Div");
+      var atmosphericDiv = document.querySelector("#atmosphericDiv");
+      var temperatureDiv = document.querySelector("#temperatureDiv");
+      var humityDiv = document.querySelector("#humityDiv");
 
       if (protocolVersion < 2)
       {
         recirculateDiv.style.display = "none";
         statusCO2Div.style.display = "none";
+        atmosphericDiv.style.display = "none";
+        temperatureDiv.style.display = "none";
+        humityDiv.style.display = "none";
       }
       else
       {
         recirculateDiv.style.display = "block";
         statusCO2Div.style.display = "block";
+        atmosphericDiv.style.display = "block";
+        temperatureDiv.style.display = "block";
+        humityDiv.style.display = "block";
       }
     }
 
@@ -3114,6 +3278,17 @@ class blueToothStatus extends blueToothIf
   
         sPressureBar.style.width = pressure + '%';
         sPressureBar.innerHTML = readValue.getUint16(4, true) + 'pa';
+        if (protocolVersion >= 2)
+        {
+            if (readValue.getUint8(2) == 0)
+            {
+                sPressureBar.className="container-progress";
+            }
+            else
+            {
+                sPressureBar.className="container-progress-alarm";
+            }
+        }
 
         var idx = 6;
 
@@ -3127,12 +3302,35 @@ class blueToothStatus extends blueToothIf
 
           sCO2Bar.style.width = co2 + 'ppm';
           sCO2Bar.innerHTML = readValue.getUint16(idx, true) + 'ppm';
+          if (readValue.getUint8(3) == 0)
+          {
+            sCO2Bar.className="container-progress";
+          }
+          else if (readValue.getUint8(3) < 3)
+          {
+             sCO2Bar.className="container-progress-warning";
+          }
+          else
+          {
+            sCO2Bar.className="container-progress-alarm";
+          }
+            
+          idx += 2;
 
+          sTemperature.value = readValue.getUint16(idx, true) + " C";
+          
           idx += 2;
           
-          // skip temperature and humity
+          sHumity.value = readValue.getUint16(idx, true);
           
-          idx += 4;
+          idx += 2;
+          
+          // Atmospheric Pressure
+          
+          sAtmosphericPressure.value = readValue.getUint16(idx, true) + " mbar";
+          idx += 2;
+          
+          // Running times
           
           sMainFilterTime.value = toHours(readValue.getUint32(idx, true));
           idx += 4;
@@ -3156,7 +3354,8 @@ class blueToothStatus extends blueToothIf
     
     run()
     {
-        if (selectDisplay === "statusDiv")
+        if (selectDisplay === "statusDiv" ||
+            selectDisplay === "status1Div")
         {
             bleiface.itemReadWithBusy(this);
         }
@@ -4068,7 +4267,8 @@ class blueToothDevice
                 this.setMessage(DBG_CONNECT, "Connected to device");
                 this.setMessage(DBG_CONNECT, "");
                 this.setMessage(DBG_CONNECT, "Version : " + this.getItem("General").getVersion());
-                
+
+                menuHide();
                 activeLinks = "connectedLinks";
 
                 if (selectDisplay === "connectingDiv")
@@ -4257,6 +4457,7 @@ function connectToBluetooth()
     bleiface.disconnected();
     if (isWebBluetoothEnabled())
     {
+        menuDisabled=true;
         navigator.bluetooth.requestDevice({
             filters: [{name: 'CLEANCAB'}],
             optionalServices: [bleiface.getServiceUUID(0), bleiface.getServiceUUID(1)]
@@ -4409,11 +4610,13 @@ function connectToBluetooth()
         {
             bleiface.setRead("Status", cdata);
             
-            bleiface.setMessage(DBG_CONNECT, "Reading done. Initializing...");            
+            bleiface.setMessage(DBG_CONNECT, "Reading done. Initializing...");        
+            menuDisabled=false;            
             return bleiface.done();
         })
         .catch(error =>
         {
+            menuDisabled=false;
             bleiface.setError(error);        
         });
     }

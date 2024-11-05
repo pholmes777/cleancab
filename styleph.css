@@ -90,6 +90,22 @@ input:checked + .slider:before
   height:24px;
 }
 
+.container-progress-alarm
+{
+  padding:4px 16px;
+  color:#fff;
+  background-color:#FF1919;
+  height:24px;
+}
+
+.container-progress-warning
+{
+  padding:4px 16px;
+  color:#fff;
+  background-color:#FFAE19;
+  height:24px;
+}
+
 .tooltip 
 {
   position: relative;
