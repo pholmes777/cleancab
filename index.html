@@ -2911,7 +2911,7 @@ alarmSettingForm.addEventListener("submit", (event) =>
     view.setUint32( 4, fieldPressureOnTime.value * 1000, true);
     view.setUint32( 8, fieldPressureOffTime.value * 1000, true);
     view.setUint32(12, 1, true);            // sample time (40ms)
-    view.setUint32(16, 4, true);           // number of samples
+    view.setUint32(16, 16, true);           // number of samples
     
     view.setUint32(20, fieldCO2WarningThreshold.value, true);
     view.setUint32(24, fieldCO2AlarmOnTime.value * 1000, true);
