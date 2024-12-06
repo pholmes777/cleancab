@@ -895,13 +895,13 @@
       <div class="container">
         <div class="row">  
           <div class="col-40">
-            <label>Target</label>
+            <label>Target Min</label>
           </div>
           <div class="col-5">
             <div class="tooltip">?<span class="tooltiptext">Minimum pressure required in the cabin</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasPressureThreshold" name="fasPressureThreshold" min="1" max="200" placeholder="25" required="true">
+            <input type="number" id="fasPressureThresholdMin" name="fasPressureThresholdMin" min="1" max="200" placeholder="25" required="true">
           </div>
           <div class="col-10">
             <label class="units">pa</label>
@@ -909,10 +909,24 @@
         </div>
         <div class="row">  
           <div class="col-40">
+            <label>Target Max</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Maximum pressure allowed in the cabin</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasPressureThresholdMax" name="fasPressureThresholdMax" min="1" max="200" placeholder="200" required="true">
+          </div>
+          <div class="col-10">
+            <label class="units">pa</label>
+          </div>
+        </div>        
+        <div class="row">  
+          <div class="col-40">
             <label>On Delay</label>
           </div>
           <div class="col-5">
-            <div class="tooltip">?<span class="tooltiptext">Time before alarm is generated when pressure is below the target</span></div>
+            <div class="tooltip">?<span class="tooltiptext">Time before alarm is generated when pressure is out of range</span></div>
           </div>
           <div class="col-45">
             <input type="number" id="fasPressureOnTime" name="fasPressureOnTime" min="1" max="240" placeholder="120" required="true">
@@ -935,6 +949,20 @@
             <label class="units">sec</label>
           </div>
         </div>      
+        <div class="row">  
+          <div class="col-40">
+            <label>Num Samples Average</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Number of samples to average pressure over</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasPressureNumSamples" name="fasPressureNumSamples" min="1" max="20" placeholder="4" required="true">
+          </div>
+          <div class="col-10">
+            <label class="units"></label>
+          </div>
+        </div>         
       </div>
       <h3>CO2 - Alarm</h3>
       <div class="container">
@@ -2878,9 +2906,12 @@ class blueToothCommission extends blueToothIf
 const alarmSettingForm = document.querySelector("#alarmSettingForm");
 
 // Settings fields
-const fieldPressureThreshold = document.querySelector("#fasPressureThreshold");
+const fieldPressureThresholdMin = document.querySelector("#fasPressureThresholdMin");
+const fieldPressureThresholdMax = document.querySelector("#fasPressureThresholdMax");
+
 const fieldPressureOnTime = document.querySelector("#fasPressureOnTime");
 const fieldPressureOffTime = document.querySelector("#fasPressureOffTime");
+const fieldPressureNumSamples = document.querySelector("#fasPressureNumSamples");
 
 const fieldCO2AlarmThreshold = document.querySelector("#fasCO2AlarmThreshold");
 const fieldCO2WarningThreshold = document.querySelector("#fasCO2WarningThreshold");
@@ -2907,11 +2938,15 @@ alarmSettingForm.addEventListener("submit", (event) =>
     const buffer = new ArrayBuffer(96);
     const view = new DataView(buffer);
 
-    view.setUint32( 0, fieldPressureThreshold.value, true);
-    view.setUint32( 4, fieldPressureOnTime.value * 1000, true);
-    view.setUint32( 8, fieldPressureOffTime.value * 1000, true);
-    view.setUint32(12, 1, true);            // sample time (40ms)
-    view.setUint32(16, 16, true);           // number of samples
+    if (fieldPressureThresholdMax.value < fieldPressureThresholdMin.value)
+    {
+        fieldPressureThresholdMax.value = 200;
+    }
+    view.setUint32( 0, fieldPressureThresholdMin.value, true);
+    view.setUint32( 4, fieldPressureThresholdMax.value, true);
+    view.setUint32( 8, fieldPressureOnTime.value * 1000, true);
+    view.setUint32(12, fieldPressureOffTime.value * 1000, true);
+    view.setUint32(16, fieldPressureNumSamples.value, true);           // number of samples
     
     view.setUint32(20, fieldCO2WarningThreshold.value, true);
     view.setUint32(24, fieldCO2AlarmOnTime.value * 1000, true);
@@ -2972,11 +3007,13 @@ class blueToothAlarmSettings extends blueToothIf
 
         bleiface.setMessage(DBG_INFO, "Read alarm: Len=" + readValue.byteLength);
 
-        fieldPressureThreshold.value = readValue.getUint32(0, true);
-        fieldPressureOnTime.value = ((readValue.getUint32(4, true) + 500) / 1000) >> 0;
-        fieldPressureOffTime.value = ((readValue.getUint32(8, true) + 500) / 1000) >> 0;
+        fieldPressureThresholdMin.value = readValue.getUint32(0, true);
+        fieldPressureThresholdMax.value = readValue.getUint32(4, true);
+        fieldPressureOnTime.value = ((readValue.getUint32(8, true) + 500) / 1000) >> 0;
+        fieldPressureOffTime.value = ((readValue.getUint32(12, true) + 500) / 1000) >> 0;
+        fieldPressureNumSamples.value = readValue.getUint32(16, true);
+        
         fieldCO2WarningThreshold.value = readValue.getUint32(20, true);
-
         fieldCO2AlarmThreshold.value = readValue.getUint32(32, true);
         fieldCO2AlarmOnTime.value = ((readValue.getUint32(36, true) + 500) / 1000) >> 0;
         fieldCO2AlarmOffTime.value = ((readValue.getUint32(40, true) + 500) / 1000) >> 0;
