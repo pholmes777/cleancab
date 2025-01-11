@@ -616,7 +616,7 @@
       </div>
       <div class="row">
         <div class="col-25">
-          <label>Calibrated By</label>
+          <label>Name</label>
         </div>
         <div class="col-75">
           <input type="text" id="cCalibrationName" maxlength="99" readonly value="">
@@ -631,7 +631,9 @@
         </div>
       </div>
     </form>
-    <div id="testSetDiv" class="hiddenitemdiv">
+  </div>
+  <div id="testSetDiv" class="hiddenitemdiv">
+    <div class="container">
       <div class="row">
         <div class="col-25">
           <label>Pressure Reading</label>
@@ -664,63 +666,63 @@
         </div>
       </form>
     </div>
-  </div>    
 
-  <div class="container">
-    <div class="row">
-      <div class="col-25">
-        <label>CO2 Reading</label>
-      </div>
-      <div class="col-65">
-        <div class="row-progress">
-          <div id="testCO2Bar" class="container-progress" style="width:10%">10%</div>
+    <div class="container">
+      <div class="row">
+        <div class="col-25">
+          <label>CO2 Reading</label>
+        </div>
+        <div class="col-65">
+          <div class="row-progress">
+            <div id="testCO2Bar" class="container-progress" style="width:10%">10%</div>
+          </div>
         </div>
       </div>
+      <form id="testCO2Form">
+        <div class="row">
+          <div class="col-25">
+            <label>Real CO2</label>
+          </div>
+          <div class="col-65">
+            <input type="number" id="testRealCO2" min="400" max="2000" value="400">
+          </div>
+          <div class="col-5">
+            <label class="units">ppm</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-25">
+          </div>
+          <div class="col-65">
+            <input type="submit" value="Set CO2" class="btn">
+            <!--input type="button" value="Set CO2" onclick="testCalibratePoint(0)"-->
+          </div>
+        </div>
+      </form>
     </div>
-    <form id="testCO2Form">
-      <div class="row">
-        <div class="col-25">
-          <label>Real CO2</label>
-        </div>
-        <div class="col-65">
-          <input type="number" id="testRealCO2" min="400" max="2000" value="400">
-        </div>
-        <div class="col-5">
-          <label class="units">ppm</label>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-25">
-        </div>
-        <div class="col-65">
-          <input type="submit" value="Set CO2" class="btn">
-          <!--input type="button" value="Set CO2" onclick="testCalibratePoint(0)"-->
-        </div>
-      </div>
-    </form>
-  </div>
   
-  <h3>Log Management</h3>
-  <div class="container">
-    <div class="row">
-      <div class="col-25">
+    <h3>Log Management</h3>
+    <div class="container">
+      <div class="row">
+        <div class="col-25">
+        </div>
+        <div class="col-65">
+          <input type="button" value="Erase Filter Log" onclick="testEraseLog(0)">
+        </div>
       </div>
-      <div class="col-65">
-        <input type="button" value="Erase Filter Log" onclick="testEraseLog(0)">
+      <div class="row">
+        <div class="col-25">
+        </div>
+        <div class="col-65">
+          <input type="button" value="Erase Alarm Log" onclick="testEraseLog(1)">
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-25">
-      </div>
-      <div class="col-65">
-        <input type="button" value="Erase Alarm Log" onclick="testEraseLog(1)">
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-25">
-      </div>
-      <div class="col-65">
-        <input type="button" value="Erase Running Counts" onclick="testEraseLog(2)">
+      <div class="row">
+        <div class="col-25">
+        </div>
+        <div class="col-65">
+          <input type="button" value="Erase Running Counts" onclick="testEraseLog(2)">
+        </div>
       </div>
     </div>
   </div>
