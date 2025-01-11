@@ -596,38 +596,74 @@
   <div class="container">
     <div class="row">
         <p id="testResultsDbg"></p>
-    </div>
-    <div class="row">
-      <div class="col-25">
-        <label>Pressure Reading</label>
-      </div>
-      <div class="col-65">
-        <div class="row-progress">
-          <div id="testPressureBar" class="container-progress" style="width:10%">10%</div>
-        </div>
-      </div>
-    </div>
-    <form id="testPressureForm">
+    </div>       
+    <form id="calibrationUserForm">
       <div class="row">
         <div class="col-25">
-          <label>Real Pressure</label>
+          <label>Date</label>
         </div>
-        <div class="col-65">
-          <input type="number" id="testRealPressure" min="0" max="300" value="0">
-        </div>
-        <div class="col-5">
-          <label class="units">pa</label>
+        <div class="col-75">
+          <input type="date" id="cCalibrationDate" readonly value="2024-02-18">
         </div>
       </div>
       <div class="row">
         <div class="col-25">
+          <label>Company</label>
         </div>
-        <div class="col-65">
-          <input type="submit" value="Set Pressure" class="btn">
-          <!--input type="button" value="Set Pressure" onclick="testCalibratePoint(1)"-->
+        <div class="col-75">
+          <input type="text" id="cCalibrationCompany" maxlength="99" readonly value="">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-25">
+          <label>Calibrated By</label>
+        </div>
+        <div class="col-75">
+          <input type="text" id="cCalibrationName" maxlength="99" readonly value="">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-25">
+          <label>Contact</label>  
+        </div>
+        <div class="col-75">
+          <input type="text" id="cCalibrationPhone" maxlength="19" readonly value="">
         </div>
       </div>
     </form>
+    <div id="testSetDiv" class="hiddenitemdiv">
+      <div class="row">
+        <div class="col-25">
+          <label>Pressure Reading</label>
+        </div>
+        <div class="col-65">
+          <div class="row-progress">
+            <div id="testPressureBar" class="container-progress" style="width:10%">10%</div>
+          </div>
+        </div>
+      </div>
+      <form id="testPressureForm">
+        <div class="row">
+          <div class="col-25">
+            <label>Real Pressure</label>
+          </div>
+          <div class="col-65">
+            <input type="number" id="testRealPressure" min="0" max="300" value="0">
+          </div>
+          <div class="col-5">
+            <label class="units">pa</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-25">
+          </div>
+          <div class="col-65">
+            <input type="submit" value="Set Pressure" class="btn">
+            <!--input type="button" value="Set Pressure" onclick="testCalibratePoint(1)"-->
+          </div>
+        </div>
+      </form>
+    </div>
   </div>    
 
   <div class="container">
@@ -2777,6 +2813,8 @@ const cMachineName = document.querySelector("#cMachineName");
 const cPlantNumber = document.querySelector("#cPlantNumber");
 const cPlantHours = document.querySelector("#cPlantHours");
 const cSaveRow = document.querySelector("#cSaveRow");
+const cTestDiv = document.querySelector("#testDiv");
+const cTestSetDiv = document.querySelector("#testSetDiv");
 
 // Callback events
 
@@ -2800,6 +2838,27 @@ commissionForm.addEventListener("submit", (event) =>
 });
 
 // helper functions
+
+function authorizeCalibration(protocolVer)
+{
+    if (protocolVer < 2)
+    {
+        cTestSetDiv.style.display = "none";
+        cTestDiv.style.display = "none";
+    }
+    else
+    {    
+        if (authorizeControl &&
+            authorizeControl.getAuthorized())
+        {
+            cTestSetDiv.style.display = "block";
+        }
+        else
+        {
+            cTestSetDiv.style.display = "none";
+        }
+    }
+}
 
 function authorizeCommission()
 {
@@ -2833,17 +2892,48 @@ class blueToothCommission extends blueToothIf
         
         this.send = false;
         this.sendValue = "";
+        this.testMenuItem = 0;
+        this.elementMenuItem = document.getElementById("menuItemLogin");
     }
 
     disconnected()
     {
         this.send = false;
+        if (this.testMenuItem)
+        {
+            this.testMenuItem.remove();
+            this.testMenuItem = 0;
+        }
     }
     
     setCommission(commissionData)
     {
         this.sendValue = commissionData;
         this.send = true;
+    }
+    
+    protocolVersionSet()
+    {
+        super.protocolVersionSet();
+        if (protocolVersion < 2)
+        {
+            if (this.testMenuItem)
+            {
+                this.testMenuItem.remove();
+                this.testMenuItem = 0;
+            }
+        }
+        else
+        {
+            if (!this.testMenuItem)
+            {
+                this.testMenuItem = document.createElement("a");
+                this.testMenuItem.setAttribute("href", "javascript:showDiv('testDiv')");
+                this.testMenuItem.innerHTML = "Calibrate";
+                
+                this.elementMenuItem.parentNode.insertBefore(this.testMenuItem, this.elementMenuItem.nextSibling); 
+            }
+        }
     }
     
     setRead(readValue)
@@ -2875,8 +2965,7 @@ class blueToothCommission extends blueToothIf
             }
 
             commissionDataValid = (myArray[0] === "V");    
-        }
-        if (!commissionDataValid)
+        }        if (!commissionDataValid)
         {
             cInstalledDate.value = getNowDateForInput();
         }
@@ -3861,6 +3950,7 @@ class authorizeClass
             this.elementPassword.readOnly = authorized;
         }
         authorizeCommission();
+        authorizeCalibration(protocolVersion);
     }
 
     processData(data)
