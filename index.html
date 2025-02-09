@@ -506,7 +506,7 @@
   </div>
 </div>
 
-<div id="calibrateDiv" class="hiddenitemdiv">
+<div id="calibrateDivP1" class="hiddenitemdiv">
   <h3>Calibration</h3>
   <div class="container">
     <div class="row">
@@ -591,48 +591,59 @@
   </div>
 </div>
 
-<div id="testDiv" class="hiddenitemdiv">
+<div id="calibrateDivP2" class="hiddenitemdiv">
   <h3>Calibration</h3>
-  <div class="container">
-    <div class="row">
+  <div>
+    <div class="container">
+      <div class="row">
         <p id="testResultsDbg"></p>
-    </div>       
-    <form id="calibrationUserForm">
-      <div class="row">
-        <div class="col-25">
-          <label>Date</label>
+      </div>       
+      <form id="calibrationUserForm">
+        <div class="row">
+          <div class="col-25">
+            <label>Date</label>
+          </div>
+          <div class="col-65">
+            <input type="date" id="cCalibrationDate" readonly value="2024-02-18">
+          </div>
         </div>
-        <div class="col-75">
-          <input type="date" id="cCalibrationDate" readonly value="2024-02-18">
+        <div class="row">
+          <div class="col-25">
+            <label>Company</label>
+          </div>
+          <div class="col-65">
+            <input type="text" id="cCalibrationCompany" maxlength="99" readonly value="">
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-25">
-          <label>Company</label>
+        <div class="row">
+          <div class="col-25">
+            <label>Name</label>
+          </div>
+          <div class="col-65">
+            <input type="text" id="cCalibrationName" maxlength="99" readonly value="">
+          </div>
         </div>
-        <div class="col-75">
-          <input type="text" id="cCalibrationCompany" maxlength="99" readonly value="">
+        <div class="row">
+          <div class="col-25">
+            <label>Contact</label>  
+          </div>
+          <div class="col-65">
+            <input type="text" id="cCalibrationPhone" maxlength="19" readonly value="">
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-25">
-          <label>Name</label>
-        </div>
-        <div class="col-75">
-          <input type="text" id="cCalibrationName" maxlength="99" readonly value="">
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-25">
-          <label>Contact</label>  
-        </div>
-        <div class="col-75">
-          <input type="text" id="cCalibrationPhone" maxlength="19" readonly value="">
-        </div>
-      </div>
-    </form>
+        <div class="row"  id="cCalibrationSaveRow" style="display:none;">
+          <div class="col-25">
+            <label>Contact</label>  
+          </div>
+          <div class="col-65">
+            <input type="submit" value="Save" class="btn">
+          </div>
+        </div>        
+      </form>
+    </div>
   </div>
-  <div id="testSetDiv" class="hiddenitemdiv">
+  <div id="calibrateSetDivP2" class="hiddenitemdiv">
+    <h3>Pressure Sensor</h3>
     <div class="container">
       <div class="row">
         <div class="col-25">
@@ -661,12 +672,12 @@
           </div>
           <div class="col-65">
             <input type="submit" value="Set Pressure" class="btn">
-            <!--input type="button" value="Set Pressure" onclick="testCalibratePoint(1)"-->
           </div>
         </div>
       </form>
     </div>
 
+    <h3>CO2 Sensor</h3>
     <div class="container">
       <div class="row">
         <div class="col-25">
@@ -700,7 +711,9 @@
         </div>
       </form>
     </div>
+  </div>
   
+  <div id="calibrateLogDivP2" class="hiddenitemdiv">
     <h3>Log Management</h3>
     <div class="container">
       <div class="row">
@@ -929,7 +942,7 @@
   <h3>Settings</h3>
   <div class="container">
     <form id="alarmSettingForm">
-      <h3>Pressure</h3>
+      <h3>Pressure Alarm</h3>
       <div class="container">
         <div class="row">  
           <div class="col-40">
@@ -1059,7 +1072,21 @@
           <div class="col-10">
             <label class="units">sec</label>
           </div>
-        </div>  
+        </div> 
+        <div class="row">  
+          <div class="col-40">
+            <label>Num Samples Average</label>
+          </div>
+          <div class="col-5">
+            <div class="tooltip">?<span class="tooltiptext">Number of samples to average CO2 over</span></div>
+          </div>
+          <div class="col-45">
+            <input type="number" id="fasCO2NumSamples" name="fasCO2NumSamples" min="1" max="20" placeholder="2" required="true">
+          </div>
+          <div class="col-10">
+            <label class="units"></label>
+          </div>
+        </div> 
       </div>      
       <h3>Fan - Warning</h3>
       <div class="container">
@@ -2267,7 +2294,7 @@ class testClass
             return true;
         }
         
-        if (selectDisplay === "testDiv")
+        if (selectDisplay === "calibrateDivP2")
         {
             bleiface.itemReadWithBusy(item);
 
@@ -2815,8 +2842,16 @@ const cMachineName = document.querySelector("#cMachineName");
 const cPlantNumber = document.querySelector("#cPlantNumber");
 const cPlantHours = document.querySelector("#cPlantHours");
 const cSaveRow = document.querySelector("#cSaveRow");
-const cTestDiv = document.querySelector("#testDiv");
-const cTestSetDiv = document.querySelector("#testSetDiv");
+
+const calibrationUserForm = document.querySelector("#calibrationUserForm");
+const cCalibrateDivP2 = document.querySelector("#calibrateDivP2");
+const cCalibrateSetDivP2 = document.querySelector("#calibrateSetDivP2");
+const cCalibrateLogDivP2 = document.querySelector("#calibrateLogDivP2");
+const cCalibrationDate = document.querySelector("#cCalibrationDate");
+const cCalibrationCompany = document.querySelector("#cCalibrationCompany");
+const cCalibrationName = document.querySelector("#cCalibrationName");
+const cCalibrationPhone = document.querySelector("#cCalibrationPhone");
+const cCalibrationSaveRow = document.querySelector("#cCalibrationSaveRow");
 
 // Callback events
 
@@ -2839,26 +2874,55 @@ commissionForm.addEventListener("submit", (event) =>
     }
 });
 
+calibrationUserForm.addEventListener("submit", (event) => 
+{
+    event.preventDefault();
+  
+    var cdata = cCalibrationDate.value + "|" +
+                cCalibrationCompany.value + "|" +
+                cCalibrationName.value + "|" +
+                cCalibrationPhone.value;
+
+    var item = bleiface.getItem("Commission");
+    if (item)
+    {
+        item.setCalibration(cdata);
+        
+        // now calibration record was written can enable the calibration items
+        
+        cCalibrateSetDivP2.style.display = "block";
+    }
+});
+
 // helper functions
 
 function authorizeCalibration(protocolVer)
 {
     if (protocolVer < 2)
     {
-        cTestSetDiv.style.display = "none";
-        cTestDiv.style.display = "none";
+        cCalibrateSetDivP2.style.display = "none";
+        cCalibrateDivP2.style.display = "none";
     }
     else
     {    
+        let allowed = true;
+        
         if (authorizeControl &&
             authorizeControl.getAuthorized())
         {
-            cTestSetDiv.style.display = "block";
+            cCalibrateLogDivP2.style.display = "block";
+            //cCalibrateSetDivP2.style.display = "block";
         }
         else
         {
-            cTestSetDiv.style.display = "none";
+            allowed = false;
+            cCalibrateLogDivP2.style.display = "none";
+            cCalibrateSetDivP2.style.display = "none";
         }
+        cCalibrationName.readOnly = !allowed;
+        cCalibrationPhone.readOnly = !allowed;
+        cCalibrationCompany.readOnly = !allowed;
+        cCalibrationSaveRow.style.display = (!allowed) ? "none" : "block";
     }
 }
 
@@ -2893,24 +2957,34 @@ class blueToothCommission extends blueToothIf
         super ("Commission", 0, "f31e779c-7729-4073-8319-a0a2f33524ed");
         
         this.send = false;
+        this.sendCal = false;
         this.sendValue = "";
-        this.testMenuItem = 0;
+        this.calibrateMenuItem = 0;
         this.elementMenuItem = document.getElementById("menuItemLogin");
     }
 
     disconnected()
     {
         this.send = false;
-        if (this.testMenuItem)
+        this.sendCal = false;
+        if (this.calibrateMenuItem)
         {
-            this.testMenuItem.remove();
-            this.testMenuItem = 0;
+            this.calibrateMenuItem.remove();
+            this.calibrateMenuItem = 0;
         }
     }
     
     setCommission(commissionData)
     {
+        this.sendCal = false;
         this.sendValue = commissionData;
+        this.send = true;
+    }
+    
+    setCalibration(calibrationData)
+    {
+        this.sendCal = true;
+        this.sendValue = calibrationData;
         this.send = true;
     }
     
@@ -2919,21 +2993,21 @@ class blueToothCommission extends blueToothIf
         super.protocolVersionSet();
         if (protocolVersion < 2)
         {
-            if (this.testMenuItem)
+            if (this.calibrateMenuItem)
             {
-                this.testMenuItem.remove();
-                this.testMenuItem = 0;
+                this.calibrateMenuItem.remove();
+                this.calibrateMenuItem = 0;
             }
         }
         else
         {
-            if (!this.testMenuItem)
+            if (!this.calibrateMenuItem)
             {
-                this.testMenuItem = document.createElement("a");
-                this.testMenuItem.setAttribute("href", "javascript:showDiv('testDiv')");
-                this.testMenuItem.innerHTML = "Calibrate";
+                this.calibrateMenuItem = document.createElement("a");
+                this.calibrateMenuItem.setAttribute("href", "javascript:showDiv('calibrateDivP2')");
+                this.calibrateMenuItem.innerHTML = "Calibrate";
                 
-                this.elementMenuItem.parentNode.insertBefore(this.testMenuItem, this.elementMenuItem.nextSibling); 
+                this.elementMenuItem.parentNode.insertBefore(this.calibrateMenuItem, this.elementMenuItem.nextSibling); 
             }
         }
     }
@@ -2949,7 +3023,8 @@ class blueToothCommission extends blueToothIf
         const myArray = decodedValue.split("|");
     
         cSaveRow.style.display = "none";
-        if (myArray.length >= 7)
+        if ((myArray.length >= 7 && protocolVersion < 2) ||
+            (myArray.length >= 8 && protocolVersion >= 2))
         {
             cInstalledDate.value = myArray[1];
             cInstallerName.value = myArray[2];
@@ -2967,22 +3042,96 @@ class blueToothCommission extends blueToothIf
             }
 
             commissionDataValid = (myArray[0] === "V");    
-        }        if (!commissionDataValid)
+        }        
+        else if (protocolVersion >= 2)
+        {
+            if (myArray.length == 1)
+            {
+                // Cw   is value was written
+            }
+            else if (myArray.length == 2)
+            {
+                // CC|- is no current Calibration
+                // Cx|- is no calibration at that position
+                
+                if (myArray[0] === "CC" &&
+                    myArray[1] === "-")
+                {
+                    cCalibrationDate.value = getNowDateForInput();
+                    cCalibrationName.value = "";
+                    cCalibrationCompany.value = "";
+                    cCalibrationPhone.value = "";
+                }
+            }
+            else if (myArray.length == 7)
+            {
+                // CC|id|date|name|company|phone|hours is the current calibration record
+                
+                cCalibrationDate.value = myArray[1]
+                cCalibrationName.value = myArray[2];
+                cCalibrationCompany.value = myArray[3];
+                cCalibrationPhone.value = myArray[4];                
+            }
+        }
+        if (!commissionDataValid)
         {
             cInstalledDate.value = getNowDateForInput();
         }
         authorizeCommission();
     }
     
+    init()
+    {
+        if (this.initState == 0)
+        {
+            if (protocolVersion >= 2)
+            {
+                bleiface.setMessage(DBG_CONNECT, "Reading calibration record");
+                this.initState++;
+                
+                const encodedValue = new TextEncoder().encode("2");
+            
+                this.write(encodedValue);
+            }
+            else
+            {
+                super.init();
+            }
+        }
+        else
+        {
+            if (this.initState == 0x01)
+            {
+                this.initState++;
+                bleiface.itemReadWithBusy(this);
+            }
+            else
+            {
+                super.init();
+            }
+        }
+    }
+
+
     run()
     {
         if (this.send)
         {
-            this.send = false;
-
-            const encodedValue = new TextEncoder().encode(this.sendValue);
+            if (this.sendCal)
+            {
+                const encodedValue = new TextEncoder().encode("1");
             
-            this.write(encodedValue);
+                this.write(encodedValue);
+                this.sendCal = false;
+            }
+            else
+            {
+                this.send = false;
+
+                const encodedValue = new TextEncoder().encode(this.sendValue);
+            
+                this.write(encodedValue);
+            }
         }
     }
 }
@@ -3008,6 +3157,7 @@ const fieldCO2AlarmThreshold = document.querySelector("#fasCO2AlarmThreshold");
 const fieldCO2WarningThreshold = document.querySelector("#fasCO2WarningThreshold");
 const fieldCO2AlarmOnTime = document.querySelector("#fasCO2AlarmOnTime");
 const fieldCO2AlarmOffTime = document.querySelector("#fasCO2AlarmOffTime");
+const fieldCO2NumSamples = document.querySelector("#fasCO2NumSamples");
 
 const fieldFanThreshold = document.querySelector("#fasFanThreshold");
 const fieldFanOnTime = document.querySelector("#fasFanOnTime");
@@ -3047,7 +3197,7 @@ alarmSettingForm.addEventListener("submit", (event) =>
     view.setUint32(36, fieldCO2AlarmOnTime.value * 1000, true);
     view.setUint32(40, fieldCO2AlarmOffTime.value * 1000, true);    
     view.setUint32(44, 2, true);            // sample time
-    view.setUint32(48, 2, true);           // number of samples
+    view.setUint32(48, fieldCO2NumSamples.value, true);                 // number of samples
 
     view.setUint32(52, fieldFanThreshold.value, true);
     view.setUint32(56, fieldFanOnTime.value * 1000, true);
@@ -3108,6 +3258,8 @@ class blueToothAlarmSettings extends blueToothIf
         fieldCO2AlarmThreshold.value = readValue.getUint32(32, true);
         fieldCO2AlarmOnTime.value = ((readValue.getUint32(36, true) + 500) / 1000) >> 0;
         fieldCO2AlarmOffTime.value = ((readValue.getUint32(40, true) + 500) / 1000) >> 0;
+        fieldCO2NumSamples.value = readValue.getUint32(48, true);
+        
         fieldFanThreshold.value = readValue.getUint32(52, true);
         fieldFanOnTime.value = ((readValue.getUint32(56, true) + 500) / 1000) >> 0;
         fieldFanOffTime.value = ((readValue.getUint32(60, true) + 500) / 1000) >> 0;
@@ -3722,7 +3874,7 @@ class calibrateClass
             return true;
         }
         
-        if (selectDisplay === "calibrateDiv")
+        if (selectDisplay === "calibrateDivP1")
         {
             bleiface.itemReadWithBusy(item);
 
@@ -3815,7 +3967,7 @@ class authorizeClass
         this.calibrateMenuItem = 0;
         this.settingMenuItem = 0;
         this.alarmSettingMenuItem = 0;
-        this.testMenuItem = 0;
+        //this.testMenuItem = 0;
     }
     
     handleClicked()
@@ -3884,8 +4036,8 @@ class authorizeClass
                     if (protocolVersion < 2)
                     {
                         this.calibrateMenuItem = document.createElement("a");
-                        this.calibrateMenuItem.setAttribute("href", "javascript:showDiv('calibrateDiv')");
-                        this.calibrateMenuItem.innerHTML = "Calibrate";
+                        this.calibrateMenuItem.setAttribute("href", "javascript:showDiv('calibrateDivP1')");
+                        this.calibrateMenuItem.innerHTML = "Calibrate2";
                 
                         this.elementMenuItem.parentNode.insertBefore(this.calibrateMenuItem, this.elementMenuItem.nextSibling); 
                     }
@@ -3909,17 +4061,17 @@ class authorizeClass
                         this.elementMenuItem.parentNode.insertBefore(this.alarmSettingMenuItem, this.elementMenuItem.nextSibling); 
                     }
                 }
-                if (!this.testMenuItem)
-                {
-                    if (protocolVersion >= 2)
-                    {
-                        this.testMenuItem = document.createElement("a");
-                        this.testMenuItem.setAttribute("href", "javascript:showDiv('testDiv')");
-                        this.testMenuItem.innerHTML = "Calibrate";
-                
-                        this.elementMenuItem.parentNode.insertBefore(this.testMenuItem, this.elementMenuItem.nextSibling); 
-                    }
-                }
+                //if (!this.testMenuItem)
+                //{
+                //    if (protocolVersion >= 2)
+                //    {
+                //        this.testMenuItem = document.createElement("a");
+                //        this.testMenuItem.setAttribute("href", "javascript:showDiv('calibrateDivP2')");
+                //        this.testMenuItem.innerHTML = "Calibrate3";
+                //
+                //        this.elementMenuItem.parentNode.insertBefore(this.testMenuItem, this.elementMenuItem.nextSibling); 
+                //    }
+                //}
             }
             else
             {
@@ -3943,11 +4095,11 @@ class authorizeClass
                     this.alarmSettingMenuItem.remove();
                     this.alarmSettingMenuItem = 0;
                 }
-                if (this.testMenuItem)
-                {
-                    this.testMenuItem.remove();
-                    this.testMenuItem = 0;
-                }
+                //if (this.testMenuItem)
+                //{
+                //    this.testMenuItem.remove();
+                //    this.testMenuItem = 0;
+                //}
             }
             this.elementPassword.readOnly = authorized;
         }
