@@ -2878,6 +2878,8 @@ calibrationUserForm.addEventListener("submit", (event) =>
 {
     event.preventDefault();
   
+    cCalibrationDate.value = getNowDateForInput();
+    
     var cdata = cCalibrationDate.value + "|" +
                 cCalibrationCompany.value + "|" +
                 cCalibrationName.value + "|" +
