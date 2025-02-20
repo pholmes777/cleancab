@@ -2967,6 +2967,8 @@ class blueToothCommission extends blueToothIf
 
     disconnected()
     {
+        super.disconnected();
+        
         this.send = false;
         this.sendCal = false;
         if (this.calibrateMenuItem)
