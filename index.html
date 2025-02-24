@@ -4241,9 +4241,9 @@ class alarmHistoryClass extends historyClass
     setExportFileHeader()
     {
         if (protocolVersion < 2)
-            this.fileData = "Date,Pressure Alarm,CO2 Alarm,Door,Fan Speed,Pressure\r\n";
+            this.fileData = "Date,Alarm,Door,Fan Speed,Pressure\r\n";
         else
-            this.fileData = "Date,Pressure Alarm,CO2 Alarm,Door,Fan Speed,Pressure,CO2\r\n";
+            this.fileData = "Date,Alarm,Door,Fan Speed,Pressure,CO2\r\n";
     }
         
     dataValid(data)
@@ -4318,9 +4318,9 @@ class alarmHistoryClass extends historyClass
         }
         if ((data.getUint8(12) & 0x03) != 0)
         {
-            return "Alarm Active";
+            return "Pressure Active";
         }
-        return "Alarm Idle";
+        return "Idle";
     }
     
     dataDoorState(data)
