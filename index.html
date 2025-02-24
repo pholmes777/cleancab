@@ -4270,7 +4270,7 @@ class alarmHistoryClass extends historyClass
                           this.dataPressure(data);
         if (protocolVersion >= 2)
         {
-            this.fileData += this.dataCO2(data);
+            this.fileData += "," + this.dataCO2(data);
         }
         this.fileData += "\r\n";
     }
