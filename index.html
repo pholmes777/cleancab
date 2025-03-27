@@ -24,6 +24,7 @@
   <div id="connectedLinks">
     <a href="javascript:disconnect()">Disconnect</a>
     <a id="menuItemLogin" href="javascript:showDiv('loginDiv')">Login</a>
+    <a href="javascript:showDiv('manageDiv')">Management</a>
     <a href="javascript:showDiv('statusDiv')">Status</a>
     <a href="javascript:showDiv('status1Div')">Running Times</a>
     <a href="javascript:showDiv('commissionDiv')">Commission</a>
@@ -53,6 +54,9 @@
 <div id="connectingDiv" class="hiddenitemdiv">
   <h3>Connection</h3>
   <div class="container">
+    <div class="row">
+        <p id="connectingVersion">Cleancab App Version: 1.00</p>
+    </div>
     <div class="row">
       <div style="width: 100%;height: 150px;background-image: url('cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;">
       <!--div style="width: 100%;height: 150px;background-image: url('static/cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;"-->
@@ -498,7 +502,7 @@
       </div>
       <div class="col-75">
         <label class="switch">
-          <input id="testModeCheckbox" type="checkbox" onclick="testModeClicked()">
+          <input id="testModeCheckbox" type="checkbox" onclick="testModeClicked(0)">
           <span class="slider round"></span>
         </label>
       </div>
@@ -506,86 +510,48 @@
   </div>
 </div>
 
-<div id="calibrateDivP1" class="hiddenitemdiv">
-  <h3>Calibration</h3>
+<div id="manageDiv" class="hiddenitemdiv">
+  <h3>General Management</h3>
   <div class="container">
-    <div class="row">
-        <p id="calDbg"></p>
-    </div>
-    <div class="row">
-      <div class="col-25">
-        <label>ADC Reading</label>
-      </div>
-      <div class="col-65">
-        <div class="row-progress">
-          <div id="calAdcBar" class="container-progress" style="width:10%">10%</div>
+    <h3>Leak Management</h3>
+    <div class="container">
+      <div class="row">
+        <div class="col-25">
+          <label>Check for leaks</label>
+        </div>
+        <div class="col-75">
+          <label class="switch">
+            <input id="testMode1Checkbox" type="checkbox" onclick="testModeClicked(1)">
+            <span class="slider round"></span>
+          </label>
         </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-25">
-        <label>Pressure</label>
-      </div>
-      <div class="col-65">
-        <div class="row-progress">
-          <div id="calPressureBar" class="container-progress" style="width:10%">10%</div>
+    </div>          
+    <h3>Log Management</h3>
+    <div class="container">
+      <div class="row">
+        <p id="logResultsDbg"></p>
+      </div> 
+      <div class="row">
+        <div class="col-25">
+        </div>
+        <div class="col-65">
+          <input type="button" value="Erase Filter Log" onclick="eraseLog(0)">
         </div>
       </div>
-    </div>
-  </div>
-  <div class="container">
-    <div class="row">
-      <div class="col-25">
-        <label>Real Pressure</label>
+      <div class="row">
+        <div class="col-25">
+        </div>
+        <div class="col-65">
+          <input type="button" value="Erase Alarm Log" onclick="eraseLog(1)">
+        </div>
       </div>
-      <div class="col-65">
-        <input type="number" id="calRealPressure" min="0" max="300" value="0">
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-25">
-      </div>
-      <div class="col-65">
-        <input type="button" value="Set Zero Point" onclick="calibratePoint(1)">
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-25">
-      </div>
-      <div class="col-65">
-        <input type="button" value="Set Point 2" onclick="calibratePoint(2)">
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-25">
-      </div>
-      <div class="col-65">
-        <input type="button" value="Clear Data Points" onclick="calibratePoint(0)">
-      </div>
-    </div>
-  </div>
-  
-  <h3>Log Management</h3>
-  <div class="container">
-    <div class="row">
-      <div class="col-25">
-      </div>
-      <div class="col-65">
-        <input type="button" value="Erase Filter Log" onclick="eraseLog(0)">
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-25">
-      </div>
-      <div class="col-65">
-        <input type="button" value="Erase Alarm Log" onclick="eraseLog(1)">
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-25">
-      </div>
-      <div class="col-65">
-        <input type="button" value="Erase Running Counts" onclick="eraseLog(2)">
+      <div class="row">
+        <div class="col-25">
+        </div>
+        <div class="col-65">
+          <input type="button" value="Erase Running Counts" onclick="eraseLog(2)">
+        </div>
       </div>
     </div>
   </div>
@@ -630,113 +596,8 @@
           <div class="col-65">
             <input type="text" id="cCalibrationPhone" maxlength="19" readonly value="">
           </div>
-        </div>
-        <div class="row"  id="cCalibrationSaveRow" style="display:none;">
-          <div class="col-25">
-            <label></label>  
-          </div>
-          <div class="col-65">
-            <input type="submit" value="Save" class="btn">
-          </div>
-        </div>        
+        </div>      
       </form>
-    </div>
-  </div>
-  <div id="calibrateSetDivP2" class="hiddenitemdiv">
-    <h3>Pressure Sensor</h3>
-    <div class="container">
-      <div class="row">
-        <div class="col-25">
-          <label>Pressure Reading</label>
-        </div>
-        <div class="col-65">
-          <div class="row-progress">
-            <div id="testPressureBar" class="container-progress" style="width:10%">10%</div>
-          </div>
-        </div>
-      </div>
-      <form id="testPressureForm">
-        <div class="row">
-          <div class="col-25">
-            <label>Real Pressure</label>
-          </div>
-          <div class="col-65">
-            <input type="number" id="testRealPressure" min="0" max="300" value="0">
-          </div>
-          <div class="col-5">
-            <label class="units">pa</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-25">
-          </div>
-          <div class="col-65">
-            <input type="submit" value="Set Pressure" class="btn">
-          </div>
-        </div>
-      </form>
-    </div>
-
-    <h3>CO2 Sensor</h3>
-    <div class="container">
-      <div class="row">
-        <div class="col-25">
-          <label>CO2 Reading</label>
-        </div>
-        <div class="col-65">
-          <div class="row-progress">
-            <div id="testCO2Bar" class="container-progress" style="width:10%">10%</div>
-          </div>
-        </div>
-      </div>
-      <form id="testCO2Form">
-        <div class="row">
-          <div class="col-25">
-            <label>Real CO2</label>
-          </div>
-          <div class="col-65">
-            <input type="number" id="testRealCO2" min="400" max="2000" value="400">
-          </div>
-          <div class="col-5">
-            <label class="units">ppm</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-25">
-          </div>
-          <div class="col-65">
-            <input type="submit" value="Set CO2" class="btn">
-            <!--input type="button" value="Set CO2" onclick="testCalibratePoint(0)"-->
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-  
-  <div id="calibrateLogDivP2" class="hiddenitemdiv">
-    <h3>Log Management</h3>
-    <div class="container">
-      <div class="row">
-        <div class="col-25">
-        </div>
-        <div class="col-65">
-          <input type="button" value="Erase Filter Log" onclick="testEraseLog(0)">
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-25">
-        </div>
-        <div class="col-65">
-          <input type="button" value="Erase Alarm Log" onclick="testEraseLog(1)">
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-25">
-        </div>
-        <div class="col-65">
-          <input type="button" value="Erase Running Counts" onclick="testEraseLog(2)">
-        </div>
-      </div>
     </div>
   </div>
 </div>
@@ -932,7 +793,13 @@
         </div>
       </div> 
       <div class="row">
-        <input id="settingSaveBtn" type="submit" value="Save Settings" class="btn">
+        <div class="col-40">
+        </div>
+        <div class="col-5">
+        </div>
+        <div class="col-50">	  
+          <input id="settingSaveBtn" type="submit" value="Save Settings" class="btn">
+		</div>
       </div>
     </form> 
   </div>
@@ -1000,20 +867,6 @@
             <label class="units">sec</label>
           </div>
         </div>      
-        <div class="row">  
-          <div class="col-40">
-            <label>Num Samples Average</label>
-          </div>
-          <div class="col-5">
-            <div class="tooltip">?<span class="tooltiptext">Number of samples to average pressure over</span></div>
-          </div>
-          <div class="col-45">
-            <input type="number" id="fasPressureNumSamples" name="fasPressureNumSamples" min="1" max="20" placeholder="4" required="true">
-          </div>
-          <div class="col-10">
-            <label class="units"></label>
-          </div>
-        </div>         
       </div>
       <h3>CO2 - Alarm</h3>
       <div class="container">
@@ -1072,21 +925,7 @@
           <div class="col-10">
             <label class="units">sec</label>
           </div>
-        </div> 
-        <div class="row">  
-          <div class="col-40">
-            <label>Num Samples Average</label>
-          </div>
-          <div class="col-5">
-            <div class="tooltip">?<span class="tooltiptext">Number of samples to average CO2 over</span></div>
-          </div>
-          <div class="col-45">
-            <input type="number" id="fasCO2NumSamples" name="fasCO2NumSamples" min="1" max="20" placeholder="2" required="true">
-          </div>
-          <div class="col-10">
-            <label class="units"></label>
-          </div>
-        </div> 
+        </div>
       </div>      
       <h3>Fan - Warning</h3>
       <div class="container">
@@ -1720,7 +1559,7 @@ class historyClass
                         }
                         else
                         {
-                            this.ReadDone();
+                            this.readDone();
                         }
                     break;
                 }
@@ -2098,62 +1937,24 @@ class blueToothIf
 // Variables
 
 var testSwitch = document.querySelector("#testModeCheckbox");
-var testPressureForm = document.querySelector("#testPressureForm");
-var testCO2Form = document.querySelector("#testCO2Form");
-
-testPressureForm.addEventListener("submit", (event) => 
-{
-    event.preventDefault();
-
-    testControl.executeSetCalibrate(1);
-});
-
-testCO2Form.addEventListener("submit", (event) => 
-{
-    event.preventDefault();
-
-    testControl.executeSetCalibrate(0);
-});
+var test1Switch = document.querySelector("#testMode1Checkbox");
 
 // Callback events
 
-function testModeClicked()
+function testModeClicked(id)
 {
     if (testControl)
     {
-        testControl.setTestState(testSwitch.checked);
+        testControl.setTestState(id == 0 ? testSwitch.checked : test1Switch.checked);
     }
 }
-
-function testEraseLog(theLog)
-{
-    if (testControl)
-    {
-        testControl.executeEraseLog(theLog);
-    }
-}
-
-function testCalibratePoint(thePoint)
-{
-    if (testControl)
-    {
-        testControl.executeSetCalibrate(thePoint);
-    }
-}
-
 
 class testClass
 {
     constructor()
     {
-        this.elementPressureBar = document.getElementById("testPressureBar");
-        this.elementCO2Bar = document.getElementById("testCO2Bar");
-        this.elementDbg = document.getElementById("testResultsDbg");
-        this.elementRealPressure = document.getElementById("testRealPressure");
-        this.elementRealCO2 = document.getElementById("testRealCO2");
-        
-        this.pressure = 0;
-        this.co2 = 0;
+		this.elementDbg = document.getElementById("testResultsDbg");
+		this.elementLogDbg = document.getElementById("logResultsDbg");
         
         this.send_req = false;
         this.send_cmd = 0;
@@ -2172,21 +1973,13 @@ class testClass
             if (this.timer == 0)
             {
                 this.elementDbg.innerHTML = "";
+				this.elementLogDbg.innerHTML = "";
             }
         }
     }
     
     restart()
     {
-        this.pressure = 0;
-        this.co2 = 0;
-        
-        this.elementPressureBar.style.width = '0%';
-        this.elementPressureBar.innerHTML = "0";
-        
-        this.elementCO2Bar.style.width = '0%';
-        this.elementCO2Bar.innerHTML = '0';   
-
         this.send_req = false;        
 
         this.deleteAlarm = false;
@@ -2199,61 +1992,20 @@ class testClass
         
         if (protocolVersion >= 2)
         {
-            this.pressure = data.getInt16(1, true);
-            this.co2 = data.getUint16(3, true);
-
-            let temp = (((this.co2 * 100) + 0.5) / 10000 >> 0);
-            if (temp > 100)
-            {
-                temp = 100;
-            }
-            this.elementCO2Bar.style.width = temp + '%';
-            this.elementCO2Bar.innerHTML = this.co2;
-
-            let temp1 = (((this.pressure * 100) + 0.5) / 500 >> 0);
-            if (temp1 > 100)
-            {
-                temp1 = 100;
-            }
-            if (temp1 < 0)
-            {
-                temp1 = 0;
-            }
-            this.elementPressureBar.style.width = temp + '%';
-            this.elementPressureBar.innerHTML = this.pressure;
-            
             if (this.deleteAlarm && (data.getUint8(5) == 0))
             {
                 this.deleteAlarm = false;
-                this.elementDbg.innerHTML = "Alarm Log Deleted";    
+                this.elementLogDbg.innerHTML = "Alarm Log Deleted";    
                 this.timer = 5;
             }
             if (this.deleteFilter && (data.getUint8(6) == 0))
             {
                 this.deleteFilter = false;
-                this.elementDbg.innerHTML = "Filter Log Deleted";    
+                this.elementLogDbg.innerHTML = "Filter Log Deleted";    
                 this.timer = 5;
             }
         }
     }   
-
-    executeSetCalibrate(theIdx)
-    { 
-        this.send_req = false;
-        
-        this.send_cmd = 1 + theIdx;
-        if (theIdx == 1)
-        {
-            this.send_value = this.elementRealPressure.value;     
-        }            
-        else if (theIdx == 0)
-        {
-            this.send_value = this.elementRealCO2.value;
-        }
-        this.send_req = true;
-        
-        bleiface.setMessage(DBG_INFO, "Sending calibrate: Cmd=" + this.send_cmd + ", Value=" + this.send_value);
-    }
     
     executeEraseLog(theLog)
     {
@@ -2267,6 +2019,14 @@ class testClass
     
     setTestState(on)
     {
+	    if (testSwitch.checked != on)
+        {
+            testSwitch.checked = on;
+        }
+        if (test1Switch.checked != on)
+        {
+            test1Switch.checked = on;
+        }
         this.send_req = false;
         this.send_cmd = 0;
         this.send_value = on ? 1 : 0;
@@ -2281,20 +2041,26 @@ class testClass
             
             item.sendRequest(this.send_cmd, this.send_value);
             
-            if (this.send_cmd == 3)
-            {
-                this.deleteFilter = true;
-                this.elementDbg.innerHTML = "Deleting Filter Log...";
-            }
             if (this.send_cmd == 4)
             {
+                this.deleteFilter = true;
+                this.elementLogDbg.innerHTML = "Deleting Filter Log...";
+            }
+            if (this.send_cmd == 5)
+            {
                 this.deleteAlarm = true;
-                this.elementDbg.innerHTML = "Deleting Alarm Log...";
+                this.elementLogDbg.innerHTML = "Deleting Alarm Log...";
+            }
+			if (this.send_cmd == 6)
+            {
+                this.elementLogDbg.innerHTML = "Running Counts Deleted";
+                this.timer = 5;
             }
             return true;
         }
         
-        if (selectDisplay === "calibrateDivP2")
+        if (selectDisplay === "calibrateDivP2" ||
+            selectDisplay === "manageDiv")
         {
             bleiface.itemReadWithBusy(item);
 
@@ -2357,6 +2123,7 @@ class blueToothTest extends blueToothIf
         testControl.handleActions(this);
     }
 }
+
 
 //==========================================================
 //
@@ -2843,15 +2610,11 @@ const cPlantNumber = document.querySelector("#cPlantNumber");
 const cPlantHours = document.querySelector("#cPlantHours");
 const cSaveRow = document.querySelector("#cSaveRow");
 
-const calibrationUserForm = document.querySelector("#calibrationUserForm");
 const cCalibrateDivP2 = document.querySelector("#calibrateDivP2");
-const cCalibrateSetDivP2 = document.querySelector("#calibrateSetDivP2");
-const cCalibrateLogDivP2 = document.querySelector("#calibrateLogDivP2");
 const cCalibrationDate = document.querySelector("#cCalibrationDate");
 const cCalibrationCompany = document.querySelector("#cCalibrationCompany");
 const cCalibrationName = document.querySelector("#cCalibrationName");
 const cCalibrationPhone = document.querySelector("#cCalibrationPhone");
-const cCalibrationSaveRow = document.querySelector("#cCalibrationSaveRow");
 
 // Callback events
 
@@ -2874,59 +2637,7 @@ commissionForm.addEventListener("submit", (event) =>
     }
 });
 
-calibrationUserForm.addEventListener("submit", (event) => 
-{
-    cCalibrationDate.value = getNowDateForInput();
-    
-    event.preventDefault();  
-    
-    var cdata = cCalibrationDate.value + "|" +
-                cCalibrationCompany.value + "|" +
-                cCalibrationName.value + "|" +
-                cCalibrationPhone.value;
-
-    var item = bleiface.getItem("Commission");
-    if (item)
-    {
-        item.setCalibration(cdata);
-        
-        // now calibration record was written can enable the calibration items
-        
-        cCalibrateSetDivP2.style.display = "block";
-    }
-});
-
 // helper functions
-
-function authorizeCalibration(protocolVer)
-{
-    if (protocolVer < 2)
-    {
-        cCalibrateSetDivP2.style.display = "none";
-        cCalibrateDivP2.style.display = "none";
-    }
-    else
-    {    
-        let allowed = true;
-        
-        if (authorizeControl &&
-            authorizeControl.getAuthorized())
-        {
-            cCalibrateLogDivP2.style.display = "block";
-            //cCalibrateSetDivP2.style.display = "block";
-        }
-        else
-        {
-            allowed = false;
-            cCalibrateLogDivP2.style.display = "none";
-            cCalibrateSetDivP2.style.display = "none";
-        }
-        cCalibrationName.readOnly = !allowed;
-        cCalibrationPhone.readOnly = !allowed;
-        cCalibrationCompany.readOnly = !allowed;
-        cCalibrationSaveRow.style.display = (!allowed) ? "none" : "block";
-    }
-}
 
 function authorizeCommission()
 {
@@ -3155,13 +2866,13 @@ const fieldPressureThresholdMax = document.querySelector("#fasPressureThresholdM
 
 const fieldPressureOnTime = document.querySelector("#fasPressureOnTime");
 const fieldPressureOffTime = document.querySelector("#fasPressureOffTime");
-const fieldPressureNumSamples = document.querySelector("#fasPressureNumSamples");
+var fieldPressureNumSamples = 4;
 
 const fieldCO2AlarmThreshold = document.querySelector("#fasCO2AlarmThreshold");
 const fieldCO2WarningThreshold = document.querySelector("#fasCO2WarningThreshold");
 const fieldCO2AlarmOnTime = document.querySelector("#fasCO2AlarmOnTime");
 const fieldCO2AlarmOffTime = document.querySelector("#fasCO2AlarmOffTime");
-const fieldCO2NumSamples = document.querySelector("#fasCO2NumSamples");
+var fieldCO2NumSamples = 4;
 
 const fieldFanThreshold = document.querySelector("#fasFanThreshold");
 const fieldFanOnTime = document.querySelector("#fasFanOnTime");
@@ -3191,7 +2902,7 @@ alarmSettingForm.addEventListener("submit", (event) =>
     view.setUint32( 4, fieldPressureThresholdMax.value, true);
     view.setUint32( 8, fieldPressureOnTime.value * 1000, true);
     view.setUint32(12, fieldPressureOffTime.value * 1000, true);
-    view.setUint32(16, fieldPressureNumSamples.value, true);           // number of samples
+    view.setUint32(16, fieldPressureNumSamples, true);           // number of samples
     
     view.setUint32(20, fieldCO2WarningThreshold.value, true);
     view.setUint32(24, fieldCO2AlarmOnTime.value * 1000, true);
@@ -3201,7 +2912,7 @@ alarmSettingForm.addEventListener("submit", (event) =>
     view.setUint32(36, fieldCO2AlarmOnTime.value * 1000, true);
     view.setUint32(40, fieldCO2AlarmOffTime.value * 1000, true);    
     view.setUint32(44, 2, true);            // sample time
-    view.setUint32(48, fieldCO2NumSamples.value, true);                 // number of samples
+    view.setUint32(48, fieldCO2NumSamples, true);                 // number of samples
 
     view.setUint32(52, fieldFanThreshold.value, true);
     view.setUint32(56, fieldFanOnTime.value * 1000, true);
@@ -3256,13 +2967,13 @@ class blueToothAlarmSettings extends blueToothIf
         fieldPressureThresholdMax.value = readValue.getUint32(4, true);
         fieldPressureOnTime.value = ((readValue.getUint32(8, true) + 500) / 1000) >> 0;
         fieldPressureOffTime.value = ((readValue.getUint32(12, true) + 500) / 1000) >> 0;
-        fieldPressureNumSamples.value = readValue.getUint32(16, true);
+        fieldPressureNumSamples = readValue.getUint32(16, true);
         
         fieldCO2WarningThreshold.value = readValue.getUint32(20, true);
         fieldCO2AlarmThreshold.value = readValue.getUint32(32, true);
         fieldCO2AlarmOnTime.value = ((readValue.getUint32(36, true) + 500) / 1000) >> 0;
         fieldCO2AlarmOffTime.value = ((readValue.getUint32(40, true) + 500) / 1000) >> 0;
-        fieldCO2NumSamples.value = readValue.getUint32(48, true);
+        fieldCO2NumSamples = readValue.getUint32(48, true);
         
         fieldFanThreshold.value = readValue.getUint32(52, true);
         fieldFanOnTime.value = ((readValue.getUint32(56, true) + 500) / 1000) >> 0;
@@ -3702,19 +3413,39 @@ class blueToothGeneral extends blueToothIf
 
 // callback functions
 
-function calibratePoint(thePoint)
-{
-    if (calibrateControl)
-    {
-        calibrateControl.executeSetCalibrate(thePoint);
-    }                    
-}
-
 function eraseLog(theLog)
 {
-    if (calibrateControl)
+    let confirmTxt = "Are you sure?";
+    switch (theLog)
     {
-        calibrateControl.executeEraseLog(theLog);
+        case 0:
+            confirmTxt = "Delete the Filter Log.\r\nContinue?";
+        break;
+        
+        case 1:
+            confirmTxt = "Delete the Alarm Log.\r\nContinue?";
+        break;
+        
+        case 2:
+            confirmTxt = "Delete the Running Counts.\r\nContinue?";
+        break;
+    }
+    if (confirm(confirmTxt))
+    {
+        if (protocolVersion >= 2)
+        {
+            if (testControl)
+            {
+                testControl.executeEraseLog(theLog);
+            }
+        }
+        else
+        {
+            if (calibrateControl)
+            {
+                calibrateControl.executeEraseLog(theLog);
+            }
+        }
     }
 }
 
@@ -3724,15 +3455,7 @@ class calibrateClass
 {
     constructor()
     {
-        this.elementPressureBar = document.getElementById("calPressureBar");
-        this.elementAdcBar = document.getElementById("calAdcBar");
-        this.elementRealPressure = document.getElementById("calRealPressure");
         this.elementDbg = document.getElementById("calDbg");
-        
-        this.pressure = 0;
-        this.adc = 0;
-        this.one_pa = 0;
-        this.two_pa = 0;
         
         this.send_req = false;
         this.send_cmd = 0;
@@ -3758,18 +3481,6 @@ class calibrateClass
     
     restart()
     {
-        this.pressure = 0;
-        this.adc = 0;
-        this.one_pa = 0;
-        this.two_pa = 0;
-        
-        this.elementRealPressure.value = "0";
-        this.elementPressureBar.style.width = '0%';
-        this.elementPressureBar.innerHTML = "Not Calibrated";
-        
-        this.elementAdcBar.style.width = '0%';
-        this.elementAdcBar.innerHTML = '0';   
-
         this.send_req = false;        
 
         this.deleteAlarm = false;
@@ -3779,36 +3490,7 @@ class calibrateClass
     processData(data)
     {
         if (data.getUint8(0) == 0)
-        {
-            this.one_pa = data.getUint16(1, true);
-            this.two_pa = data.getUint16(3, true);
-            this.adc = data.getUint16(5, true);
-            this.pressure = data.getUint16(7, true);
-
-            let temp = (((this.adc * 100) + 0.5) / 4096 >> 0);
-            if (temp > 100)
-            {
-                temp = 100;
-            }
-            this.elementAdcBar.style.width = temp + '%';
-            this.elementAdcBar.innerHTML = this.adc;
-
-            if (this.pressure == 0xffff)
-            {
-                this.elementPressureBar.style.width = '0%';
-                this.elementPressureBar.innerHTML = "Not Calibrated";
-            }
-            else
-            {
-                let temp = (((this.pressure * 100) + 0.5) / 250 >> 0);
-                if (temp > 100)
-                {
-                    temp = 100;
-                }
-                this.elementPressureBar.style.width = temp + '%';
-                this.elementPressureBar.innerHTML = this.pressure;
-            }
-            
+        {   
             if (this.deleteAlarm && (data.getUint8(9) == 0))
             {
                 this.deleteAlarm = false;
@@ -3823,28 +3505,6 @@ class calibrateClass
             }
         }
     }   
-
-    executeSetCalibrate(thePoint)
-    { 
-        this.send_req = false;
-        this.send_idx = 0;
-        
-        if (thePoint == 0)
-        {      
-            this.send_cmd = 1;          // delete
-        }
-        else
-        {       
-            this.send_cmd = 0;          // set
-            this.send_value = 0;
-            this.send_idx = thePoint - 1;       
-        }
-        
-        this.send_value = this.elementRealPressure.value;      
-        this.send_req = true;
-        
-        bleiface.setMessage(DBG_INFO, "Sending calibrate: Cmd=" + this.send_cmd + ", Value=" + this.send_value + "Idx=" + this.send_idx);
-    }
     
     executeEraseLog(theLog)
     {
@@ -3875,13 +3535,6 @@ class calibrateClass
                 this.deleteAlarm = true;
                 this.elementDbg.innerHTML = "Deleting Alarm Log...";
             }
-            return true;
-        }
-        
-        if (selectDisplay === "calibrateDivP1")
-        {
-            bleiface.itemReadWithBusy(item);
-
             return true;
         }
         return false;
@@ -3968,7 +3621,6 @@ class authorizeClass
         this.elementMenuItem = document.getElementById("menuItemLogin");
         this.elementHeader = document.getElementById("loginDivHeader");
         this.elementPasswordDiv = document.getElementById("loginPasswordRow");
-        this.calibrateMenuItem = 0;
         this.settingMenuItem = 0;
         this.alarmSettingMenuItem = 0;
         //this.testMenuItem = 0;
@@ -4034,18 +3686,7 @@ class authorizeClass
                 this.elementMenuItem.innerHTML = "Logout";
                 this.elementHeader.innerHTML = "Logout";
                 this.elementPasswordDiv.style.display = "none";
-                
-                if (!this.calibrateMenuItem)
-                {
-                    if (protocolVersion < 2)
-                    {
-                        this.calibrateMenuItem = document.createElement("a");
-                        this.calibrateMenuItem.setAttribute("href", "javascript:showDiv('calibrateDivP1')");
-                        this.calibrateMenuItem.innerHTML = "Calibrate2";
-                
-                        this.elementMenuItem.parentNode.insertBefore(this.calibrateMenuItem, this.elementMenuItem.nextSibling); 
-                    }
-                }
+
                 if (!this.settingMenuItem)
                 {
                     this.settingMenuItem = document.createElement("a");
@@ -4065,17 +3706,6 @@ class authorizeClass
                         this.elementMenuItem.parentNode.insertBefore(this.alarmSettingMenuItem, this.elementMenuItem.nextSibling); 
                     }
                 }
-                //if (!this.testMenuItem)
-                //{
-                //    if (protocolVersion >= 2)
-                //    {
-                //        this.testMenuItem = document.createElement("a");
-                //        this.testMenuItem.setAttribute("href", "javascript:showDiv('calibrateDivP2')");
-                //        this.testMenuItem.innerHTML = "Calibrate3";
-                //
-                //        this.elementMenuItem.parentNode.insertBefore(this.testMenuItem, this.elementMenuItem.nextSibling); 
-                //    }
-                //}
             }
             else
             {
@@ -4083,12 +3713,7 @@ class authorizeClass
                 this.elementMenuItem.innerHTML = "Login";
                 this.elementHeader.innerHTML = "Login";
                 this.elementPasswordDiv.style.display = "block";
-                
-                if (this.calibrateMenuItem)
-                {
-                    this.calibrateMenuItem.remove();
-                    this.calibrateMenuItem = 0;
-                }
+
                 if (this.settingMenuItem)
                 {
                     this.settingMenuItem.remove();
@@ -4108,7 +3733,6 @@ class authorizeClass
             this.elementPassword.readOnly = authorized;
         }
         authorizeCommission();
-        authorizeCalibration(protocolVersion);
     }
 
     processData(data)
