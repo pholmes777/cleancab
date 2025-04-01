@@ -84,24 +84,27 @@ input:checked + .slider:before
 }
 .container-progress
 {
-  padding:0px 0px;
-  color:#fff;
+  padding:4px 0px;
+  color:#000;
+  text-align: center;
   background-color:#4CAF50;
   height:24px;
 }
 
 .container-progress-alarm
 {
-  padding:0px 0px;
-  color:#fff;
+  padding:4px 0px;
+  color:#000;
+  text-align: center;
   background-color:#FF1919;
   height:24px;
 }
 
 .container-progress-warning
 {
-  padding:0px 0px;
-  color:#fff;
+  padding:4px 0px;
+  color:#000;
+  text-align: center;
   background-color:#FFAE19;
   height:24px;
 }
