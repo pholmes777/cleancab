@@ -24,7 +24,6 @@
   <div id="connectedLinks">
     <a href="javascript:disconnect()">Disconnect</a>
     <a id="menuItemLogin" href="javascript:showDiv('loginDiv')">Login</a>
-    <a href="javascript:showDiv('manageDiv')">Management</a>
     <a href="javascript:showDiv('statusDiv')">Status</a>
     <a href="javascript:showDiv('status1Div')">Running Times</a>
     <a href="javascript:showDiv('commissionDiv')">Commission</a>
@@ -2725,7 +2724,7 @@ class blueToothCommission extends blueToothIf
             {
                 this.calibrateMenuItem = document.createElement("a");
                 this.calibrateMenuItem.setAttribute("href", "javascript:showDiv('calibrateDivP2')");
-                this.calibrateMenuItem.innerHTML = "Calibrate";
+                this.calibrateMenuItem.innerHTML = "Calibration Info";
                 
                 this.elementMenuItem.parentNode.insertBefore(this.calibrateMenuItem, this.elementMenuItem.nextSibling); 
             }
