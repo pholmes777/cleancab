@@ -80,7 +80,7 @@
       </div>
       <div class="col-65">
         <div class="row-progress">
-          <div id="sFanSpeedBar" class="container-progress" style="width:10%">10%</div>
+          <div id="sFanSpeedBar" class="container-progress" style="width:1%">1%</div>
         </div>
       </div>    
     </div>
@@ -90,7 +90,7 @@
       </div>
       <div class="col-65">
         <div class="row-progress">
-          <div id="sPressureBar" class="container-progress" style="width:10%">10pa</div>
+          <div id="sPressureBar" class="container-progress" style="width:1%">1pa</div>
         </div>
       </div>   
     </div>
@@ -100,7 +100,7 @@
       </div>
       <div class="col-65">
         <div class="row-progress">
-          <div id="sCO2Bar" class="container-progress" style="width:10%">400ppm</div>
+          <div id="sCO2Bar" class="container-progress" style="width:1%">0ppm</div>
         </div>
       </div>
     </div>
@@ -558,7 +558,7 @@
 </div>
 
 <div id="calibrateDivP2" class="hiddenitemdiv">
-  <h3>Calibration</h3>
+  <h3>Calibration Status</h3>
   <div>
     <div class="container">
       <div class="row">
@@ -797,9 +797,9 @@
         </div>
         <div class="col-5">
         </div>
-        <div class="col-50">	  
+        <div class="col-50">
           <input id="settingSaveBtn" type="submit" value="Save Settings" class="btn">
-		</div>
+        </div>
       </div>
     </form> 
   </div>
@@ -925,7 +925,7 @@
           <div class="col-10">
             <label class="units">sec</label>
           </div>
-        </div>
+        </div> 
       </div>      
       <h3>Fan - Warning</h3>
       <div class="container">
@@ -1555,7 +1555,7 @@ class historyClass
                             this.count--;
                             result = true;
                     
-                            bleiface.itemReadWithBusy(item);
+                            this.readNext(item);
                         }
                         else
                         {
@@ -1572,6 +1572,11 @@ class historyClass
         return result;
     }
 
+    readNext(item)
+    {
+        bleiface.itemReadWithBusy(item);
+    }
+    
     readDone()
     {
         bleiface.setMessage(DBG_INFO, "History " + this.name + ": Finished");
@@ -3917,6 +3922,26 @@ class alarmHistoryClass extends historyClass
     
     dataRecordType(data)
     {
+        let co2MsgState = "CO2 Idle";
+        
+        if (protocolVersion >= 2)
+        {
+            switch (data.getUint8(13) & 0x03)
+            {
+                case 0x01:
+                    co2MsgState = "CO2 Info";
+                break;
+                
+                case 0x02:
+                    co2MsgState = "CO2 Warning";
+                break;
+                 
+                case 0x03:
+                    co2MsgState = "CO2 Active";
+                break;
+            }
+        }
+                
         if ((data.getUint8(13) & 0x80) == 0x80)
         {
             if (protocolVersion < 2)
@@ -3926,19 +3951,47 @@ class alarmHistoryClass extends historyClass
                     return "CO2 Active";
                 }
             }
-            else
+            return co2MsgState;
+        }
+        if (protocolVersion >= 2 && data.getUint8(1) >= 2)
+        {
+            if (data.getUint8(20) != 0xff &&
+                (data.getUint8(20) & 0x80) == 0x80)
             {
-                switch (data.getUint8(13) & 0x03)
+                if ((data.getUint8(20) & 0x01) == 0)
                 {
-                    case 0x01:
-                        return "CO2 Info";
-                    case 0x02:
-                        return "CO2 Warning";
-                    case 0x03:
-                        return "CO2 Active";
-                }                   
-            }
-            return "CO2 Idle";
+                    return "Buzzer Idle";
+                }
+             
+                let bMsgState = "Active";             
+                if ((data.getUint8(20) & 0x02) == 0x02)
+                {
+                    bMsgState = "Muted";    
+                }
+                let bMsgReason = "";
+                
+                if ((data.getUint8(20) & 0x30) != 0)
+                {
+                    if ((data.getUint8(20) & 0x08) != 0)
+                    {
+                        bMsgReason = "Pressure and ";
+                    }
+                    if ((data.getUint8(20) & 0x20) != 0)
+                    {
+                        bMsgReason += "CO2 Active";
+                    }
+                    else
+                    {
+                        bMsgReason += "CO2 Warning";
+                    }
+                }
+                else
+                {
+                    bMsgReason = "Pressure";    
+                }
+                
+                return "Buzzer " + bMsgState + " (" + bMsgReason + ")";
+            }            
         }
         if ((data.getUint8(12) & 0x03) != 0)
         {
@@ -4549,6 +4602,7 @@ function connect()
         testControl.restart();
     
         testSwitch.checked = false;
+        test1Switch.checked = false;
  
         menuHide();
         showDiv("connectingDiv");
