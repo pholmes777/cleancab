@@ -84,7 +84,7 @@ input:checked + .slider:before
 }
 .container-progress
 {
-  padding:4px 16px;
+  padding:0px 0px;
   color:#fff;
   background-color:#4CAF50;
   height:24px;
@@ -92,7 +92,7 @@ input:checked + .slider:before
 
 .container-progress-alarm
 {
-  padding:4px 16px;
+  padding:0px 0px;
   color:#fff;
   background-color:#FF1919;
   height:24px;
@@ -100,7 +100,7 @@ input:checked + .slider:before
 
 .container-progress-warning
 {
-  padding:4px 16px;
+  padding:0px 0px;
   color:#fff;
   background-color:#FFAE19;
   height:24px;
@@ -134,6 +134,18 @@ input:checked + .slider:before
   visibility: visible;
 }
 
+button {
+  background-color: #04AA6D;
+  color: white;
+  padding: 6px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  float: right;
+  width: 100%;
+  border: 1px solid #04AA6D;
+} 
+
 button:disabled,
     button[disabled] {
         background-color: grey;
@@ -147,18 +159,6 @@ button:disabled,
         border: 1px solid #04AA6D;
     }
     
-button {
-  background-color: #04AA6D;
-  color: white;
-  padding: 6px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  float: right;
-  width: 100%;
-  border: 1px solid #04AA6D;
-} 
-
 input[type=text], select, textarea {
   width: 100%;
   padding: 6px;
@@ -201,6 +201,42 @@ input[type=radio], select, textarea {
 
 input[type=button] {
   background-color: #04AA6D;
+  color: white;
+  padding: 6px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  float: right;
+  width: 100%;
+  border: 1px solid #04AA6D;
+} 
+
+input[type=file] {
+  background-color: #04AA6D;
+  color: white;
+  padding: 6px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  float: right;
+  width: 100%;
+  border: 1px solid #04AA6D;
+} 
+
+input[type=button][disabled] {
+  background-color: grey;
+  color: white;
+  padding: 6px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  float: right;
+  width: 100%;
+  border: 1px solid #04AA6D;
+} 
+
+input[type=file][disabled] {
+  background-color: grey;
   color: white;
   padding: 6px 20px;
   border: none;
@@ -301,6 +337,12 @@ label {
 .col-5 {
   float: left;
   width: 5%;
+  margin-top: 6px;
+}
+
+.col-2 {
+  float: left;
+  width: 2%;
   margin-top: 6px;
 }
 
