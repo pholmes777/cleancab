@@ -3,7 +3,7 @@
   "short_name": "CleanCab",
   "description": "Monitor and Configure your CleanCab Pressurizer",
   "id": "/cleancab",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "scope": "/",
   "background_color": "#000000",
