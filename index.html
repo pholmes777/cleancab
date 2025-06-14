@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="styleph.css">
     <link rel="manifest" href="manifest.json">
+    <script src="chart.umd.min.js"></script>
     <!--link rel="stylesheet" type="text/css" href="static/styleph.css"-->
     <!--link rel="manifest" href="static/manifest.json"-->
   </head>
@@ -29,7 +30,8 @@
     <a href="javascript:showDiv('commissionDiv')">Commission</a>
     <a href="javascript:showDiv('alarmHistoryDiv')">Alarm History</a>
     <a href="javascript:showDiv('filterDetailsDiv')">Filter Details</a>
-    <a href="javascript:showDiv('filterHistoryDiv')">Filter History</a>
+    <a href="javascript:showDiv('filterHistoryDiv')">Filter History</a>    
+    <a href="javascript:showDiv('recorderDiv')">Recorder</a>
     <a href="javascript:showDiv('contactDiv')">Contact</a>
   </div>
   <a href="javascript:void(0);" class="icon" onclick="toggleMenu()">
@@ -54,7 +56,7 @@
   <h3>Connection</h3>
   <div class="container">
     <div class="row">
-        <p id="connectingVersion">Cleancab App Version: 1.07</p>
+        <p id="connectingVersion">Cleancab App Version: 1.07.1</p>
     </div>
     <div class="row">
       <div style="width: 100%;height: 150px;background-image: url('cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;">
@@ -64,6 +66,57 @@
     <div class="row">
       <p id="connectingTicks"></p>
       <p id="connectingState"></p>  
+    </div>
+  </div>
+</div>
+
+<div id="recorderDiv" class="hiddenitemdiv">
+  <h3>Recording</h3>
+  <div class="container">
+    <div class="row">
+      <div class="col-25">
+        <label>Sample Rate</label>
+      </div>
+      <div class="col-65">
+        <select id="recorderSamples" style="width:100%">
+            <option value=60>60</option>
+            <option value=30 selected>30</option>
+            <option value=20>20</option>
+        </select>
+      </div>
+      <div class="col-10">
+        <label class="units">secs</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-25">
+        <label>Duration</label>
+      </div>
+      <div class="col-65">
+        <select id="recorderLength" style="width:100%">
+            <option value=60>60</option>
+            <option value=30>30</option>
+            <option value=15 selected>15</option>
+        </select>
+      </div>
+      <div class="col-10">
+        <label class="units">mins</label>
+      </div>      
+    </div>    
+    <div class="row">
+      <div class="col-25">
+      </div>
+      <div class="col-35">
+        <input id="recorderStartStop" type="button" value="Start Recording" onclick="recorderStartStop(event)"/>
+      </div>
+      <div class="col-5">
+      </div>
+      <div class="col-35">
+        <input id="recorderSave" type="button" value="Save" onclick="recorderSave(event)"  disabled="true"/>
+      </div>
+    </div>
+      <canvas id="recorderChart" style="width:100%"></canvas>
+    <div>
     </div>
   </div>
 </div>
@@ -1191,6 +1244,7 @@ var filterHistory;
 var alarmHistory;
 var authorizeControl;
 var calibrateControl;
+var recorderControl;
 var testControl;
 
 function init()
@@ -1206,6 +1260,7 @@ function init()
     alarmHistory = new alarmHistoryClass("alarm", "Alarm");
     authorizeControl = new authorizeClass();
     calibrateControl = new calibrateClass();
+    recorderControl = new recorderClass();
     testControl = new testClass();
 
     // testing lines... removed \/
@@ -1215,7 +1270,7 @@ function init()
     //bleiface.protocolVersionSet();
     // testing lines end
     
-    setTimeout(secondTimer, 500);
+    setTimeout(halfSecondTimer, 500);
 }
 
 //=====================================================
@@ -3258,6 +3313,20 @@ class blueToothStatus extends blueToothIf
         super.setRead(readValue);
 
         let fan = this.decodeFanSpeed(readValue.getUint8(0));
+        
+        if (selectDisplay === "recorderDiv")
+        {
+            if (protocolVersion >= 2)
+            {
+                recorderControl.statusUpdate(fan, readValue.getUint16(4, true), readValue.getUint16(6, true));
+            }
+            else
+            {
+                recorderControl.statusUpdate(fan, readValue.getUint16(4, true), 0);
+            }
+            return;
+        }
+        
         sFanSpeedBar.style.width = fan + '%';
         sFanSpeedBar.innerHTML = fan + '%';
 
@@ -3360,7 +3429,8 @@ class blueToothStatus extends blueToothIf
     run()
     {
         if (selectDisplay === "statusDiv" ||
-            selectDisplay === "status1Div")
+            selectDisplay === "status1Div" ||
+            selectDisplay === "recorderDiv")
         {
             bleiface.itemReadWithBusy(this);
         }
@@ -3599,6 +3669,356 @@ class blueToothCalibrate extends blueToothIf
         calibrateControl.handleActions(this);
     }
 }    
+
+//==========================================================
+//
+//          Recorder
+//
+//==========================================================
+
+function recorderSave(e)
+{
+    if (recorderControl)
+    {
+        recorderControl.save()
+    }
+}
+
+function recorderStartStop(e)
+{
+    if (recorderControl)
+    {
+        recorderControl.startStop()
+    }
+}
+
+class recorderClass
+{
+    constructor()
+    {
+        this.started = false;
+        this.index = 0;
+        this.ticks = 0;
+        this.stopStartBtn = document.getElementById("recorderStartStop");
+        this.saveBtn = document.getElementById("recorderSave");
+        this.sampleRateCbox = document.getElementById("recorderSamples");
+        this.sampleLengthCbox = document.getElementById("recorderLength")
+        this.testSpeed = 0;
+        this.testPressure = 0;
+        this.testCO2 = 400;
+        this.canvas = document.getElementById("recorderChart");
+        this.doSample = false;
+        this.sampleTime = 0;
+        this.samplePeriod = 30;
+        this.sampleDuration = 15 * 60;
+        this.savedSamplePeriod = 30;
+        this.numSamples = ((this.sampleDuration / this.samplePeriod) >> 0) + 1;
+
+        this.chart = new Chart(this.canvas.getContext("2d"),
+        {
+            type: "line",
+            data:
+            {
+                labels: [0],
+                datasets: [
+                {
+                    data: [0],
+                    borderColor: "green",
+                    label: 'Fan Speed',
+                    fill: false,
+                    yAxisID: 'y',
+                },
+                {
+                    data: [0],
+                    borderColor: "red",
+                    label: 'Pressure',
+                    fill: false,
+                    yAxisID: 'y1',
+                },
+                {
+                    data: [0],
+                    borderColor: "blue",
+                    label: 'CO2',
+                    fill: false,
+                    yAxisID: 'y2',
+                }
+                ]
+            },
+            options:
+            {
+                responsive: true,
+                interaction:
+                {
+                    mode: 'index',
+                    intersect: false,
+                },
+                stacked: false,
+                animation:
+                {
+                    duration: 0,
+                },
+                plugins:
+                {
+                    title:
+                    {
+                        display: true,
+                        text: 'System chart'
+                    }
+                },
+                scales:
+                {
+                    x:
+                    {
+                        title:
+                        {
+                            display: true,
+                            text: 'Minutes'
+                        }
+                    },
+                    y:
+                    {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        color: "red",
+                        min: 0,
+                        max: 100,
+                    },
+                    y1:
+                    {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        min : 0,
+                        max : 200,
+                        grid:
+                        {
+                            drawOnChartArea: false,
+                        },
+                    },
+                    y2:
+                    {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        min : 0,
+                        max : 5000,
+                        grid:
+                        {
+                            drawOnChartArea: false,
+                        },
+                    },
+                }
+            }
+        });
+        
+        this.setupXAxis();
+        this.chart.update();
+    }
+
+    save()
+    {
+        if (this.chart)
+        {
+            if (this.chart.data.datasets[0].data.length > 1)
+            {
+                let filedata = "Time,Fan Speed,Pressure(pa),CO2(ppm)\r\n";
+                let i = 0;
+
+                while (i < this.chart.data.datasets[0].data.length)
+                {
+                    filedata += this.secondsToTime(i * this.savedSamplePeriod, true) + "," +
+                                this.chart.data.datasets[0].data[i] + "," +
+                                this.chart.data.datasets[1].data[i] + "," +
+                                this.chart.data.datasets[2].data[i] + "\r\n";
+                    i++;
+                }
+                var tempLink = document.createElement("a");
+                var taBlob = new Blob([filedata], {type: 'text/plain'});
+                tempLink.setAttribute('href', URL.createObjectURL(taBlob));
+                tempLink.setAttribute('download', "test_report.txt");
+                tempLink.click();
+
+                URL.revokeObjectURL(tempLink.href);
+            }
+        }
+    }
+
+    secondsToTime(theTime, useHours)
+    {
+        let hours = (theTime / 3600) >> 0;
+        let mins = ((theTime % 3600) / 60) >> 0;
+        let secs = theTime % 60;
+
+        if (useHours)
+        {
+            return '"' + pad2(hours) + ":" + pad2(mins) + ":" + pad2(secs) + '"';
+        }
+        return mins + ":" + pad2(secs);
+    }
+
+    setupXAxis()
+    {    
+        let i = 0;
+        
+        this.chart.data.labels = [];
+        for (i = 0; i < this.numSamples; i++)
+        {
+            this.chart.data.labels.push(this.secondsToTime(i * this.samplePeriod, false));
+        }
+    }
+
+    updateStopStartBtn()
+    {
+        if (this.started)
+        {
+            if (this.index == 0)
+            {
+                this.stopStartBtn.value = "Stop  (starting)"; 
+            }
+            else
+            {
+                let remaining = this.sampleDuration - this.sampleTime;
+        
+                if (remaining < 0)
+                {
+                    this.stopStartBtn.value = "Stop  (finishing)";    
+                }        
+                else
+                {   
+                    this.stopStartBtn.value = "Stop  (" + this.secondsToTime(remaining, false) + ")";    
+                }
+            }
+        }
+    }
+            
+    startStop()
+    {
+        if (this.started)
+        {
+            this.started = false;
+            this.stopStartBtn.value = "Start";
+            this.saveBtn.disabled = false;
+            if (wakeLockObj)        
+            {
+                wakeLockObj.release();
+                wakeLockObj = null;
+            }
+            this.sampleRateCbox.disabled = false;
+            this.sampleLengthCbox.disabled = false;
+            this.savedSamplePeriod = this.samplePeriod;
+        }
+        else
+        {
+            this.sampleTime = 0;
+            this.sampleRateCbox.disabled = true;
+            this.sampleLengthCbox.disabled = true;
+            this.samplePeriod = parseInt(this.sampleRateCbox.value);
+            this.sampleDuration = parseInt(this.sampleLengthCbox.value) * 60;
+            this.numSamples = ((this.sampleDuration / this.samplePeriod) >> 0) + 1;
+            this.setupXAxis();
+            this.started = true;
+            this.updateStopStartBtn();
+            
+            this.saveBtn.disabled = true;
+            this.ticks = 0;
+            this.index = 0;
+            this.doSample = true;
+            this.chart.data.datasets[0].data = [0];
+            this.chart.data.datasets[1].data = [0];
+            this.chart.data.datasets[2].data = [0];
+            this.chart.update();
+            
+            if ("wakeLock" in navigator)
+            {
+                navigator.wakeLock.request('screen')
+                    .then((wakeLock) => 
+                    {
+                        wakeLockObj = wakeLock;
+          
+                        wakeLockObj.addEventListener('release', () => 
+                        {
+                            wakeLockObj = null;
+                        })
+                    })
+                    .catch((err) => 
+                    {
+                    })
+            }
+        }
+    }
+
+    addRecord(theSpeed, thePressure, theCO2)
+    {
+        if (this.index == 0)
+        {
+            this.chart.data.datasets[0].data[0] = theSpeed;
+            this.chart.data.datasets[1].data[0] = thePressure;
+            this.chart.data.datasets[2].data[0] = theCO2;
+            this.index++;
+        }
+        else
+        {
+            this.chart.data.datasets[0].data.push(theSpeed);
+            this.chart.data.datasets[1].data.push(thePressure);
+            this.chart.data.datasets[2].data.push(theCO2);
+            this.index++;
+            if (this.index >= this.numSamples)
+            {
+                if (this.started)
+                {
+                    this.startStop();
+                }
+            }
+        }
+        this.chart.update();
+    }
+
+    statusUpdate(fanSpeed, pressure, CO2)
+    {
+        if (this.started && this.doSample)
+        {
+            this.doSample = false;
+            this.addRecord(fanSpeed, pressure, CO2);
+        }
+    }
+
+    tick()
+    {
+        if (this.started)
+        {
+            if (selectDisplay === "recorderDiv")
+            {
+                this.ticks++;
+                                                
+                if (this.ticks & 0x01)
+                {
+                    let secondTicks = (this.ticks >> 1) % this.samplePeriod;
+                
+                    if (secondTicks == (this.samplePeriod - 1))
+                    {
+                        if (this.doSample)
+                        {
+                            // missed a sample.
+
+                            this.addRecord(0, 0, 0);
+                        }
+                    }
+                    if (secondTicks == 0)
+                    {
+                        this.doSample = true;
+                    }
+                    this.sampleTime++;
+                    this.updateStopStartBtn()
+                }
+            }
+            else
+            {
+                this.startStop();
+            }
+        }
+    }
+}
 
 //==========================================================
 //
@@ -4643,7 +5063,7 @@ function disconnect()
     //phdbg.innerHTML = "";
 }
 
-function secondTimer()
+function halfSecondTimer()
 {
     if (authorizeControl)
     {
@@ -4661,8 +5081,12 @@ function secondTimer()
     {
         bleiface.tick();
     }
-
-    setTimeout(secondTimer, 500);
+    if (recorderControl)
+    {
+        recorderControl.tick();
+    }
+    
+    setTimeout(halfSecondTimer, 500);
 }
 
 function bluetoothPoll()

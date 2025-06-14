@@ -13,7 +13,8 @@ const APP_STATIC_RESOURCES = [
     '/cleancab/fallback.html',
     '/cleancab/manifest.json',
     '/cleancab/cleancab.png',
-    '/cleancab/styleph.css'];
+    '/cleancab/styleph.css',
+    '/cleancab/chart.umd.min.js'];
                 
 self.addEventListener("install", (event) => {
   event.waitUntil(
