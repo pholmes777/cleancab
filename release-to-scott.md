@@ -11,6 +11,9 @@ manifest.json
 index.html	
   navigator.serviceWorker.register('serviceworker.js', {scope: '/cleancab/'})	
   
+serviceworker.js
+    - all url needs /cleancab/
+  
   
   
 For Scott
@@ -22,3 +25,5 @@ manifest.json
 index.html	
   navigator.serviceWorker.register('serviceworker.js', {scope: '/'})	
 	
+serviceworker.js
+    - change /ceancab/ back to just /
