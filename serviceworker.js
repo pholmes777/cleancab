@@ -28,20 +28,36 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("activate", (event) => {
-  console.log("Handling activate event");
+  console.log("🔄 Service worker activating...");
+
   event.waitUntil(
     (async () => {
-      const names = await caches.keys();
-      await Promise.all(
-        names
-        .filter((name) => name !== CACHE_NAME && name.startsWith(APP_NAME))
-        .map((name) => {
-          console.log("Handling activate. Delete cache:", name);
-          return caches.delete(name);
-        }),
-      );
-      await clients.claim();
-    })(),
+      try {
+        const cacheNames = await caches.keys();
+        const oldCaches = cacheNames.filter(
+          (name) => name !== CACHE_NAME && name.startsWith(APP_NAME)
+        );
+
+        if (oldCaches.length) {
+          console.log("🧹 Deleting old caches:", oldCaches);
+        } else {
+          console.log("✅ No old caches to clean up.");
+        }
+
+        await Promise.all(
+          oldCaches.map((name) =>
+            caches.delete(name).then(() => {
+              console.log(`🗑️ Deleted cache: ${name}`);
+            })
+          )
+        );
+
+        await clients.claim();
+        console.log("🎉 Service worker is now active and ready!");
+      } catch (err) {
+        console.error("🚨 Error during activate handler:", err);
+      }
+    })()
   );
 });
 
