@@ -1,26 +1,93 @@
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open('app-cache').then((cache) => {
-            return cache.addAll([
-                '/',
-                '/app-images/appicon-144.png',
-                '/app-images/appicon-192.png',
-                '/app-images/appicon-256.png',
-                '/app-images/appicon-512.png',
-                '/index.html',
-                '/manifest.json',
-                '/serviceworker.js',
-                '/cleancab.png',
-                '/styleph.css'
-            ]);
-        })
-    );
+//Reference: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Tutorials/CycleTracker/Service_workers
+
+const VERSION = "v1"
+const APP_NAME = "cleancab-app";
+const CACHE_NAME = `${APP_NAME}-${VERSION}`;
+
+const APP_STATIC_RESOURCES = [
+    '/',
+    '/app-images/appicon-144.png',
+    '/app-images/appicon-192.png',
+    '/app-images/appicon-256.png',
+    '/app-images/appicon-512.png',
+    '/index.html',
+    '/fallback.html',
+    '/manifest.json',
+    '/cleancab.png',
+    '/styleph.css'];
+                
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      cache.addAll(APP_STATIC_RESOURCES).catch((err) => {
+        console.error("Failed to cache resources during install:", err);
+      });
+    })(),
+  );
 });
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener("activate", (event) => {
+  console.log("Handling activate event");
+  event.waitUntil(
+    (async () => {
+      const names = await caches.keys();
+      await Promise.all(
+        names
+        .filter((name) => name !== CACHE_NAME && name.startsWith(APP_NAME))
+        .map((name) => {
+          console.log("Handling activate. Delete cache:", name);
+          return caches.delete(name);
+        }),
+      );
+      await clients.claim();
+    })(),
+  );
+});
+
+self.addEventListener("fetch", (event) => 
+{
+  console.log("Handling fetch event for", event.request.url);  
+
+  if (event.request.mode === "navigate") 
+  {
     event.respondWith(
-        caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
-        })
+      caches.match('/index.html').then((cachedResponse) => 
+        cachedResponse || fetch(event.request).catch(() => caches.match('/index.html'))
+      )
     );
+    return;
+  }
+
+  // Handle other requests with caching updates
+  event.respondWith(
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      const cachedResponse = await cache.match(event.request.url);
+
+      if (cachedResponse) {
+        console.log("Found response in cache:", cachedResponse);
+        return cachedResponse;
+      }
+
+      console.log("No response found in cache. Fetching from network...");
+      
+      return fetch(event.request).then(
+        async (response) => {
+          console.log("Response from network:", response);
+
+          // Cache the newly fetched response
+          const responseClone = response.clone(); // Clone because response streams can only be read once
+          const cache = await caches.open(CACHE_NAME);
+          cache.put(event.request.url, responseClone);
+
+          return response;
+        },
+        (error) => {
+          console.error("Fetching failed:", error);
+          return caches.match('/fallback.html') || new Response("Offline", { status: 503 });
+        }
+      );
+    })()
+  );
 });
