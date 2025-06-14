@@ -46,13 +46,13 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => 
 {
-  console.log("Handling fetch event for", event.request.url);  
+  console.log("Handling fetch event for", event.request.url);   
 
   if (event.request.mode === "navigate") 
   {
     event.respondWith(
-      caches.match('/index.html').then((cachedResponse) => 
-        cachedResponse || fetch(event.request).catch(() => caches.match('/index.html'))
+      caches.match('/cleancab/index.html').then((cachedResponse) => 
+        cachedResponse || fetch(event.request).catch(() => caches.match('/cleancab/index.html'))
       )
     );
     return;
@@ -62,7 +62,13 @@ self.addEventListener("fetch", (event) =>
   event.respondWith(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
-      const cachedResponse = await cache.match(event.request);
+      
+      const requestUrl = new URL(event.request.url);
+      const normalizedRequest = requestUrl.pathname;
+
+      console.log("Normalized fetch event for", normalizedRequest); 
+  
+      const cachedResponse = await cache.match(event.request) || await cache.match(normalizedRequest);
 
       if (cachedResponse) {
         console.log("Found response in cache:", cachedResponse);
@@ -71,22 +77,20 @@ self.addEventListener("fetch", (event) =>
 
       console.log("No response found in cache. Fetching from network...");
       
-      return fetch(event.request).then(
-        async (response) => {
-          console.log("Response from network:", response);
+      try {
+        const response = await fetch(event.request);
+        console.log("Response from network:", response);
 
-          // Cache the newly fetched response
-          const responseClone = response.clone(); // Clone because response streams can only be read once
-          const cache = await caches.open(CACHE_NAME);
-          cache.put(event.request.url, responseClone);
+        const responseClone = response.clone();
+        cache.put(normalizedRequest, responseClone);
 
-          return response;
-        },
-        (error) => {
-          console.error("Fetching failed:", error);
-          return caches.match('/fallback.html') || new Response("Offline", { status: 503 });
-        }
-      );
+        return response;
+      } catch (error) {
+        console.error("Fetching failed:", error);
+        return caches.match('/cleancab/fallback.html').then((fallback) =>
+            fallback || new Response("Offline", { status: 503 })
+        );
+      }
     })()
   );
 });
