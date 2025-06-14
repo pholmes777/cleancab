@@ -5,16 +5,15 @@ const APP_NAME = "cleancab-app";
 const CACHE_NAME = `${APP_NAME}-${VERSION}`;
 
 const APP_STATIC_RESOURCES = [
-    '/',
-    '/app-images/appicon-144.png',
-    '/app-images/appicon-192.png',
-    '/app-images/appicon-256.png',
-    '/app-images/appicon-512.png',
-    '/index.html',
-    '/fallback.html',
-    '/manifest.json',
-    '/cleancab.png',
-    '/styleph.css'];
+    '/cleancab/app-images/appicon-144.png',
+    '/cleancab/app-images/appicon-192.png',
+    '/cleancab/app-images/appicon-256.png',
+    '/cleancab/app-images/appicon-512.png',
+    '/cleancab/index.html',
+    '/cleancab/fallback.html',
+    '/cleancab/manifest.json',
+    '/cleancab/cleancab.png',
+    '/cleancab/styleph.css'];
                 
 self.addEventListener("install", (event) => {
   event.waitUntil(
