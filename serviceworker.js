@@ -1,6 +1,6 @@
 //Reference: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Tutorials/CycleTracker/Service_workers
 
-const VERSION = "v4"
+const VERSION = "v5"
 const APP_NAME = "cleancab-app";
 const CACHE_NAME = `${APP_NAME}-${VERSION}`;
 
@@ -82,6 +82,10 @@ self.addEventListener("fetch", (event) =>
       
       const requestUrl = new URL(event.request.url);
       const normalizedRequest = requestUrl.pathname;
+
+      if (normalizedRequest === '/cleancab/serviceworker.js') {
+        return fetch(event.request);
+      }
 
       console.log("Normalized fetch event for", normalizedRequest); 
   
