@@ -17,6 +17,8 @@ const APP_STATIC_RESOURCES = [
     '/cleancab/chart.umd.min.js'];
                 
 self.addEventListener("install", (event) => {
+  self.skipWaiting();
+    
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
