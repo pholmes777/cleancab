@@ -4106,7 +4106,7 @@ class authorizeClass
     {
         return this.authorized;
     }
-    
+
     protocolVersionSet()
     {
         if (protocolVersion >= 2)
@@ -4131,7 +4131,7 @@ class authorizeClass
         }
         this.updateAlarmSetting();
     }
-   
+
     updateAlarmSetting()
     {
         if (this.alarmSettingMenuItem)
@@ -4146,7 +4146,7 @@ class authorizeClass
                 this.elementAlarmSettingSaveDiv.style.display = "none";
         }
     }
-   
+
     setAuthorized(authorized)
     {
         if (authorized != this.authorized)
@@ -4226,16 +4226,16 @@ class authorizeClass
         {
             this.timer = 5;
             this.elementDbg.innerHTML = "Trying...";
-           
+
             this.sendLogin = false;
             this.queryLogin = true;
             this.count = 2;
 
             item.sendLogin(this.sendPassword);
-            
+
             return true;
         }
-       
+
         if (this.queryLogin)
         {
             if (this.count == 0)
@@ -4254,7 +4254,7 @@ class authorizeClass
             return true;
         }
         return false;
-    }    
+    }
 }
 
 // bluetooth interface
