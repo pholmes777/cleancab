@@ -56,7 +56,7 @@
   <h3>Connection</h3>
   <div class="container">
     <div class="row">
-        <p id="connectingVersion">Cleancab App Version: 1.07.02</p>
+        <p id="connectingVersion">Cleancab App Version: 1.07.04</p>
     </div>
     <div class="row">
       <div style="width: 100%;height: 150px;background-image: url('cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;">
@@ -1148,7 +1148,7 @@
           </div>
         </div>        
       </div>
-      <div class="row">
+      <div class="row" id="alarmSettingSaveDiv">
         <input id="alarmSettingSaveBtn" type="submit" value="Save Settings" class="btn">
       </div>
     </form> 
@@ -1265,9 +1265,9 @@ function init()
 
     onDisconnected();
     // testing lines... removed \/
-    protocolVersion = 2;
-    bleiface.protocolVersionSet();
-    authorizeControl.setAuthorized(false);
+    //protocolVersion = 2;
+    //bleiface.protocolVersionSet();
+    //authorizeControl.setAuthorized(false);
     // testing lines end
     
     setTimeout(halfSecondTimer, 500);
@@ -4052,6 +4052,7 @@ class authorizeClass
         this.elementMenuItem = document.getElementById("menuItemLogin");
         this.elementHeader = document.getElementById("loginDivHeader");
         this.elementPasswordDiv = document.getElementById("loginPasswordRow");
+        this.elementAlarmSettingSaveDiv = document.getElementById("alarmSettingSaveDiv");
         this.settingMenuItem = 0;
         this.alarmSettingMenuItem = 0;
         //this.testMenuItem = 0;
@@ -4136,6 +4137,13 @@ class authorizeClass
         if (this.alarmSettingMenuItem)
         {
             alarmSettingForm.querySelectorAll('input').forEach(input => {input.readOnly = !this.authorized;});
+        }
+        if (this.elementAlarmSettingSaveDiv)
+        {
+            if (this.authorized)
+                this.elementAlarmSettingSaveDiv.style.display = "block";
+            else
+                this.elementAlarmSettingSaveDiv.style.display = "none";
         }
     }
    
