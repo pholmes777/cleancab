@@ -4106,11 +4106,45 @@ class authorizeClass
         return this.authorized;
     }
     
+    protocolVersionSet()
+    {
+        if (protocolVersion >= 2)
+        {
+            if (!this.alarmSettingMenuItem)
+            {
+                this.alarmSettingMenuItem = document.createElement("a");
+                this.alarmSettingMenuItem.setAttribute("href", "javascript:showDiv('alarmSettingDiv')");
+                this.alarmSettingMenuItem.innerHTML = "Alarm Settings";
+
+                this.elementMenuItem.parentNode.insertBefore(this.alarmSettingMenuItem, this.elementMenuItem.nextSibling);
+                updateAlarmSetting();
+            }
+        }
+        else
+        {
+            if (this.alarmSettingMenuItem)
+            {
+                this.alarmSettingMenuItem.remove();
+                this.alarmSettingMenuItem = 0;
+            }
+        }
+        updateAlarmSetting();
+    }
+   
+    updateAlarmSetting()
+    {
+        if (this.alarmSettingMenuItem)
+        {
+            alarmSettingForm.querySelectorAll('input').forEach(input => {input.readOnly = !this.authorized;});
+        }
+    }
+   
     setAuthorized(authorized)
     {
         if (authorized != this.authorized)
         {
             this.authorized = authorized;
+            updateAlarmSetting();
             if (authorized)
             {
                 this.elementBtn.value = "Logout";  
@@ -4126,17 +4160,6 @@ class authorizeClass
                 
                     this.elementMenuItem.parentNode.insertBefore(this.settingMenuItem, this.elementMenuItem.nextSibling); 
                 }
-                if (!this.alarmSettingMenuItem)
-                {
-                    if (protocolVersion >= 2)
-                    {
-                        this.alarmSettingMenuItem = document.createElement("a");
-                        this.alarmSettingMenuItem.setAttribute("href", "javascript:showDiv('alarmSettingDiv')");
-                        this.alarmSettingMenuItem.innerHTML = "Alarm Settings";
-                
-                        this.elementMenuItem.parentNode.insertBefore(this.alarmSettingMenuItem, this.elementMenuItem.nextSibling); 
-                    }
-                }
             }
             else
             {
@@ -4150,16 +4173,6 @@ class authorizeClass
                     this.settingMenuItem.remove();
                     this.settingMenuItem = 0;
                 }
-                if (this.alarmSettingMenuItem)
-                {
-                    this.alarmSettingMenuItem.remove();
-                    this.alarmSettingMenuItem = 0;
-                }
-                //if (this.testMenuItem)
-                //{
-                //    this.testMenuItem.remove();
-                //    this.testMenuItem = 0;
-                //}
             }
             this.elementPassword.readOnly = authorized;
         }
@@ -4169,12 +4182,12 @@ class authorizeClass
     processData(data)
     {
         const decodedValue = new TextDecoder().decode(data);
-        
+
         let wasAuthorized = this.authorized;
-        
+
         this.queryLogin = false;
         this.setAuthorized(decodedValue == "Y");    
-        
+
         if (this.sendPassword == "")
         {
             if (!this.authorized && wasAuthorized)
@@ -4198,14 +4211,14 @@ class authorizeClass
             }
         }
     }    
-    
+
     handleActions(item)
     {
         if (this.sendLogin)
         {
             this.timer = 5;
             this.elementDbg.innerHTML = "Trying...";
-            
+           
             this.sendLogin = false;
             this.queryLogin = true;
             this.count = 2;
@@ -4214,7 +4227,7 @@ class authorizeClass
             
             return true;
         }
-        
+       
         if (this.queryLogin)
         {
             if (this.count == 0)
@@ -4244,21 +4257,28 @@ class blueToothAuthorize extends blueToothIf
     {
         super ("Authorize", 1, "af297289-ad63-457c-bc81-de7db0450df7");
     }
-    
+
     setRead(readValue)
     {
         super.setRead(readValue);
 
         authorizeControl.processData(readValue);
     }
-    
+
     sendLogin(password)
     {
         const encodedValue = new TextEncoder().encode(password);
-        
+
         this.write(encodedValue);
     }
-    
+
+    protocolVersionSet()
+    {
+        super.protocolVersionSet();
+
+        authorizeControl.protocolVersionSet();
+    }
+
     run()
     {
         authorizeControl.handleActions(this);
