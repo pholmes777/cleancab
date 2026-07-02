@@ -56,7 +56,7 @@
   <h3>Connection</h3>
   <div class="container">
     <div class="row">
-        <p id="connectingVersion">Cleancab App Version: 1.08</p>
+        <p id="connectingVersion">Cleancab App Version: 1.09</p>
     </div>
     <div class="row">
       <div style="width: 100%;height: 150px;background-image: url('cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;">
@@ -739,7 +739,7 @@
       </div>
       <div class="row">  
         <div class="col-40">
-          <label>Fixed Fan Speed</label>
+          <label id="ffixedSpeedLbl">Fixed Fan Speed</label>
         </div>
         <div class="col-5">
           <div class="tooltip">?<span class="tooltiptext">The required fan speed</span></div>
@@ -3088,6 +3088,7 @@ const fieldRampRate = document.querySelector("#frampRate");
 const fieldStartPause = document.querySelector("#fstartPause");
 const fieldDoorSpeed = document.querySelector("#fdoorSpeed");
 const fieldFixedSpeed = document.querySelector("#ffixedSpeed");
+const fieldFixedSpeedLbl = document.querySelector("#ffixedSpeedLbl");
 const fieldTargetPressure = document.querySelector("#ftargetPressure");
 const fieldMinSpeed = document.querySelector("#fminSpeed");
 const fieldStepSize = document.querySelector("#fstepSize");
@@ -3131,6 +3132,7 @@ function handleModeClick(myRadio)
     if (myRadio.value == 0)
     {
         fieldFixedSpeed.disabled = false;
+        fieldFixedSpeedLbl.innerHTML = "Fixed Fan Speed";
         fieldTargetPressure.disabled = true;
         fieldMinSpeed.disabled = true;
         fieldStepSize.disabled = true;
@@ -3138,7 +3140,15 @@ function handleModeClick(myRadio)
     }
     else
     {
-        fieldFixedSpeed.disabled = true;
+        if (protocolVersion >= 3)
+        {
+            fieldFixedSpeed.disabled = false;
+            fieldFixedSpeedLbl.innerHTML = "Starting Fan Speed";
+        }
+        else
+        {
+            fieldFixedSpeed.disabled = true;
+        }
         fieldTargetPressure.disabled = false;
         fieldMinSpeed.disabled = false;
         fieldStepSize.disabled = false;
@@ -3202,7 +3212,15 @@ class blueToothSettings extends blueToothIf
           setRadioInput("fco2Mode", readValue.getUint16(22, true));
         }
 
-        fieldFixedSpeed.disabled = mode == 1;
+        if (protocolVersion >= 3)
+        {
+            fieldFixedSpeed.disabled = false;
+            fieldFixedSpeedLbl.innerHTML = (mode == 0) ? "Fixed Fan Speed" : "Starting Fan Speed";
+        }
+        else
+        {
+            fieldFixedSpeed.disabled = mode == 1;
+        }
         fieldTargetPressure.disabled = mode == 0;
         fieldMinSpeed.disabled = mode == 0;
         fieldStepSize.disabled = mode == 0;
