@@ -56,7 +56,7 @@
   <h3>Connection</h3>
   <div class="container">
     <div class="row">
-        <p id="connectingVersion">Cleancab App Version: 1.09a</p>
+        <p id="connectingVersion">Cleancab App Version: 1.09b</p>
     </div>
     <div class="row">
       <div style="width: 100%;height: 150px;background-image: url('cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;">
@@ -2940,6 +2940,10 @@ function co2AlarmEnableClicked()
     fieldCO2AlarmThreshold.disabled = !fieldCO2AlarmEnable.checked;
     fieldCO2AlarmOnTime.disabled = !fieldCO2AlarmEnable.checked;
     fieldCO2AlarmOffTime.disabled = !fieldCO2AlarmEnable.checked;
+    
+    fieldCO2FlushLevelOn.disabled =  !fieldCO2AlarmEnable.checked;
+    fieldCO2FlushLevelOff.disabled = !fieldCO2AlarmEnable.checked;
+    fieldCO2FlushTarget.disabled = !fieldCO2AlarmEnable.checked;
 }
 
 const alarmSettingForm = document.querySelector("#alarmSettingForm");
@@ -2998,7 +3002,7 @@ alarmSettingForm.addEventListener("submit", (event) =>
     if (fieldCO2AlarmEnable.checked)
         view.setUint32(36, fieldCO2AlarmOnTime.value * 1000, true);
     else
-        view.setUint32(36, 1, true);
+        view.setUint32(36, 240, true);
     view.setUint32(40, fieldCO2AlarmOffTime.value * 1000, true);    
     view.setUint32(44, 2, true);            // sample time
     view.setUint32(48, fieldCO2NumSamples, true);                 // number of samples
@@ -4192,7 +4196,12 @@ class authorizeClass
     {
         if (this.alarmSettingMenuItem)
         {
-            alarmSettingForm.querySelectorAll('input').forEach(input => {input.readOnly = !this.authorized;});
+            alarmSettingForm.querySelectorAll('input').forEach(input => {
+                if (input.type === 'checkbox') {
+                    input.disabled = !this.authorized;
+                } else {
+                    input.readOnly = !this.authorized;
+                }});
         }
         if (this.elementAlarmSettingSaveDiv)
         {
