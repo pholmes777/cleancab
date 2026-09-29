@@ -56,7 +56,7 @@
   <h3>Connection</h3>
   <div class="container">
     <div class="row">
-        <p id="connectingVersion">Cleancab App Version: 1.10a</p>
+        <p id="connectingVersion">Cleancab App Version: 1.10b</p>
     </div>
     <div class="row">
       <div style="width: 100%;height: 150px;background-image: url('cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;">
@@ -922,7 +922,7 @@
       </div>
       <h3>CO2 - Alarm</h3>
       <div class="container">
-        <div class="row hiddenitemdiv" id="fasCO2AlarmEnableDiv">
+        <div class="row" id="fasCO2AlarmEnableDiv">
           <div class="col-40">
             <label>Enable CO2 Alarms</label>
           </div>
@@ -3539,9 +3539,9 @@ class blueToothGeneral extends blueToothIf
         bleiface.protocolVersionSet();
         bleiface.setMessage(DBG_CONNECT, "Version: " + this.version);  
         if (supportedBitmap & 0x02)
-            fieldCO2AlarmEnableDiv.style = "block";
+            fieldCO2AlarmEnableDiv.style.display = "block";
         else
-            fieldCO2AlarmEnableDiv.style = "none";
+            fieldCO2AlarmEnableDiv.style.display = "none";
     }    
 }
 
