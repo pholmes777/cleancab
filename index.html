@@ -922,6 +922,19 @@
       </div>
       <h3>CO2 - Alarm</h3>
       <div class="container">
+        <div class="row" id="fasCO2AlarmEnableDiv">
+          <div class="col-40">
+            <label>Enable CO2 alarms</label>
+          </div>
+          <div class="col-5">
+          </div>
+          <div class="col-45">
+            <label class="switch">
+              <input id="fasCO2AlarmEnable" type="checkbox" onclick="co2AlarmEnableClicked(0)">
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
         <div class="row">  
           <div class="col-40">
             <label>Warning Target</label>
@@ -930,7 +943,7 @@
             <div class="tooltip">?<span class="tooltiptext">Warning level for CO2 in the cabin</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasCO2WarningThreshold" min="400" max="10000" placeholder="1000" required="true">
+            <input type="number" id="fasCO2WarningThreshold" min="400" max="40000" placeholder="1000" required="true">
           </div>
           <div class="col-10">
             <label class="units">ppm</label>
@@ -944,7 +957,7 @@
             <div class="tooltip">?<span class="tooltiptext">Alarm level for CO2 in the cabin</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasCO2AlarmThreshold" min="400" max="10000" placeholder="1000" required="true">
+            <input type="number" id="fasCO2AlarmThreshold" min="400" max="40000" placeholder="1000" required="true">
           </div>
           <div class="col-10">
             <label class="units">ppm</label>
@@ -1101,8 +1114,6 @@
         </div>
       </div>
 
-
-
       <h3>CO2 Flush</h3>
       <div class="container">
         <div class="row">  
@@ -1113,7 +1124,7 @@
             <div class="tooltip">?<span class="tooltiptext">The CO2 level to start the flush process</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasCO2FlushLevelOn" min="1000" max="10000" placeholder="1500" required="true">
+            <input type="number" id="fasCO2FlushLevelOn" min="1000" max="40000" placeholder="1500" required="true">
           </div>
           <div class="col-10">
             <label class="units">ppm</label>
@@ -1127,7 +1138,7 @@
             <div class="tooltip">?<span class="tooltiptext">The CO2 level to stop the flush process</span></div>
           </div>
           <div class="col-45">
-            <input type="number" id="fasCO2FlushLevelOff" min="500" max="10000" placeholder="1000" required="true">
+            <input type="number" id="fasCO2FlushLevelOff" min="500" max="40000" placeholder="1000" required="true">
           </div>
           <div class="col-10">
             <label class="units">ppm</label>
@@ -1265,6 +1276,7 @@ function init()
 
     onDisconnected();
     // testing lines... removed \/
+    //supportedBitmap = 3;
     //protocolVersion = 2;
     //bleiface.protocolVersionSet();
     //authorizeControl.setAuthorized(false);
@@ -2922,6 +2934,13 @@ class blueToothCommission extends blueToothIf
 //
 //==========================================================
 
+function co2AlarmEnableClicked()
+{
+    fieldCO2WarningThreshold.disabled = !fieldCO2AlarmEnable.checked;
+    fieldCO2AlarmThreshold.disabled = !fieldCO2AlarmEnable.checked;
+    fieldCO2AlarmOnTime.disabled = !fieldCO2AlarmEnable.checked;
+    fieldCO2AlarmOffTime.disabled = !fieldCO2AlarmEnable.checked;
+}
 
 const alarmSettingForm = document.querySelector("#alarmSettingForm");
 
@@ -2933,6 +2952,8 @@ const fieldPressureOnTime = document.querySelector("#fasPressureOnTime");
 const fieldPressureOffTime = document.querySelector("#fasPressureOffTime");
 var fieldPressureNumSamples = 4;
 
+const fieldCO2AlarmEnableDiv = document.querySelector("#fasCO2AlarmEnableDiv");
+const fieldCO2AlarmEnable = document.querySelector("#fasCO2AlarmEnable");
 const fieldCO2AlarmThreshold = document.querySelector("#fasCO2AlarmThreshold");
 const fieldCO2WarningThreshold = document.querySelector("#fasCO2WarningThreshold");
 const fieldCO2AlarmOnTime = document.querySelector("#fasCO2AlarmOnTime");
@@ -2974,7 +2995,10 @@ alarmSettingForm.addEventListener("submit", (event) =>
     view.setUint32(28, fieldCO2AlarmOffTime.value * 1000, true);
     
     view.setUint32(32, fieldCO2AlarmThreshold.value, true);
-    view.setUint32(36, fieldCO2AlarmOnTime.value * 1000, true);
+    if (fieldCO2AlarmEnable.checked)
+        view.setUint32(36, fieldCO2AlarmOnTime.value * 1000, true);
+    else
+        view.setUint32(36, 1, true);
     view.setUint32(40, fieldCO2AlarmOffTime.value * 1000, true);    
     view.setUint32(44, 2, true);            // sample time
     view.setUint32(48, fieldCO2NumSamples, true);                 // number of samples
@@ -3036,7 +3060,14 @@ class blueToothAlarmSettings extends blueToothIf
         
         fieldCO2WarningThreshold.value = readValue.getUint32(20, true);
         fieldCO2AlarmThreshold.value = readValue.getUint32(32, true);
-        fieldCO2AlarmOnTime.value = ((readValue.getUint32(36, true) + 500) / 1000) >> 0;
+
+        fieldCO2AlarmEnable.checked = ((supportedBitmap & 0x02) == 0) || readValue.getUint32(36, true) != 1;
+        co2AlarmEnableClicked();
+
+        if (!fieldCO2AlarmEnable.checked)
+            fieldCO2AlarmOnTime.value = 1;
+        else
+            fieldCO2AlarmOnTime.value = ((readValue.getUint32(36, true) + 500) / 1000) >> 0;
         fieldCO2AlarmOffTime.value = ((readValue.getUint32(40, true) + 500) / 1000) >> 0;
         fieldCO2NumSamples = readValue.getUint32(48, true);
         
@@ -3464,6 +3495,7 @@ class blueToothStatus extends blueToothIf
 // variables
 
 var protocolVersion = 0;
+var supportedBitmap = 0;
 
 // bluetooth interface
 
@@ -3489,17 +3521,23 @@ class blueToothGeneral extends blueToothIf
             // this is the new version of the general message
         
             protocolVersion = readValue.getUint8(1);
+            supportedBitmap = readValue.getUint32(2, true);
             this.version = readValue.getUint8(6) + "." + pad2(readValue.getUint8(7));
         }
         else
         {
             protocolVersion = 0;
+            supportedBitmap = 0;
             const decodedValue = new TextDecoder().decode(readValue);
     
             this.version = decodedValue;  
         }
         bleiface.protocolVersionSet();
         bleiface.setMessage(DBG_CONNECT, "Version: " + this.version);  
+        if (supportedBitmap & 0x02)
+            fieldCO2AlarmEnableDiv.style = "block";
+        else
+            fieldCO2AlarmEnableDiv.style = "none";
     }    
 }
 
