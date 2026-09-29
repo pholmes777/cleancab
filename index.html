@@ -56,7 +56,7 @@
   <h3>Connection</h3>
   <div class="container">
     <div class="row">
-        <p id="connectingVersion">Cleancab App Version: 1.09b</p>
+        <p id="connectingVersion">Cleancab App Version: 1.09c</p>
     </div>
     <div class="row">
       <div style="width: 100%;height: 150px;background-image: url('cleancab.png'); background-repeat: no-repeat; background-size: contain; background-position: center;">
@@ -3002,7 +3002,7 @@ alarmSettingForm.addEventListener("submit", (event) =>
     if (fieldCO2AlarmEnable.checked)
         view.setUint32(36, fieldCO2AlarmOnTime.value * 1000, true);
     else
-        view.setUint32(36, 240, true);
+        view.setUint32(36, 1, true);
     view.setUint32(40, fieldCO2AlarmOffTime.value * 1000, true);    
     view.setUint32(44, 2, true);            // sample time
     view.setUint32(48, fieldCO2NumSamples, true);                 // number of samples
@@ -3069,7 +3069,7 @@ class blueToothAlarmSettings extends blueToothIf
         co2AlarmEnableClicked();
 
         if (!fieldCO2AlarmEnable.checked)
-            fieldCO2AlarmOnTime.value = 1;
+            fieldCO2AlarmOnTime.value = 240;
         else
             fieldCO2AlarmOnTime.value = ((readValue.getUint32(36, true) + 500) / 1000) >> 0;
         fieldCO2AlarmOffTime.value = ((readValue.getUint32(40, true) + 500) / 1000) >> 0;
