@@ -27,3 +27,17 @@ index.html
 	
 serviceworker.js
     - change /cleancab/ back to just /
+    
+    
+    
+For me: Filter mon
+
+serviceworker.js
+        - all url needs /cleancab-filter/
+        
+index.html	
+  navigator.serviceWorker.register('serviceworker.js', {scope: '/cleancab-filter/'})        
+  
+manifest.json
+	"start_url": "/cleancab-filter/index.html",
+	"scope": "/cleancab-filter/",  
