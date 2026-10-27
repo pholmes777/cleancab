@@ -26,4 +26,4 @@ index.html
   navigator.serviceWorker.register('serviceworker.js', {scope: '/'})	
 	
 serviceworker.js
-    - change /ceancab/ back to just /
+    - change /cleancab/ back to just /

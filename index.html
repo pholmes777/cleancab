@@ -1214,7 +1214,7 @@ if (urlParams.get('source') === 'twa') {
 
 if ('serviceWorker' in navigator) 
 {
-  navigator.serviceWorker.register('serviceworker.js', {scope: '/cleancab/'})
+  navigator.serviceWorker.register('serviceworker.js', {scope: '/'})
     .then(function(registration) 
     {
         console.log('ServiceWorker registration successful!');

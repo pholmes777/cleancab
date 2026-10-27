@@ -1,20 +1,20 @@
 //Reference: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Tutorials/CycleTracker/Service_workers
 
-const VERSION = "v8"
+const VERSION = "v9"
 const APP_NAME = "cleancab-app";
 const CACHE_NAME = `${APP_NAME}-${VERSION}`;
 
 const APP_STATIC_RESOURCES = [
-    '/cleancab/app-images/appicon-144.png',
-    '/cleancab/app-images/appicon-192.png',
-    '/cleancab/app-images/appicon-256.png',
-    '/cleancab/app-images/appicon-512.png',
-    '/cleancab/index.html',
-    '/cleancab/fallback.html',
-    '/cleancab/manifest.json',
-    '/cleancab/cleancab.png',
-    '/cleancab/styleph.css',
-    '/cleancab/chart.umd.min.js'];
+    '/app-images/appicon-144.png',
+    '/app-images/appicon-192.png',
+    '/app-images/appicon-256.png',
+    '/app-images/appicon-512.png',
+    '/index.html',
+    '/fallback.html',
+    '/manifest.json',
+    '/cleancab.png',
+    '/styleph.css',
+    '/chart.umd.min.js'];
                 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
@@ -70,8 +70,8 @@ self.addEventListener("fetch", (event) =>
   if (event.request.mode === "navigate") 
   {
     event.respondWith(
-      caches.match('/cleancab/index.html').then((cachedResponse) => 
-        cachedResponse || fetch(event.request).catch(() => caches.match('/cleancab/index.html'))
+      caches.match('/index.html').then((cachedResponse) => 
+        cachedResponse || fetch(event.request).catch(() => caches.match('/index.html'))
       )
     );
     return;
@@ -85,7 +85,7 @@ self.addEventListener("fetch", (event) =>
       const requestUrl = new URL(event.request.url);
       const normalizedRequest = requestUrl.pathname;
 
-      if (normalizedRequest === '/cleancab/serviceworker.js') {
+      if (normalizedRequest === '/serviceworker.js') {
         return fetch(event.request);
       }
 
@@ -110,7 +110,7 @@ self.addEventListener("fetch", (event) =>
         return response;
       } catch (error) {
         console.error("Fetching failed:", error);
-        return caches.match('/cleancab/fallback.html').then((fallback) =>
+        return caches.match('/fallback.html').then((fallback) =>
             fallback || new Response("Offline", { status: 503 })
         );
       }
